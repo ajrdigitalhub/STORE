@@ -30,7 +30,7 @@ import { OrderService, Order } from '../../services/order.service';
               @for (order of orders; track order._id) {
                 <tr class="border-b border-chrome-800/50 hover:bg-chrome-800/30 transition-colors">
                   <td class="px-4 py-3 text-chrome-300 text-sm font-mono">{{ order._id.slice(-8) }}</td>
-                  <td class="px-4 py-3 text-chrome-300 text-sm">{{ order.user?.name || 'N/A' }}</td>
+                  <td class="px-4 py-3 text-chrome-300 text-sm">{{ order.user?.name || order.shippingAddress?.fullName || 'N/A' }}</td>
                   <td class="px-4 py-3 text-chrome-400 text-sm">{{ order.items.length }} items</td>
                   <td class="px-4 py-3 text-chrome-200 text-sm font-medium">₹{{ order.totalAmount | number }}</td>
                   <td class="px-4 py-3"><span class="metallic-badge text-xs">{{ order.paymentMethod | uppercase }} - {{ order.paymentStatus | titlecase }}</span></td>
@@ -67,8 +67,8 @@ import { OrderService, Order } from '../../services/order.service';
             </div>
             <div class="space-y-3 text-sm">
               <div><span class="text-chrome-500">Order ID:</span> <span class="text-chrome-300 font-mono ml-2">{{ selectedOrder._id }}</span></div>
-              <div><span class="text-chrome-500">Customer:</span> <span class="text-chrome-300 ml-2">{{ selectedOrder.user?.name }}</span></div>
-              <div><span class="text-chrome-500">Email:</span> <span class="text-chrome-300 ml-2">{{ selectedOrder.user?.email }}</span></div>
+              <div><span class="text-chrome-500">Customer:</span> <span class="text-chrome-300 ml-2">{{ selectedOrder.user?.name || selectedOrder.shippingAddress?.fullName || 'N/A' }}</span></div>
+              <div><span class="text-chrome-500">Email:</span> <span class="text-chrome-300 ml-2">{{ selectedOrder.user?.email || 'N/A' }}</span></div>
               <div class="border-t border-chrome-700 pt-3">
                 <p class="text-chrome-500 mb-2">Items:</p>
                 @for (item of selectedOrder.items; track item.name) {
