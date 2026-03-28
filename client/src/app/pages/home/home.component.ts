@@ -13,8 +13,8 @@ import { environment } from '../../../environments/environment';
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <!-- Hero Section -->
-    <section class="relative overflow-hidden py-20 sm:py-28">
-      <div class="absolute inset-0 bg-gradient-to-b from-chrome-900/50 via-chrome-950 to-chrome-950"></div>
+      <section class="relative overflow-hidden pt-28 pb-20 sm:pb-28 min-h-[70vh]">
+       <div class="absolute inset-0 bg-gradient-to-b from-chrome-900/50 via-chrome-950 to-chrome-950"></div>
       <div class="absolute inset-0 shimmer pointer-events-none"></div>
       <div class="relative max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-white via-chrome-300 to-chrome-500 bg-clip-text text-transparent mb-6 animate-fade-in">
@@ -140,7 +140,7 @@ export class HomeComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.categoryService.getCategories().subscribe(cats => this.categories = cats);

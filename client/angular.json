@@ -89,6 +89,9 @@
             "development": {
               "buildTarget": "client:build:development"
             }
+            "options": {
+      "allowedHosts": ["59e5-103-106-180-144.ngrok-free.app"]
+    }
           },
           "defaultConfiguration": "development"
         }
