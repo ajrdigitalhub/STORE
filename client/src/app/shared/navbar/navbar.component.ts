@@ -15,10 +15,13 @@ import { CartService } from '../../services/cart.service';
           <!-- Logo -->
           <a routerLink="/" class="flex items-center space-x-2 group">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-chrome-200 to-chrome-500 flex items-center justify-center">
-              <span class="text-chrome-950 font-bold text-sm">S</span>
+              <!-- <span class="text-chrome-950 font-bold text-sm">S</span> -->
+               <span class="text-chrome-950 font-bold text-sm">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdrYsk8mNLzFAwHDcy5R5Cx1q5QHCKdwk-0A&s" alt="FL">
+               </span>
             </div>
             <span class="text-xl font-bold bg-gradient-to-r from-chrome-100 to-chrome-400 bg-clip-text text-transparent group-hover:from-white group-hover:to-chrome-300 transition-all">
-              STORE
+              IDEAZONE3D
             </span>
           </a>
 
