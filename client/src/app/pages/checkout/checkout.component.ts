@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
 import { PaymentService } from '../../services/payment.service';
+import { PaymentConfigService } from '../../services/payment-config.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -128,6 +129,7 @@ export class CheckoutComponent {
     public cartService: CartService,
     private orderService: OrderService,
     private paymentService: PaymentService,
+    private configService: PaymentConfigService,
     private router: Router
   ) {}
 
@@ -150,7 +152,9 @@ export class CheckoutComponent {
         name: i.name,
         price: i.price,
         quantity: i.quantity,
-        image: i.image
+        image: i.image,
+        customName: i.customName,
+        customImage: i.customImage
       })),
       shippingAddress: this.address,
       paymentMethod: this.paymentMethod,
@@ -162,13 +166,15 @@ export class CheckoutComponent {
         if (this.paymentMethod === 'razorpay') {
           try {
             const rzOrder = await this.paymentService.createRazorpayOrder(order.totalAmount, order._id).toPromise();
+            const config = await this.configService.getPublicConfig().toPromise();
             const response = await this.paymentService.openRazorpay({
               key: rzOrder.key,
               amount: rzOrder.amount,
               currency: rzOrder.currency,
               order_id: rzOrder.orderId,
-              name: 'STORE',
+              name: config.merchantName || 'IDEAZONE3D',
               description: 'Order Payment',
+              image: config.merchantLogo || '',
               theme: { color: '#404040' }
             });
             await this.paymentService.verifyPayment({
@@ -179,8 +185,9 @@ export class CheckoutComponent {
             }).toPromise();
             this.cartService.clearCart();
             this.router.navigate(['/orders']);
-          } catch (err) {
-            this.errorMsg = 'Payment failed or was cancelled';
+          } catch (err: any) {
+            console.error('Payment Error:', err);
+            this.errorMsg = err.message || 'Payment failed or was cancelled';
             this.processing = false;
           }
         } else {

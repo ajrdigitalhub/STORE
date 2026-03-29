@@ -28,6 +28,8 @@ import { CartService } from '../../services/cart.service';
           <!-- Desktop Nav -->
           <div class="hidden md:flex items-center space-x-6">
             <a routerLink="/" routerLinkActive="text-white" [routerLinkActiveOptions]="{exact:true}" class="text-chrome-400 hover:text-white transition-colors text-sm font-medium">Home</a>
+            <a routerLink="/about" routerLinkActive="text-white" class="text-chrome-400 hover:text-white transition-colors text-sm font-medium">About</a>
+            <a routerLink="/contact" routerLinkActive="text-white" class="text-chrome-400 hover:text-white transition-colors text-sm font-medium">Contact</a>
             @if (authService.isLoggedIn && !authService.isAdmin) {
               <a routerLink="/orders" routerLinkActive="text-white" class="text-chrome-400 hover:text-white transition-colors text-sm font-medium">Orders</a>
             }
@@ -78,6 +80,8 @@ import { CartService } from '../../services/cart.service';
           <div class="md:hidden pb-4 animate-fade-in">
             <div class="flex flex-col space-y-2 pt-2 border-t border-chrome-800">
               <a routerLink="/" (click)="mobileOpen=false" class="text-chrome-400 hover:text-white py-2 text-sm">Home</a>
+              <a routerLink="/about" (click)="mobileOpen=false" class="text-chrome-400 hover:text-white py-2 text-sm">About</a>
+              <a routerLink="/contact" (click)="mobileOpen=false" class="text-chrome-400 hover:text-white py-2 text-sm">Contact</a>
               @if (authService.isLoggedIn && !authService.isAdmin) {
                 <a routerLink="/orders" (click)="mobileOpen=false" class="text-chrome-400 hover:text-white py-2 text-sm">Orders</a>
               }

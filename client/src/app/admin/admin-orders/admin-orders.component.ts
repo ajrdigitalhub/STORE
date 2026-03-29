@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService, Order } from '../../services/order.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-orders',
@@ -72,9 +73,20 @@ import { OrderService, Order } from '../../services/order.service';
               <div class="border-t border-chrome-700 pt-3">
                 <p class="text-chrome-500 mb-2">Items:</p>
                 @for (item of selectedOrder.items; track item.name) {
-                  <div class="flex justify-between py-1">
-                    <span class="text-chrome-400">{{ item.name }} × {{ item.quantity }}</span>
-                    <span class="text-chrome-200">₹{{ item.price * item.quantity | number }}</span>
+                  <div class="flex flex-col py-2 border-b border-chrome-800/30 last:border-0">
+                    <div class="flex justify-between">
+                      <span class="text-chrome-400">{{ item.name }} × {{ item.quantity }}</span>
+                      <span class="text-chrome-200">₹{{ item.price * item.quantity | number }}</span>
+                    </div>
+                    @if (item.customName) {
+                      <p class="text-xs text-chrome-300 ml-2 italic">Custom Name: {{ item.customName }}</p>
+                    }
+                    @if (item.customImage) {
+                      <div class="ml-2 mt-1 flex items-center gap-2">
+                        <span class="text-xs text-chrome-500 text-nowrap">Custom Image:</span>
+                        <img [src]="getImageUrl(item.customImage)" class="w-12 h-12 object-cover rounded border border-chrome-600" />
+                      </div>
+                    }
                   </div>
                 }
               </div>
@@ -113,5 +125,11 @@ export class AdminOrdersComponent implements OnInit {
 
   viewOrder(order: Order): void {
     this.selectedOrder = order;
+  }
+
+  getImageUrl(img: string): string {
+    if (!img) return '';
+    if (img.startsWith('http')) return img;
+    return environment.serverUrl + img;
   }
 }

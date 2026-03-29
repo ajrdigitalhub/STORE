@@ -19,5 +19,5 @@ import { ChatWidgetComponent } from './shared/chat-widget/chat-widget.component'
   styles: []
 })
 export class App {
-  title = 'STORE';
+  title = 'IDEAZONE3D';
 }

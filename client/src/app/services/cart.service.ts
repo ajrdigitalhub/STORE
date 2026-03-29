@@ -8,6 +8,8 @@ export interface CartItem {
   quantity: number;
   image: string;
   selectedVariants?: { [key: string]: string };
+  customName?: string;
+  customImage?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,7 +40,13 @@ export class CartService {
   }
 
   addToCart(item: CartItem): void {
-    const idx = this.cartItems.findIndex(i => i.product === item.product);
+    const idx = this.cartItems.findIndex(i =>
+      i.product === item.product &&
+      JSON.stringify(i.selectedVariants) === JSON.stringify(item.selectedVariants) &&
+      i.customName === item.customName &&
+      i.customImage === item.customImage
+    );
+
     if (idx > -1) {
       this.cartItems[idx].quantity += item.quantity;
     } else {

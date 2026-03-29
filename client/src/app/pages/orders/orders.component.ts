@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, Order } from '../../services/order.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-orders',
@@ -43,10 +44,20 @@ import { OrderService, Order } from '../../services/order.service';
               </div>
 
               <div class="space-y-2 mb-4">
-                @for (item of order.items; track item.name) {
-                  <div class="flex justify-between text-sm">
-                    <span class="text-chrome-400">{{ item.name }} × {{ item.quantity }}</span>
-                    <span class="text-chrome-200">₹{{ item.price * item.quantity | number }}</span>
+                @for (item of order.items; track $index) {
+                  <div class="flex flex-col space-y-1">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-chrome-400">{{ item.name }} × {{ item.quantity }}</span>
+                      <span class="text-chrome-200">₹{{ item.price * item.quantity | number }}</span>
+                    </div>
+                    @if (item.customName) {
+                      <p class="text-xs text-chrome-300 ml-2 italic">Name: {{ item.customName }}</p>
+                    }
+                    @if (item.customImage) {
+                      <div class="ml-2 mt-1">
+                        <img [src]="getImageUrl(item.customImage)" class="w-12 h-12 object-cover rounded border border-chrome-600" />
+                      </div>
+                    }
                   </div>
                 }
               </div>
@@ -86,5 +97,11 @@ export class OrdersComponent implements OnInit {
   getPaymentClass(status: string): string {
     const cls: any = { pending: 'border-chrome-600', paid: 'border-chrome-300 bg-chrome-700', failed: 'border-chrome-600 opacity-50', refunded: 'border-chrome-500' };
     return cls[status] || '';
+  }
+
+  getImageUrl(img: string): string {
+    if (!img) return '';
+    if (img.startsWith('http')) return img;
+    return environment.serverUrl + img;
   }
 }

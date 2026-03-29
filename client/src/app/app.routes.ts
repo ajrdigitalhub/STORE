@@ -33,6 +33,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'about',
+    loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent)
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent)
+  },
+  {
     path: 'admin',
     canActivate: [adminGuard],
     loadComponent: () => import('./admin/admin-layout.component').then(m => m.AdminLayoutComponent),
@@ -60,6 +68,22 @@ export const routes: Routes = [
       {
         path: 'chat',
         loadComponent: () => import('./admin/admin-chat/admin-chat.component').then(m => m.AdminChatComponent)
+      },
+      {
+        path: 'about',
+        loadComponent: () => import('./admin/admin-about/admin-about.component').then(m => m.AdminAboutComponent)
+      },
+      {
+        path: 'messages',
+        loadComponent: () => import('./admin/admin-messages/admin-messages.component').then(m => m.AdminMessagesComponent)
+      },
+      {
+        path: 'contact',
+        loadComponent: () => import('./admin/admin-contact/admin-contact.component').then(m => m.AdminContactComponent)
+      },
+      {
+        path: 'payment',
+        loadComponent: () => import('./admin/admin-payment-config.component').then(m => m.AdminPaymentConfigComponent)
       }
     ]
   },

@@ -3,10 +3,20 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface OrderItem {
+  product: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  customName?: string;
+  customImage?: string;
+}
+
 export interface Order {
   _id: string;
   user: any;
-  items: any[];
+  items: OrderItem[];
   totalAmount: number;
   shippingAddress: any;
   paymentMethod: string;

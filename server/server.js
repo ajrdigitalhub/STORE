@@ -16,6 +16,10 @@ const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 const paymentRoutes = require('./routes/payment');
+const messageRoutes = require('./routes/messages');
+const aboutRoutes = require('./routes/about');
+const contactConfigRoutes = require('./routes/contact-config');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 const server = http.createServer(app);
@@ -39,6 +43,10 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/about', aboutRoutes);
+app.use('/api/contact-config', contactConfigRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

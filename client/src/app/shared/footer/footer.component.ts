@@ -26,6 +26,8 @@ import { RouterModule } from '@angular/router';
             <h4 class="text-chrome-200 font-semibold mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
             <div class="flex flex-col space-y-2">
               <a routerLink="/" class="text-chrome-500 hover:text-chrome-200 text-sm transition-colors">Home</a>
+              <a routerLink="/about" class="text-chrome-500 hover:text-chrome-200 text-sm transition-colors">About Us</a>
+              <a routerLink="/contact" class="text-chrome-500 hover:text-chrome-200 text-sm transition-colors">Contact Us</a>
               <a routerLink="/cart" class="text-chrome-500 hover:text-chrome-200 text-sm transition-colors">Cart</a>
               <a routerLink="/orders" class="text-chrome-500 hover:text-chrome-200 text-sm transition-colors">Orders</a>
             </div>

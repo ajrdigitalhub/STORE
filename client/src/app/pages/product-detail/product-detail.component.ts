@@ -5,10 +5,13 @@ import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { environment } from '../../../environments/environment';
 
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="max-w-7xl mx-auto px-4 pt-24 pb-16">
       @if (loading) {
@@ -87,6 +90,25 @@ import { environment } from '../../../environments/environment';
               }
             </div>
 
+            <!-- Custom Options for Featured Products -->
+            @if (product.featured) {
+              <div class="metallic-card p-4 space-y-4 border-chrome-600">
+                <h3 class="text-chrome-200 font-semibold flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"/></svg>
+                  Custom Options
+                </h3>
+                <div>
+                  <label class="text-chrome-400 text-sm mb-1 block">Enter Name / Text</label>
+                  <input [(ngModel)]="customName" class="metallic-input w-full" placeholder="Ex: Your Name or Brand" />
+                </div>
+                <div>
+                  <label class="text-chrome-400 text-sm mb-1 block">Upload Design / Image</label>
+                  <input type="file" (change)="onFileSelected($event)" accept="image/*"
+                    class="block w-full text-sm text-chrome-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-chrome-800 file:text-chrome-200 hover:file:bg-chrome-700 cursor-pointer" />
+                </div>
+              </div>
+            }
+
             <!-- Quantity & Add -->
             <div class="flex items-center space-x-4">
               <div class="flex items-center metallic-card px-1">
@@ -94,9 +116,9 @@ import { environment } from '../../../environments/environment';
                 <span class="px-4 py-2 text-chrome-200 font-medium">{{ quantity }}</span>
                 <button (click)="quantity = quantity + 1" class="px-3 py-2 text-chrome-400 hover:text-white transition-colors">+</button>
               </div>
-              <button (click)="addToCart()" [disabled]="product.stock === 0"
+              <button (click)="addToCart()" [disabled]="product.stock === 0 || uploading"
                 class="flex-1 metallic-btn-primary metallic-btn py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed">
-                Add to Cart
+                {{ uploading ? 'Uploading...' : 'Add to Cart' }}
               </button>
             </div>
 
@@ -120,10 +142,17 @@ export class ProductDetailComponent implements OnInit {
   addedToCart = false;
   Math = Math;
 
+  // Custom options for featured products
+  customName = '';
+  customImage = '';
+  selectedFile: File | null = null;
+  uploading = false;
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -146,18 +175,51 @@ export class ProductDetailComponent implements OnInit {
     this.selectedVariants[name] = option;
   }
 
-  addToCart(): void {
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  async addToCart(): Promise<void> {
     if (!this.product) return;
+
+    let uploadedImageUrl = '';
+    if (this.selectedFile) {
+      this.uploading = true;
+      const formData = new FormData();
+      formData.append('image', this.selectedFile);
+
+      try {
+        const res: any = await this.http.post(`${environment.apiUrl}/upload`, formData).toPromise();
+        uploadedImageUrl = res.imageUrl;
+      } catch (error) {
+        console.error('Upload failed', error);
+        alert('Image upload failed. Please try again.');
+        this.uploading = false;
+        return;
+      }
+      this.uploading = false;
+    }
+
     this.cartService.addToCart({
       product: this.product._id,
       name: this.product.name,
       price: this.product.price,
       quantity: this.quantity,
       image: this.product.images?.[0] || '',
-      selectedVariants: { ...this.selectedVariants }
+      selectedVariants: { ...this.selectedVariants },
+      customName: this.customName,
+      customImage: uploadedImageUrl
     });
     this.addedToCart = true;
     setTimeout(() => this.addedToCart = false, 2000);
+
+    // Reset custom fields
+    this.customName = '';
+    this.selectedFile = null;
+    this.customImage = '';
   }
 
   getImageUrl(img: string): string {
