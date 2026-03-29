@@ -4,6 +4,7 @@ const Razorpay = require('razorpay');
 const Order = require('../models/Order');
 const PaymentConfig = require('../models/PaymentConfig');
 const { auth } = require('../middleware/auth');
+const { getIO } = require('../socket/chat');
 
 const router = express.Router();
 
@@ -90,7 +91,16 @@ router.post('/verify', auth, async (req, res, next) => {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       orderStatus: 'processing'
-    }, { new: true });
+    }, { new: true }).populate('user', 'name email');
+
+    // Emit to admin
+    const io = getIO();
+    if (io) {
+      io.to('admin-room').emit('admin:orderUpdate', {
+        type: 'payment',
+        order
+      });
+    }
 
     res.json({ message: 'Payment verified successfully', order });
   } catch (error) {

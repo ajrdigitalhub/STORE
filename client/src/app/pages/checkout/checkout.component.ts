@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
+import { ToastService } from '../../services/toast.service';
 import { PaymentService } from '../../services/payment.service';
 import { PaymentConfigService } from '../../services/payment-config.service';
 import { environment } from '../../../environments/environment';
@@ -130,6 +131,7 @@ export class CheckoutComponent {
     private orderService: OrderService,
     private paymentService: PaymentService,
     private configService: PaymentConfigService,
+    private toastService: ToastService,
     private router: Router
   ) {}
 
@@ -184,6 +186,7 @@ export class CheckoutComponent {
               orderId: order._id
             }).toPromise();
             this.cartService.clearCart();
+            this.toastService.show('🎉 Order Placed Successfully! Get ready for something amazing! 🚀', 'success', 6000);
             this.router.navigate(['/orders']);
           } catch (err: any) {
             console.error('Payment Error:', err);
@@ -192,6 +195,7 @@ export class CheckoutComponent {
           }
         } else {
           this.cartService.clearCart();
+          this.toastService.show('🛍️ Order Placed! Thank you for shopping with us! ✨', 'success', 6000);
           this.router.navigate(['/orders']);
         }
       },

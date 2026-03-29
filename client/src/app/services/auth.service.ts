@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SocketService } from './socket.service';
 
 export interface User {
   _id: string;
@@ -26,7 +27,7 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
   private router = inject(Router);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private socketService: SocketService) {
     this.loadUser();
   }
 
@@ -36,6 +37,7 @@ export class AuthService {
     if (token && user) {
       try {
         this.currentUserSubject.next(JSON.parse(user));
+        this.socketService.connect(token);
       } catch {
         this.logout();
       }
@@ -58,12 +60,14 @@ export class AuthService {
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
     this.currentUserSubject.next(res.user);
+    this.socketService.connect(res.token);
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
+    this.socketService.disconnect();
     this.router.navigate(['/login']);
   }
 

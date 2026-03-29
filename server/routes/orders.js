@@ -2,6 +2,7 @@ const express = require('express');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { auth, adminAuth } = require('../middleware/auth');
+const { getIO } = require('../socket/chat');
 
 const router = express.Router();
 
@@ -40,6 +41,15 @@ router.post('/', auth, async (req, res, next) => {
 
     await order.save();
     await order.populate('user', 'name email');
+
+    // Emit to admin
+    const io = getIO();
+    if (io) {
+      io.to('admin-room').emit('admin:orderUpdate', {
+        type: 'new',
+        order
+      });
+    }
 
     res.status(201).json(order);
   } catch (error) {
@@ -111,6 +121,25 @@ router.put('/:id/status', adminAuth, async (req, res, next) => {
       order.paymentStatus = 'paid';
     }
     await order.save();
+
+    // Emit to customer and admin
+    const io = getIO();
+    if (io) {
+      // To customer
+      io.to(order.user.toString()).emit('customer:orderUpdate', {
+        type: 'status',
+        orderId: order._id,
+        status: orderStatus,
+        order
+      });
+      // To admin (to update their list/dashboard)
+      io.to('admin-room').emit('admin:orderUpdate', {
+        type: 'status',
+        orderId: order._id,
+        status: orderStatus,
+        order
+      });
+    }
 
     res.json(order);
   } catch (error) {

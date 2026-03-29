@@ -56,9 +56,31 @@ const orderSchema = new mongoose.Schema({
   },
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
-  razorpaySignature: { type: String }
+  razorpaySignature: { type: String },
+  orderNumber: {
+    type: String,
+    unique: true
+  }
 }, {
   timestamps: true
+});
+
+orderSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const Order = mongoose.model('Order');
+    let isUnique = false;
+    let newOrderNumber = '';
+    
+    while (!isUnique) {
+      const num = Math.floor(100000 + Math.random() * 900000);
+      newOrderNumber = `ORD-${num}`;
+      const existing = await Order.findOne({ orderNumber: newOrderNumber });
+      if (!existing) isUnique = true;
+    }
+    
+    this.orderNumber = newOrderNumber;
+  }
+  next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);

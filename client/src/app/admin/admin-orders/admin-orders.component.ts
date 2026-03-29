@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService, Order } from '../../services/order.service';
+import { SocketService } from '../../services/socket.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -109,10 +110,17 @@ export class AdminOrdersComponent implements OnInit {
   orders: Order[] = [];
   selectedOrder: Order | null = null;
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private socketService: SocketService
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders();
+    this.socketService.adminOrderUpdate$.subscribe(data => {
+      console.log('Real-time order update:', data);
+      this.loadOrders();
+    });
   }
 
   loadOrders(): void {
