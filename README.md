@@ -55,6 +55,20 @@ ng serve
 | **Customer** | `/` | `john@test.com` | `password123` |
 
 ## 📁 Project Structure
-- `client/`: Angular frontend application.
-- `server/`: Node.js/Express backend API.
-- `server/uploads/`: Directory for product and custom user images.
+
+### 💻 Client (Angular)
+- `src/app/admin/`: Admin dashboard components and logic.
+- `src/app/guards/`: Auth and Admin route guards.
+- `src/app/interceptors/`: JWT token inclusion in API requests.
+- `src/app/pages/`: Main customer-facing pages (Home, Product, Cart, Orders).
+- `src/app/services/`: Core business logic and API communication.
+- `src/app/shared/`: Reusable components (Navbar, Footer, Modal, etc.).
+
+### 🖥️ Server (Node.js/Express)
+- `middleware/`: Authentication and error handling middleware.
+- `models/`: Mongoose schemas for Users, Products, Orders, etc.
+- `routes/`: API endpoint definitions.
+- `socket/`: Real-time chat implementation using Socket.io.
+- `uploads/`: Storage for product and custom customer images.
+- `seed.js`: Database initialization and reset script.
+- `cleanup.js`: Database total cleanup script.
