@@ -11,7 +11,7 @@ router.get('/public', async (req, res, next) => {
     if (!config) {
       // Fallback to env if nothing in DB
       return res.json({
-        razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+        razorpayKeyId: process.env.RAZORPAY_KEYid,
         merchantName: 'IDEAZONE3D',
         merchantLogo: ''
       });
@@ -32,7 +32,7 @@ router.get('/admin', adminAuth, async (req, res, next) => {
     let config = await PaymentConfig.findOne();
     if (!config) {
       return res.json({
-        razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+        razorpayKeyId: process.env.RAZORPAY_KEYid,
         razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
         merchantName: 'IDEAZONE3D',
         merchantLogo: ''

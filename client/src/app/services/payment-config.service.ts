@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface PaymentConfig {
-  _id?: string;
+  id?: string;
   razorpayKeyId: string;
   razorpayKeySecret?: string;
   merchantName: string;

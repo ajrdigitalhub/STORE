@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 import { SocketService } from './socket.service';
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;

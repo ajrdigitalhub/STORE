@@ -167,23 +167,23 @@ export class CheckoutComponent {
       next: async (order) => {
         if (this.paymentMethod === 'razorpay') {
           try {
-            const rzOrder = await this.paymentService.createRazorpayOrder(order.totalAmount, order._id).toPromise();
+            const rzOrder = await this.paymentService.createRazorpayOrder(order.totalAmount, order.id).toPromise();
             const config = await this.configService.getPublicConfig().toPromise();
             const response = await this.paymentService.openRazorpay({
               key: rzOrder.key,
               amount: rzOrder.amount,
               currency: rzOrder.currency,
-              order_id: rzOrder.orderId,
+              orderid: rzOrder.orderId,
               name: config.merchantName || 'IDEAZONE3D',
               description: 'Order Payment',
               image: config.merchantLogo || '',
               theme: { color: '#404040' }
             });
             await this.paymentService.verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_orderid: response.razorpay_orderid,
+              razorpay_paymentid: response.razorpay_paymentid,
               razorpay_signature: response.razorpay_signature,
-              orderId: order._id
+              orderId: order.id
             }).toPromise();
             this.cartService.clearCart();
             this.toastService.show('🎉 Order Placed Successfully! Get ready for something amazing! 🚀', 'success', 6000);

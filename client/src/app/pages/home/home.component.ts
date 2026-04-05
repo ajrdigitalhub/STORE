@@ -40,9 +40,9 @@ import { environment } from '../../../environments/environment';
           [class]="!selectedCategory ? 'metallic-btn-primary metallic-btn text-sm' : 'metallic-btn text-sm'">
           All
         </button>
-        @for (cat of categories; track cat._id) {
-          <button (click)="selectedCategory=cat._id; loadProducts()"
-            [class]="selectedCategory === cat._id ? 'metallic-btn-primary metallic-btn text-sm' : 'metallic-btn text-sm'">
+        @for (cat of categories; track cat.id) {
+          <button (click)="selectedCategory=cat.id; loadProducts()"
+            [class]="selectedCategory === cat.id ? 'metallic-btn-primary metallic-btn text-sm' : 'metallic-btn text-sm'">
             {{ cat.name }}
           </button>
         }
@@ -68,8 +68,8 @@ import { environment } from '../../../environments/environment';
         </div>
       } @else {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          @for (product of products; track product._id) {
-            <div class="metallic-card overflow-hidden group cursor-pointer animate-fade-in" [routerLink]="['/product', product._id]">
+          @for (product of products; track product.id) {
+            <div class="metallic-card overflow-hidden group cursor-pointer animate-fade-in" [routerLink]="['/product', product.id]">
               <!-- Image -->
               <div class="relative overflow-hidden h-52 bg-chrome-800">
                 @if (product.images && product.images.length > 0) {
@@ -175,7 +175,7 @@ export class HomeComponent implements OnInit {
     event.stopPropagation();
     event.preventDefault();
     this.cartService.addToCart({
-      product: product._id,
+      product: product.id,
       name: product.name,
       price: product.price,
       quantity: 1,

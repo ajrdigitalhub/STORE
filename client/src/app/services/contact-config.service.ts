@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface ContactConfig {
-  _id?: string;
+  id?: string;
   address: string;
   phone: string;
   email: string;

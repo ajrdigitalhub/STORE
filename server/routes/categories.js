@@ -7,7 +7,7 @@ const router = express.Router();
 // GET /api/categories
 router.get('/', async (req, res, next) => {
   try {
-    const categories = await Category.find({ active: true }).sort('name');
+    const categories = await Category.findAllActive();
     res.json(categories);
   } catch (error) {
     next(error);
@@ -29,8 +29,7 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', adminAuth, async (req, res, next) => {
   try {
     const { name, description, image } = req.body;
-    const category = new Category({ name, description, image });
-    await category.save();
+    const category = await Category.create({ name, description, image });
     res.status(201).json(category);
   } catch (error) {
     next(error);
@@ -41,11 +40,7 @@ router.post('/', adminAuth, async (req, res, next) => {
 router.put('/:id', adminAuth, async (req, res, next) => {
   try {
     const { name, description, image, active } = req.body;
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
-      { name, description, image, active },
-      { new: true, runValidators: true }
-    );
+    const category = await Category.update(req.params.id, { name, description, image, active });
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json(category);
   } catch (error) {
@@ -56,8 +51,8 @@ router.put('/:id', adminAuth, async (req, res, next) => {
 // DELETE /api/categories/:id — admin only
 router.delete('/:id', adminAuth, async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndDelete(req.params.id);
-    if (!category) return res.status(404).json({ message: 'Category not found' });
+    const deleted = await Category.delete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Category not found' });
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
     next(error);

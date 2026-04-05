@@ -15,13 +15,13 @@ import { CategoryService, Category } from '../../services/category.service';
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        @for (cat of categories; track cat._id) {
+        @for (cat of categories; track cat.id) {
           <div class="metallic-card p-5 hover:border-chrome-500 transition-all">
             <h3 class="text-chrome-200 font-semibold mb-1">{{ cat.name }}</h3>
             <p class="text-chrome-500 text-sm mb-4">{{ cat.description || 'No description' }}</p>
             <div class="flex space-x-2">
               <button (click)="editCategory(cat)" class="metallic-btn text-xs flex-1">Edit</button>
-              <button (click)="deleteCategory(cat._id)" class="metallic-btn text-xs flex-1 border-chrome-700 text-chrome-600 hover:text-chrome-300">Delete</button>
+              <button (click)="deleteCategory(cat.id)" class="metallic-btn text-xs flex-1 border-chrome-700 text-chrome-600 hover:text-chrome-300">Delete</button>
             </div>
           </div>
         }
@@ -86,7 +86,7 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   editCategory(cat: Category): void {
-    this.editingId = cat._id;
+    this.editingId = cat.id;
     this.form = { name: cat.name, description: cat.description || '' };
     this.formError = '';
     this.showForm = true;

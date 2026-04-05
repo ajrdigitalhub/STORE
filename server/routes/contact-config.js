@@ -7,11 +7,7 @@ const router = express.Router();
 // GET /api/contact-config - Public: Fetch contact details
 router.get('/', async (req, res, next) => {
   try {
-    let config = await ContactConfig.findOne();
-    if (!config) {
-      config = new ContactConfig();
-      await config.save();
-    }
+    const config = await ContactConfig.get();
     res.json(config);
   } catch (error) {
     next(error);
@@ -22,19 +18,7 @@ router.get('/', async (req, res, next) => {
 router.put('/', adminAuth, async (req, res, next) => {
   try {
     const { address, phone, email, workingHours } = req.body;
-    let config = await ContactConfig.findOne();
-    
-    if (!config) {
-      config = new ContactConfig({ address, phone, email, workingHours });
-    } else {
-      config.address = address || config.address;
-      config.phone = phone || config.phone;
-      config.email = email || config.email;
-      config.workingHours = workingHours || config.workingHours;
-      config.updatedAt = Date.now();
-    }
-
-    await config.save();
+    const config = await ContactConfig.update({ address, phone, email, working_hours: workingHours });
     res.json(config);
   } catch (error) {
     next(error);

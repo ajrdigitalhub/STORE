@@ -31,7 +31,7 @@ import { environment } from '../../../environments/environment';
               </tr>
             </thead>
             <tbody>
-              @for (product of products; track product._id) {
+              @for (product of products; track product.id) {
                 <tr class="border-b border-chrome-800/50 hover:bg-chrome-800/30 transition-colors">
                   <td class="px-4 py-3">
                     <div class="flex items-center space-x-3">
@@ -50,7 +50,7 @@ import { environment } from '../../../environments/environment';
                   <td class="px-4 py-3">
                     <div class="flex space-x-2">
                       <button (click)="editProduct(product)" class="text-chrome-400 hover:text-white text-sm transition-colors">Edit</button>
-                      <button (click)="deleteProduct(product._id)" class="text-chrome-600 hover:text-chrome-300 text-sm transition-colors">Delete</button>
+                      <button (click)="deleteProduct(product.id)" class="text-chrome-600 hover:text-chrome-300 text-sm transition-colors">Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -92,8 +92,8 @@ import { environment } from '../../../environments/environment';
                 <div>
                   <label class="text-chrome-400 text-sm mb-1 block">Category</label>
                   <select [(ngModel)]="form.category" class="metallic-input">
-                    @for (cat of categories; track cat._id) {
-                      <option [value]="cat._id">{{ cat.name }}</option>
+                    @for (cat of categories; track cat.id) {
+                      <option [value]="cat.id">{{ cat.name }}</option>
                     }
                   </select>
                 </div>
@@ -161,13 +161,13 @@ export class AdminProductsComponent implements OnInit {
   }
 
   editProduct(product: Product): void {
-    this.editingId = product._id;
+    this.editingId = product.id;
     this.form = {
       name: product.name,
       description: product.description,
       price: product.price,
       comparePrice: product.comparePrice,
-      category: product.category?._id || product.category,
+      category: product.category?.id || product.category,
       stock: product.stock,
       featured: product.featured
     };

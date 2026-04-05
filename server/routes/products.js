@@ -29,36 +29,29 @@ const upload = multer({
 // GET /api/products — list with search, filter, pagination
 router.get('/', async (req, res, next) => {
   try {
-    const { search, category, minPrice, maxPrice, featured, page = 1, limit = 12, sort = '-createdAt' } = req.query;
-    const filter = { active: true };
+    const { search, category, minPrice, maxPrice, featured, page = 1, limit = 12, sort = 'created_at', order = 'desc' } = req.query;
+    const featuredFilter = typeof featured === 'string' ? featured === 'true' : undefined;
 
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
-    }
-    if (category) filter.category = category;
-    if (featured === 'true') filter.featured = true;
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
-    }
-
-    const skip = (Number(page) - 1) * Number(limit);
-    const [products, total] = await Promise.all([
-      Product.find(filter).populate('category', 'name').sort(sort).skip(skip).limit(Number(limit)),
-      Product.countDocuments(filter)
-    ]);
+    const result = await Product.findAll({
+      search,
+      category,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      featured: featuredFilter,
+      page: Number(page),
+      limit: Number(limit),
+      sort,
+      order
+    });
 
     res.json({
-      products,
-      total,
-      page: Number(page),
-      pages: Math.ceil(total / Number(limit))
+      products: result.products,
+      total: result.total,
+      page: result.page,
+      pages: Math.ceil(result.total / Number(limit))
     });
   } catch (error) {
+    console.error('Error fetching products:', error);
     next(error);
   }
 });
@@ -66,7 +59,7 @@ router.get('/', async (req, res, next) => {
 // GET /api/products/:id
 router.get('/:id', async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id).populate('category', 'name');
+    const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
@@ -85,13 +78,11 @@ router.post('/', adminAuth, upload.array('images', 5), async (req, res, next) =>
       try { parsedVariants = JSON.parse(variants); } catch (e) { parsedVariants = []; }
     }
 
-    const product = new Product({
-      name, description, price: Number(price), comparePrice: Number(comparePrice || 0),
-      category, stock: Number(stock || 0), images, variants: parsedVariants,
+    const product = await Product.create({
+      name, description, price: Number(price), compare_price: Number(comparePrice || 0),
+      categoryid: category, stock: Number(stock || 0), images, variants: parsedVariants,
       featured: featured === 'true'
     });
-    await product.save();
-    await product.populate('category', 'name');
     res.status(201).json(product);
   } catch (error) {
     next(error);
@@ -115,13 +106,12 @@ router.put('/:id', adminAuth, upload.array('images', 5), async (req, res, next) 
     }
 
     const updateData = {
-      name, description, price: Number(price), comparePrice: Number(comparePrice || 0),
-      category, stock: Number(stock || 0), images: [...parsedExisting, ...newImages],
+      name, description, price: Number(price), compare_price: Number(comparePrice || 0),
+      categoryid: category, stock: Number(stock || 0), images: [...parsedExisting, ...newImages],
       variants: parsedVariants, featured: featured === 'true'
     };
 
-    const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true })
-      .populate('category', 'name');
+    const product = await Product.update(req.params.id, updateData);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
@@ -132,8 +122,8 @@ router.put('/:id', adminAuth, upload.array('images', 5), async (req, res, next) 
 // DELETE /api/products/:id — admin only
 router.delete('/:id', adminAuth, async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    const deleted = await Product.delete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Product not found' });
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     next(error);

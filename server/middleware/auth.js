@@ -17,7 +17,7 @@ const auth = async (req, res, next) => {
     }
 
     req.user = user;
-    req.userId = user._id;
+    req.userId = user.id;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token.' });
@@ -43,7 +43,7 @@ const adminAuth = async (req, res, next) => {
     }
 
     req.user = user;
-    req.userId = user._id;
+    req.userId = user.id;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token.' });

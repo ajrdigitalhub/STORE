@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Product {
-  _id: string;
+  id: string;
   name: string;
   description: string;
   price: number;

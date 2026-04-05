@@ -44,12 +44,11 @@ const initializeSocket = (server) => {
       try {
         const { text, customerName } = data;
 
-        let chat = await Chat.findOne({ customer: socket.userId });
+        let chat = await Chat.findByCustomer(socket.userId);
         if (!chat) {
-          chat = new Chat({
-            customer: socket.userId,
-            customerName: customerName || 'Customer',
-            messages: []
+          chat = await Chat.create({
+            customerid: socket.userId,
+            customer_name: customerName || 'Customer'
           });
         }
 
@@ -60,22 +59,18 @@ const initializeSocket = (server) => {
           timestamp: new Date()
         };
 
-        chat.messages.push(message);
-        chat.lastMessage = text;
-        chat.lastMessageAt = new Date();
-        chat.isActive = true;
-        await chat.save();
+        chat = await Chat.addMessage(chat.id, message);
 
         // Emit to admin room
         io.to('admin-room').emit('admin:newMessage', {
-          chatId: chat._id,
+          chatId: chat.id,
           customerId: socket.userId,
-          customerName: chat.customerName,
+          customerName: chat.customer_name,
           message
         });
 
         // Acknowledge to sender
-        socket.emit('message:sent', { message, chatId: chat._id });
+        socket.emit('message:sent', { message, chatId: chat.id });
       } catch (err) {
         socket.emit('error', { message: 'Failed to send message' });
       }
@@ -86,7 +81,7 @@ const initializeSocket = (server) => {
       try {
         const { text, customerId, adminName } = data;
 
-        let chat = await Chat.findOne({ customer: customerId });
+        let chat = await Chat.findByCustomer(customerId);
         if (!chat) {
           return socket.emit('error', { message: 'Chat not found' });
         }
@@ -98,17 +93,14 @@ const initializeSocket = (server) => {
           timestamp: new Date()
         };
 
-        chat.messages.push(message);
-        chat.lastMessage = text;
-        chat.lastMessageAt = new Date();
-        await chat.save();
+        chat = await Chat.addMessage(chat.id, message);
 
         // Emit to the customer
-        io.to(customerId).emit('customer:newMessage', { message, chatId: chat._id });
+        io.to(customerId).emit('customer:newMessage', { message, chatId: chat.id });
 
         // Emit back to admin room
         io.to('admin-room').emit('admin:messageUpdate', {
-          chatId: chat._id,
+          chatId: chat.id,
           customerId,
           message
         });
@@ -121,11 +113,11 @@ const initializeSocket = (server) => {
     socket.on('chat:history', async (data) => {
       try {
         const customerId = socket.userRole === 'admin' ? data.customerId : socket.userId;
-        const chat = await Chat.findOne({ customer: customerId });
+        const chat = await Chat.getHistory(customerId);
         socket.emit('chat:history', {
-          chatId: chat?._id,
+          chatId: chat?.id,
           messages: chat?.messages || [],
-          customerName: chat?.customerName || ''
+          customerName: chat?.customer_name || ''
         });
       } catch (err) {
         socket.emit('error', { message: 'Failed to load chat history' });
@@ -136,9 +128,7 @@ const initializeSocket = (server) => {
     socket.on('admin:getChats', async () => {
       try {
         if (socket.userRole !== 'admin') return;
-        const chats = await Chat.find({ isActive: true })
-          .sort('-lastMessageAt')
-          .populate('customer', 'name email');
+        const chats = await Chat.findAllActive();
         socket.emit('admin:chatList', chats);
       } catch (err) {
         socket.emit('error', { message: 'Failed to load chats' });

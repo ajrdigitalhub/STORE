@@ -37,9 +37,9 @@ const testOrderNumber = async () => {
     }
 
     const orderData = {
-      user: user._id,
+      user: user.id,
       items: [{
-        product: product._id,
+        product: product.id,
         name: product.name,
         price: product.price,
         quantity: 1

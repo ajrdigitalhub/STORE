@@ -8,8 +8,7 @@ const router = express.Router();
 router.post('/', async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;
-    const newMessage = new Message({ name, email, subject, message });
-    await newMessage.save();
+    const newMessage = await Message.create({ name, email, subject, message });
     res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
     next(error);
@@ -19,8 +18,14 @@ router.post('/', async (req, res, next) => {
 // GET /api/messages - Admin: Get all contact queries
 router.get('/', adminAuth, async (req, res, next) => {
   try {
-    const messages = await Message.find().sort({ createdAt: -1 });
-    res.json(messages);
+    const { page = 1, limit = 10, status } = req.query;
+    const result = await Message.findAll({ page: Number(page), limit: Number(limit), status });
+    res.json({
+      messages: result.messages,
+      total: result.total,
+      page: result.page,
+      pages: Math.ceil(result.total / Number(limit))
+    });
   } catch (error) {
     next(error);
   }
@@ -30,11 +35,7 @@ router.get('/', adminAuth, async (req, res, next) => {
 router.patch('/:id', adminAuth, async (req, res, next) => {
   try {
     const { status } = req.body;
-    const message = await Message.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const message = await Message.updateStatus(req.params.id, status);
     if (!message) {
       return res.status(404).json({ message: 'Message not found' });
     }
@@ -47,8 +48,8 @@ router.patch('/:id', adminAuth, async (req, res, next) => {
 // DELETE /api/messages/:id - Admin: Delete a message
 router.delete('/:id', adminAuth, async (req, res, next) => {
   try {
-    const message = await Message.findByIdAndDelete(req.params.id);
-    if (!message) {
+    const deleted = await Message.delete(req.params.id);
+    if (!deleted) {
       return res.status(404).json({ message: 'Message not found' });
     }
     res.json({ message: 'Message deleted successfully' });

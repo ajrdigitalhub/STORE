@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const pool = require('./db');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
@@ -11,35 +11,32 @@ const Order = require('./models/Order');
 
 const seed = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce');
-    console.log('Connected to MongoDB');
+    console.log('Connected to PostgreSQL');
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Category.deleteMany({});
-    await Product.deleteMany({});
-    await Order.deleteMany({});
+    // Clear existing data (be careful in production!)
+    await pool.query('DELETE FROM orders');
+    await pool.query('DELETE FROM products');
+    await pool.query('DELETE FROM categories');
+    await pool.query('DELETE FROM users');
 
     // Create admin
-    const admin = new User({
+    const admin = await User.create({
       name: 'Admin',
       email: 'admin@store.com',
-      password: 'admin123',
+      password: await User.hashPassword('admin123'),
       role: 'admin',
       phone: '9999999999'
     });
-    await admin.save();
     console.log('Admin created: admin@store.com / admin123');
 
     // Create test customer
-    const customer = new User({
+    const customer = await User.create({
       name: 'John Doe',
       email: 'john@test.com',
-      password: 'password123',
+      password: await User.hashPassword('password123'),
       role: 'customer',
       phone: '8888888888'
     });
-    await customer.save();
     console.log('Customer created: john@test.com / password123');
 
     console.log('\nSeed completed successfully! (Users only)');

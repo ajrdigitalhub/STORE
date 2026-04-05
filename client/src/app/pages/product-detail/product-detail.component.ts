@@ -204,7 +204,7 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.cartService.addToCart({
-      product: this.product._id,
+      product: this.product.id,
       name: this.product.name,
       price: this.product.price,
       quantity: this.quantity,

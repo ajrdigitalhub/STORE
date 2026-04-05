@@ -7,12 +7,7 @@ const router = express.Router();
 // GET /api/about - Public: Fetch About Us content
 router.get('/', async (req, res, next) => {
   try {
-    let about = await About.findOne();
-    if (!about) {
-      // Create default if not exists
-      about = new About();
-      await about.save();
-    }
+    const about = await About.get();
     res.json(about);
   } catch (error) {
     next(error);
@@ -23,20 +18,7 @@ router.get('/', async (req, res, next) => {
 router.put('/', adminAuth, async (req, res, next) => {
   try {
     const { title, subtitle, description, mission, vision } = req.body;
-    let about = await About.findOne();
-    
-    if (!about) {
-      about = new About({ title, subtitle, description, mission, vision });
-    } else {
-      about.title = title || about.title;
-      about.subtitle = subtitle || about.subtitle;
-      about.description = description || about.description;
-      about.mission = mission || about.mission;
-      about.vision = vision || about.vision;
-      about.lastUpdated = Date.now();
-    }
-
-    await about.save();
+    const about = await About.update({ title, subtitle, description, mission, vision });
     res.json(about);
   } catch (error) {
     next(error);

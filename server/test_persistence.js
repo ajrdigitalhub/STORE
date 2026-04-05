@@ -18,10 +18,10 @@ const testSave = async () => {
     }
 
     const order = new Order({
-      user: user._id,
+      user: user.id,
       items: [
         {
-          product: product._id,
+          product: product.id,
           name: product.name,
           price: product.price,
           quantity: 1,

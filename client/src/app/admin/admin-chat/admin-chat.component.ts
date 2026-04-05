@@ -18,9 +18,9 @@ import { ChatService, ChatMessage } from '../../services/chat.service';
             <h3 class="text-chrome-300 text-sm font-medium">Conversations</h3>
           </div>
           <div class="flex-1 overflow-y-auto">
-            @for (chat of chatList; track chat._id) {
+            @for (chat of chatList; track chat.id) {
               <button (click)="selectChat(chat)"
-                [class]="selectedChatId === chat._id ? 'bg-chrome-800 border-l-2 border-chrome-300' : 'hover:bg-chrome-800/50'"
+                [class]="selectedChatId === chat.id ? 'bg-chrome-800 border-l-2 border-chrome-300' : 'hover:bg-chrome-800/50'"
                 class="w-full text-left p-4 border-b border-chrome-800/50 transition-colors">
                 <p class="text-chrome-200 text-sm font-medium">{{ chat.customerName || chat.customer?.name || 'Customer' }}</p>
                 <p class="text-chrome-500 text-xs truncate mt-1">{{ chat.lastMessage || 'No messages' }}</p>
@@ -105,8 +105,8 @@ export class AdminChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   selectChat(chat: any): void {
-    this.selectedChatId = chat._id;
-    this.selectedCustomerId = chat.customer?._id || chat.customer;
+    this.selectedChatId = chat.id;
+    this.selectedCustomerId = chat.customer?.id || chat.customer;
     this.selectedCustomerName = chat.customerName || chat.customer?.name || 'Customer';
     this.chatService.loadChatHistory(this.selectedCustomerId);
   }

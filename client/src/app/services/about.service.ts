@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AboutContent {
-  _id?: string;
+  id?: string;
   title: string;
   subtitle: string;
   description: string;

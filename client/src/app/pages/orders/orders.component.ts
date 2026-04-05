@@ -28,12 +28,12 @@ import { environment } from '../../../environments/environment';
         </div>
       } @else {
         <div class="space-y-4">
-          @for (order of orders; track order._id) {
+          @for (order of orders; track order.id) {
             <div class="metallic-card p-6 animate-fade-in">
               <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
                   <p class="text-chrome-500 text-xs">Order ID</p>
-                  <p class="text-chrome-300 text-sm font-mono">{{ order._id }}</p>
+                  <p class="text-chrome-300 text-sm font-mono">{{ order.id }}</p>
                 </div>
                 <div class="text-right">
                   <p class="text-chrome-500 text-xs">{{ order.createdAt | date:'medium' }}</p>

@@ -81,9 +81,9 @@ import { AdminService } from '../../services/admin.service';
               </tr>
             </thead>
             <tbody>
-              @for (order of stats.recentOrders; track order._id) {
+              @for (order of stats.recentOrders; track order.id) {
                 <tr class="border-b border-chrome-800/50 hover:bg-chrome-800/30 transition-colors">
-                  <td class="px-4 py-3 text-chrome-300 text-sm font-mono">{{ order._id.slice(-8) }}</td>
+                  <td class="px-4 py-3 text-chrome-300 text-sm font-mono">{{ order.id.slice(-8) }}</td>
                   <td class="px-4 py-3 text-chrome-300 text-sm">{{ order.user?.name || order.shippingAddress?.fullName || 'N/A' }}</td>
                   <td class="px-4 py-3 text-chrome-200 text-sm font-medium">₹{{ order.totalAmount | number }}</td>
                   <td class="px-4 py-3"><span class="metallic-badge text-xs">{{ order.orderStatus | titlecase }}</span></td>

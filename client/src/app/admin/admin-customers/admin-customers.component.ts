@@ -23,7 +23,7 @@ import { AdminService } from '../../services/admin.service';
               </tr>
             </thead>
             <tbody>
-              @for (customer of customers; track customer._id) {
+              @for (customer of customers; track customer.id) {
                 <tr class="border-b border-chrome-800/50 hover:bg-chrome-800/30 transition-colors">
                   <td class="px-4 py-3 text-chrome-200 text-sm">{{ customer.name }}</td>
                   <td class="px-4 py-3 text-chrome-400 text-sm">{{ customer.email }}</td>
@@ -55,10 +55,10 @@ import { AdminService } from '../../services/admin.service';
             </div>
             <h3 class="text-chrome-400 text-sm font-medium mb-3">Order History</h3>
             @if (selectedCustomer.orders?.length) {
-              @for (order of selectedCustomer.orders; track order._id) {
+              @for (order of selectedCustomer.orders; track order.id) {
                 <div class="metallic-card p-3 mb-2 border-chrome-700">
                   <div class="flex justify-between text-sm">
-                    <span class="text-chrome-400 font-mono">{{ order._id.slice(-8) }}</span>
+                    <span class="text-chrome-400 font-mono">{{ order.id.slice(-8) }}</span>
                     <span class="metallic-badge text-xs">{{ order.orderStatus | titlecase }}</span>
                   </div>
                   <div class="flex justify-between mt-1 text-sm">
@@ -87,6 +87,6 @@ export class AdminCustomersComponent implements OnInit {
   }
 
   viewCustomer(customer: any): void {
-    this.adminService.getCustomer(customer._id).subscribe(data => this.selectedCustomer = data);
+    this.adminService.getCustomer(customer.id).subscribe(data => this.selectedCustomer = data);
   }
 }

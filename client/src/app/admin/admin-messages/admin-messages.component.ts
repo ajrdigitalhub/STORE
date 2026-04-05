@@ -26,7 +26,7 @@ import { MessageService, ContactMessage } from '../../services/message.service';
               </tr>
             </thead>
             <tbody class="divide-y divide-chrome-800">
-              @for (msg of messages; track msg._id) {
+              @for (msg of messages; track msg.id) {
                 <tr class="hover:bg-chrome-800/30 transition-colors group">
                   <td class="px-6 py-4 text-sm text-chrome-300">
                     {{ msg.createdAt | date:'short' }}
@@ -47,7 +47,7 @@ import { MessageService, ContactMessage } from '../../services/message.service';
                     <button (click)="viewMessage(msg)" class="text-chrome-400 hover:text-white transition-colors">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </button>
-                    <button (click)="deleteMessage(msg._id!)" class="text-chrome-600 hover:text-red-500 transition-colors">
+                    <button (click)="deleteMessage(msg.id!)" class="text-chrome-600 hover:text-red-500 transition-colors">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
                   </td>
@@ -101,7 +101,7 @@ import { MessageService, ContactMessage } from '../../services/message.service';
               <div class="flex items-center justify-between pt-4 border-t border-chrome-800">
                 <div class="flex items-center space-x-3">
                   <label class="text-sm text-chrome-400">Mark as:</label>
-                  <select (change)="updateStatus(selectedMessage._id!, $any($event.target).value)" 
+                  <select (change)="updateStatus(selectedMessage.id!, $any($event.target).value)" 
                     class="bg-chrome-900 border border-chrome-700 text-chrome-300 text-sm rounded-lg p-1.5 focus:border-chrome-500 outline-none">
                     <option value="new" [selected]="selectedMessage.status === 'new'">New</option>
                     <option value="read" [selected]="selectedMessage.status === 'read'">Read</option>
@@ -134,14 +134,14 @@ export class AdminMessagesComponent implements OnInit {
   viewMessage(msg: ContactMessage): void {
     this.selectedMessage = msg;
     if (msg.status === 'new') {
-      this.updateStatus(msg._id!, 'read');
+      this.updateStatus(msg.id!, 'read');
     }
   }
 
   updateStatus(id: string, status: string): void {
     this.messageService.updateStatus(id, status).subscribe(() => {
       this.loadMessages();
-      if (this.selectedMessage && this.selectedMessage._id === id) {
+      if (this.selectedMessage && this.selectedMessage.id === id) {
         this.selectedMessage.status = status as any;
       }
     });
