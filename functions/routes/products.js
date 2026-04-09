@@ -1,5 +1,5 @@
 const express = require('express');
-const multer = require('multer');
+// const multer = require('multer');
 const path = require('path');
 const Product = require('../models/Product');
 const { auth, adminAuth } = require('../middleware/auth');
@@ -7,24 +7,25 @@ const { auth, adminAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // Multer config for product images
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif/;
-    const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = allowed.test(file.mimetype);
-    if (extOk && mimeOk) cb(null, true);
-    else cb(new Error('Only image files are allowed'));
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
+//   filename: (req, file, cb) => {
+//     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+//     cb(null, uniqueName);
+//   }
+// });
+const upload =[];
+//  multer({
+//   storage,
+//   limits: { fileSize: 5 * 1024 * 1024 },
+//   fileFilter: (req, file, cb) => {
+//     const allowed = /jpeg|jpg|png|webp|gif/;
+//     const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
+//     const mimeOk = allowed.test(file.mimetype);
+//     if (extOk && mimeOk) cb(null, true);
+//     else cb(new Error('Only image files are allowed'));
+//   }
+// });
 
 // GET /api/products — list with search, filter, pagination
 router.get('/', async (req, res, next) => {
@@ -68,7 +69,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /api/products — admin only
-router.post('/', adminAuth, upload.array('images', 5), async (req, res, next) => {
+router.post('/', adminAuth, async (req, res, next) => {
   try {
     const { name, description, price, comparePrice, category, stock, variants, featured } = req.body;
     const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
@@ -90,7 +91,7 @@ router.post('/', adminAuth, upload.array('images', 5), async (req, res, next) =>
 });
 
 // PUT /api/products/:id — admin only
-router.put('/:id', adminAuth, upload.array('images', 5), async (req, res, next) => {
+router.put('/:id', adminAuth, async (req, res, next) => {
   try {
     const { name, description, price, comparePrice, category, stock, variants, featured, existingImages } = req.body;
     const newImages = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];

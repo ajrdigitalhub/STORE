@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api',
+  apiUrl: 'https://api-idytnc225a-uc.a.run.app/api',
   serverUrl: 'http://localhost:5000',
   razorpayKeyId: 'rzp_live_SWkTKCLIt8zw0o'
 };

@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const dotenv = require('dotenv');
 const path = require('path');
-
+const functions = require('firebase-functions');
 dotenv.config();
 
 const { initializeSocket } = require('./socket/chat');
@@ -58,8 +58,11 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
-module.exports = { app, server };
+// Export as a Cloud Function
+exports.api = functions.https.onRequest(app);
+
+// module.exports = { app, server };

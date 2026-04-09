@@ -1,37 +1,72 @@
 const express = require('express');
-const multer = require('multer');
+const Busboy = require('busboy');
 const path = require('path');
-const { auth } = require('../middleware/auth');
-
+const { bucket } = require('../firebaseAdmin');
 const router = express.Router();
 
-// Multer config for custom item images
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
+router.post('/', (req, res) => {
+  const busboy = Busboy({ headers: req.headers });
+  let fileUploaded = false;
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif/;
-    const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = allowed.test(file.mimetype);
-    if (extOk && mimeOk) cb(null, true);
-    else cb(new Error('Only image files are allowed'));
-  }
-});
+  busboy.on('file', (name, file, info) => {
+    const { filename, encoding, mimeType } = info;
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const newFileName = uniqueSuffix + path.extname(filename);
 
-// POST /api/upload — authenticated users can upload custom images
-router.post('/', auth, upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
-  }
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+    const blob = bucket.file(`uploads/${newFileName}`);
+    const blobStream = blob.createWriteStream({
+      metadata: {
+        contentType: mimeType
+      },
+      resumable: false
+    });
+
+    blobStream.on('error', (err) => {
+      console.error('Blob stream error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Upload failed', message: err.message });
+      }
+    });
+
+    blobStream.on('finish', async () => {
+      fileUploaded = true;
+      try {
+        // FIX: Removed blob.makePublic() as it crashes on Uniform Access buckets.
+        // Instead, we generate a Signed URL.
+        const [url] = await blob.getSignedUrl({
+          action: 'read',
+          expires: '03-01-2500' // Far future date
+        });
+
+        res.json({
+          success: true,
+          url: url,
+          fileName: newFileName
+        });
+      } catch (err) {
+        console.error('Error generating URL:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Could not generate file URL' });
+        }
+      }
+    });
+
+    file.pipe(blobStream);
+  });
+
+  busboy.on('error', (err) => {
+    console.error('Busboy error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Parsing failed' });
+    }
+  });
+
+  busboy.on('finish', () => {
+    // Note: If multiple files are uploaded, you might need a different 
+    // counter logic, but for a single file, this works.
+  });
+
+  req.pipe(busboy);
 });
 
 module.exports = router;
