@@ -15,7 +15,7 @@
     }
   ],
   "hosting": {
-    "public": "client/dist/client/browser",
+    "public": "dist/app/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -24,11 +24,11 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/index.csr.html"
       }
     ],
     "predeploy": [
-      "npm --prefix client run build"
+      "npm run build"
     ]
   }
 }

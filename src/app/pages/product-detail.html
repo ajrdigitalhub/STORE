@@ -1,0 +1,113 @@
+@if (product(); as p) {
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <nav class="flex items-center gap-2 text-sm text-accent-muted mb-12">
+      <a routerLink="/" class="hover:text-white">Home</a>
+      <span class="material-icons text-xs">chevron_right</span>
+      <a routerLink="/products" class="hover:text-white">Products</a>
+      <span class="material-icons text-xs">chevron_right</span>
+      <span class="text-white">{{ p.name }}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div class="space-y-6">
+        <div class="glass-card p-2 rounded-3xl overflow-hidden aspect-square">
+          <img [src]="selectedImage() || (p.images && p.images.length > 0 ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/800/800')" [alt]="p.name" class="w-full h-full object-cover rounded-2xl" referrerpolicy="no-referrer">
+        </div>
+        <div class="grid grid-cols-4 gap-4">
+          @for (img of p.images; track img) {
+            <button (click)="selectedImage.set(img)" class="glass-card p-1 rounded-xl overflow-hidden aspect-square border-2" [class.border-accent]="selectedImage() === img" [class.border-transparent]="selectedImage() !== img">
+              <img [src]="img" [alt]="p.name" class="w-full h-full object-cover rounded-lg" referrerpolicy="no-referrer">
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="mb-8">
+          <span class="bg-accent/10 text-accent text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-4 inline-block border border-accent/20">
+            {{ p.category_name || 'Uncategorized' }}
+          </span>
+          <h1 class="text-5xl font-bold mb-4 leading-tight">{{ p.name }}</h1>
+          <div class="flex items-center gap-4 mb-6">
+            <span class="text-3xl font-bold text-accent">{{ p.price | currency:'INR' }}</span>
+            <span class="text-sm text-accent-muted line-through">{{ p.price * 1.2 | currency:'INR' }}</span>
+            <span class="bg-green-500/20 text-green-500 text-xs font-bold px-2 py-1 rounded">Save 20%</span>
+          </div>
+          <p class="text-accent-muted text-lg leading-relaxed mb-8">
+            {{ p.description }}
+          </p>
+        </div>
+
+        <div class="space-y-8 mb-12">
+          <div class="flex items-center gap-6">
+            <div class="flex items-center glass-card p-1 rounded-xl">
+              <button (click)="updateQuantity(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-white/5 rounded-lg transition-colors">
+                <span class="material-icons">remove</span>
+              </button>
+              <span class="w-12 text-center font-bold">{{ quantity() }}</span>
+              <button (click)="updateQuantity(1)" class="w-10 h-10 flex items-center justify-center hover:bg-white/5 rounded-lg transition-colors">
+                <span class="material-icons">add</span>
+              </button>
+            </div>
+            <span class="text-sm text-accent-muted">
+              @if (p.stock > 0) {
+                <span class="text-green-500 flex items-center gap-1">
+                  <span class="material-icons text-xs">check_circle</span> In Stock ({{ p.stock }} units)
+                </span>
+              } @else {
+                <span class="text-red-500 flex items-center gap-1">
+                  <span class="material-icons text-xs">error</span> Out of Stock
+                </span>
+              }
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button (click)="addToCart()" class="metallic-button flex-grow py-4 text-lg flex items-center justify-center gap-3" [disabled]="p.stock <= 0">
+              <span class="material-icons">shopping_cart</span>
+              Add to Cart
+            </button>
+            <button class="metallic-button-outline py-4 px-6 flex items-center justify-center">
+              <span class="material-icons">favorite_border</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="border-t border-white/5 pt-8 space-y-6">
+          <div class="flex items-start gap-4">
+            <span class="material-icons text-accent">local_shipping</span>
+            <div>
+              <h4 class="font-bold text-sm">Fast Worldwide Shipping</h4>
+              <p class="text-xs text-accent-muted">Free shipping on orders over ₹5,000. Delivered in 3-5 business days.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="material-icons text-accent">verified_user</span>
+            <div>
+              <h4 class="font-bold text-sm">Secure Payment Guarantee</h4>
+              <p class="text-xs text-accent-muted">Your payment information is processed securely with Razorpay encryption.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (relatedProducts().length > 0) {
+      <div class="mt-24">
+        <h2 class="text-3xl font-bold mb-12">Related Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          @for (product of relatedProducts(); track product.id) {
+            <app-product-card [product]="product"></app-product-card>
+          }
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="min-h-[60vh] flex items-center justify-center">
+    <div class="animate-pulse text-accent-muted flex flex-col items-center gap-4">
+      <span class="material-icons text-6xl">hourglass_empty</span>
+      <p>Loading product details...</p>
+    </div>
+  </div>
+}

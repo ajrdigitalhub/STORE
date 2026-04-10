@@ -1,74 +1,102 @@
-# E-Commerce Platform
+# IDEA Zone 3D - E-commerce Platform
 
-A production-ready e-commerce platform built with Angular, Node.js, Express, and MongoDB, featuring a premium metallic design system.
+A full-stack 3D printing e-commerce application built with Angular and Node.js. This platform allows users to browse 3D printed products, manage categories, place orders, and communicate via real-time chat.
 
-## 🚀 Key Features
-- **Featured Product Customization**: Customers can provide a custom name and upload an image for products tagged as "featured".
-- **Metallic UI/UX**: Custom grayscale design system with modern glassmorphism and animations.
-- **Complete Order Flow**: Cart, Checkout, COD, and Razorpay integration.
-- **Admin Dashboard**: Real-time stats, order management, and product/category control.
-- **Real-time Chat**: Customer-to-Admin support powered by Socket.io.
-- **JWT Authentication**: Secure login for both customers and administrators.
+## Tech Stack
 
-## 🛠️ Prerequisites
-- Node.js (v18+)
-- MongoDB (Local or Atlas)
-- Angular CLI (`npm i -g @angular/cli`)
+### Frontend
+- **Framework**: Angular (v21+)
+- **State Management**: Angular Signals
+- **Styling**: Tailwind CSS
+- **Icons**: Angular Material Icons
+- **Animations**: Motion (Vanilla JS)
+- **Real-time**: Socket.io-client
 
-## 📋 Setup Instructions
+### Backend
+- **Runtime**: Node.js (ES Modules)
+- **Framework**: Express.js
+- **Database**: PostgreSQL (via `pg`)
+- **Real-time**: Socket.io
+- **Authentication**: Firebase Admin SDK
+- **File Uploads**: Multer
+- **Payments**: Razorpay Integration
 
-### 1. Database Management
-Ensure MongoDB is running locally on port `27017`.
+## Project Structure
 
-**Seed the Database (Reset):**
-```bash
-cd server
-node seed.js
+The project uses **npm workspaces** to separate the frontend and backend concerns while maintaining a unified development experience.
+
+```text
+├── server/                 # Node.js Backend (Workspace)
+│   ├── routes/             # API Route handlers
+│   ├── app.js              # Express application setup
+│   ├── main.js             # Server entry point
+│   └── package.json        # Backend-specific dependencies
+├── src/                    # Angular Frontend
+│   ├── app/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Route-level components
+│   │   ├── services/       # Data services (ApiService, AuthService, etc.)
+│   │   └── firebase.ts     # Firebase client configuration
+│   └── environments/       # Environment-specific configurations
+├── public/                 # Static assets and uploads
+├── package.json            # Root configuration and UI dependencies
+└── angular.json            # Angular CLI configuration
 ```
-*Clears all data and creates default accounts (admin@store.com / admin123 and john@test.com / password123).*
 
-**Full Cleanup (Delete All):**
-```bash
-cd server
-npm run cleanup
-```
+## Key Features
 
-### 2. Run Backend
+- **Centralized API Service**: All frontend HTTP calls are routed through a unified `ApiService` that handles base URL injection based on the environment.
+- **Zoneless Angular**: Optimized performance using Angular's zoneless change detection and Signals.
+- **Hybrid Workspace**: Clean separation between UI and Server dependencies using npm workspaces.
+- **Real-time Chat**: Integrated support desk for users to communicate with admins.
+- **Secure Payments**: Integrated Razorpay checkout flow.
+- **Dynamic Configuration**: Admin-controlled hero slides, about content, and contact information.
+
+## Getting Started
+
+### Prerequisites
+- Node.js (LTS version recommended)
+- PostgreSQL database
+- Firebase Project (for Authentication)
+
+### Installation
+
+1. Clone the repository.
+2. Install dependencies for both workspaces:
+   ```bash
+   npm install
+   ```
+
+### Environment Setup
+
+Create a `.env` file in the root directory (refer to `.env.example`):
+- `DATABASE_URL`: PostgreSQL connection string.
+- `FIREBASE_PROJECT_ID`: Your Firebase project ID.
+- `FIREBASE_PRIVATE_KEY`: Firebase service account private key.
+- `FIREBASE_CLIENT_EMAIL`: Firebase service account email.
+- `RAZORPAY_KEY_ID`: Razorpay API Key.
+- `RAZORPAY_KEY_SECRET`: Razorpay API Secret.
+
+### Development
+
+Run the development server (Frontend with HMR and Backend proxy):
 ```bash
-cd server
 npm run dev
 ```
-*Server runs on `http://localhost:5000`*
 
-### 3. Run Frontend
-```bash
-cd client
-ng serve
-```
-*Frontend runs on `http://localhost:4200`*
+### Production
 
-## 🔐 Default Credentials
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+2. Start the production server:
+   ```bash
+   npm start
+   ```
 
-| Role | Link | Email | Password |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `/admin` | `admin@store.com` | `admin123` |
-| **Customer** | `/` | `john@test.com` | `password123` |
+## API Refactoring
 
-## 📁 Project Structure
-
-### 💻 Client (Angular)
-- `src/app/admin/`: Admin dashboard components and logic.
-- `src/app/guards/`: Auth and Admin route guards.
-- `src/app/interceptors/`: JWT token inclusion in API requests.
-- `src/app/pages/`: Main customer-facing pages (Home, Product, Cart, Orders).
-- `src/app/services/`: Core business logic and API communication.
-- `src/app/shared/`: Reusable components (Navbar, Footer, Modal, etc.).
-
-### 🖥️ Server (Node.js/Express)
-- `middleware/`: Authentication and error handling middleware.
-- `models/`: Mongoose schemas for Users, Products, Orders, etc.
-- `routes/`: API endpoint definitions.
-- `socket/`: Real-time chat implementation using Socket.io.
-- `uploads/`: Storage for product and custom customer images.
-- `seed.js`: Database initialization and reset script.
-- `cleanup.js`: Database total cleanup script.
+The application uses a centralized `ApiService` located at `src/app/services/api.service.ts`. This service uses `environment.apiUrl` to determine the backend location:
+- **Development**: `http://localhost:3000/api`
+- **Production**: `/api` (relative to the served domain)

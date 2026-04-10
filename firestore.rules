@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: uid, email, displayName, role, createdAt
+    //
+    // Collection: products
+    // Fields: name, description, price, category, images, stock, isFeatured, createdAt
+    //
+    // Collection: orders
+    // Fields: orderId, customerUid, items, total, status, paymentStatus, paymentMethod, shippingAddress, createdAt
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "ajrgroupconnect@gmail.com" && request.auth.token.email_verified == true)
+        );
+    }
+
+    function isValidUser(data) {
+      return data.uid is string && data.email is string && data.role in ['customer', 'admin'];
+    }
+
+    function isValidProduct(data) {
+      return data.name is string && data.price is number && data.stock is number;
+    }
+
+    function isValidOrder(data) {
+      return data.customerUid is string && data.total is number && data.status in ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidProduct(request.resource.data);
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.customerUid || isAdmin());
+      allow create: if isAuthenticated() && isValidOrder(request.resource.data);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /chats/{chatId}/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

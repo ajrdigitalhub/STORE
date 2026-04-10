@@ -1,0 +1,54 @@
+<div class="min-h-[80vh] flex items-center justify-center px-6 py-12">
+  <div class="glass-card w-full max-w-md p-10">
+    <div class="w-16 h-16 bg-accent text-metallic-black rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold">I</div>
+    <h1 class="text-3xl font-bold mb-2 text-center">{{ isRegister() ? 'Create Account' : 'Welcome Back' }}</h1>
+    <p class="text-accent-muted mb-8 text-center text-sm">
+      {{ isRegister() ? 'Join IDEA Zone 3D to start your journey.' : 'Sign in to manage your orders and custom prints.' }}
+    </p>
+
+    <form (submit)="handleSubmit()" class="space-y-4 mb-8">
+      @if (isRegister()) {
+        <div class="space-y-1">
+          <label for="displayName" class="tech-label text-[10px]">Full Name</label>
+          <input id="displayName" type="text" [(ngModel)]="displayName" name="displayName" class="input-field text-sm" placeholder="John Doe" required>
+        </div>
+      }
+      <div class="space-y-1">
+        <label for="email" class="tech-label text-[10px]">Email Address</label>
+        <input id="email" type="email" [(ngModel)]="email" name="email" class="input-field text-sm" placeholder="name@example.com" required>
+      </div>
+      <div class="space-y-1">
+        <label for="password" class="tech-label text-[10px]">Password</label>
+        <input id="password" type="password" [(ngModel)]="password" name="password" class="input-field text-sm" placeholder="••••••••" required>
+      </div>
+      
+      <button type="submit" [disabled]="isLoading()" class="metallic-button w-full py-3 mt-4 flex items-center justify-center gap-2">
+        @if (isLoading()) {
+          <span class="animate-spin material-icons text-sm">refresh</span>
+          Processing...
+        } @else {
+          {{ isRegister() ? 'Register' : 'Sign In' }}
+        }
+      </button>
+    </form>
+
+    <div class="relative mb-8">
+      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+      <div class="relative flex justify-center text-[10px] uppercase tracking-widest"><span class="bg-metallic-black px-4 text-accent-muted">Or continue with</span></div>
+    </div>
+
+    <button (click)="loginWithGoogle()" [disabled]="isLoading()" class="w-full py-3 rounded border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-3 text-sm">
+      <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
+      Google Account
+    </button>
+    
+    <p class="text-center mt-8 text-xs text-accent-muted">
+      {{ isRegister() ? 'Already have an account?' : 'Don\'t have an account?' }}
+      <button (click)="toggleMode()" class="text-accent hover:underline font-bold ml-1">{{ isRegister() ? 'Sign In' : 'Register' }}</button>
+    </p>
+
+    <div class="mt-8 pt-8 border-t border-white/5 text-center">
+      <a routerLink="/" class="text-[10px] uppercase tracking-widest text-accent-muted hover:text-accent transition-colors">Continue as Guest</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <h1 class="text-4xl font-bold mb-12">Checkout</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="lg:col-span-2 space-y-8">
+      <div class="glass-card p-8">
+        <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+          <span class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">1</span>
+          Shipping Address
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label for="fullName" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Full Name</label>
+            <input id="fullName" type="text" [(ngModel)]="address.name" placeholder="John Doe" class="input-field">
+          </div>
+          <div class="space-y-2">
+            <label for="phone" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Phone Number</label>
+            <input id="phone" type="text" [(ngModel)]="address.phone" placeholder="+91 9876543210" class="input-field">
+          </div>
+          <div class="md:col-span-2 space-y-2">
+            <label for="street" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Street Address</label>
+            <input id="street" type="text" [(ngModel)]="address.street" placeholder="123, Tech Park" class="input-field">
+          </div>
+          <div class="space-y-2">
+            <label for="city" class="text-xs font-bold uppercase tracking-widest text-accent-muted">City</label>
+            <input id="city" type="text" [(ngModel)]="address.city" placeholder="Mumbai" class="input-field">
+          </div>
+          <div class="space-y-2">
+            <label for="pincode" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Pincode</label>
+            <input id="pincode" type="text" [(ngModel)]="address.pincode" placeholder="400001" class="input-field">
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-8">
+        <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+          <span class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">2</span>
+          Payment Method
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button (click)="paymentMethod.set('COD')" class="glass-card p-6 text-left border-2 transition-all" [class.border-accent]="paymentMethod() === 'COD'" [class.border-transparent]="paymentMethod() !== 'COD'">
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons text-accent">local_shipping</span>
+              @if (paymentMethod() === 'COD') {
+                <span class="material-icons text-accent text-sm">check_circle</span>
+              }
+            </div>
+            <h4 class="font-bold mb-1">Cash on Delivery</h4>
+            <p class="text-xs text-accent-muted">Pay when you receive your order.</p>
+          </button>
+
+          <button (click)="paymentMethod.set('Razorpay')" class="glass-card p-6 text-left border-2 transition-all" [class.border-accent]="paymentMethod() === 'Razorpay'" [class.border-transparent]="paymentMethod() !== 'Razorpay'">
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons text-accent">payment</span>
+              @if (paymentMethod() === 'Razorpay') {
+                <span class="material-icons text-accent text-sm">check_circle</span>
+              }
+            </div>
+            <h4 class="font-bold mb-1">Razorpay Secure</h4>
+            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking.</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="glass-card p-8">
+        <h2 class="text-2xl font-bold mb-8">Order Summary</h2>
+        <div class="space-y-4 mb-8">
+          @for (item of cartService.items(); track item.id) {
+            <div class="flex justify-between text-sm">
+              <span class="text-accent-muted">{{ item.name }} x {{ item.quantity }}</span>
+              <span>{{ item.price * item.quantity | currency:'INR' }}</span>
+            </div>
+          }
+          <div class="border-t border-white/5 pt-4 flex justify-between text-xl font-bold text-white">
+            <span>Total</span>
+            <span>{{ cartService.totalPrice() * 1.18 | currency:'INR' }}</span>
+          </div>
+        </div>
+
+        <button (click)="placeOrder()" [disabled]="isProcessing()" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
+          @if (isProcessing()) {
+            <span class="animate-spin material-icons text-sm">refresh</span>
+            Processing...
+          } @else {
+            Place Order
+            <span class="material-icons">check_circle</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
