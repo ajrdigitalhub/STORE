@@ -5,14 +5,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
+  standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateUrl: './login.html',
+  templateUrl: './register.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
   `]
 })
-export class LoginComponent {
+export class RegisterComponent {
   authService = inject(AuthService);
   router = inject(Router);
   
@@ -21,30 +22,31 @@ export class LoginComponent {
   
   email = '';
   password = '';
+  displayName = '';
 
-  async loginWithGoogle() {
+  async registerWithGoogle() {
     this.isLoading.set(true);
     try {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/']);
     } catch (error: unknown) {
       console.error(error instanceof Error ? error.message : error);
-      alert('Login failed. Please try again.');
+      alert('Registration failed. Please try again.');
     } finally {
       this.isLoading.set(false);
     }
   }
 
   async handleSubmit() {
-    if (!this.email || !this.password) return;
+    if (!this.email || !this.password || !this.displayName) return;
 
     this.isLoading.set(true);
     try {
-      await this.authService.loginWithEmail(this.email, this.password);
+      await this.authService.registerWithEmail(this.email, this.password, this.displayName);
       this.router.navigate(['/']);
     } catch (error: unknown) {
       console.error(error instanceof Error ? error.message : error);
-      alert('Login failed. Check your credentials.');
+      alert('Registration failed. Please check your details.');
     } finally {
       this.isLoading.set(false);
     }

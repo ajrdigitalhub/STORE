@@ -45,6 +45,10 @@
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">call</span>
         <span class="font-medium text-xs uppercase tracking-widest">Communication Hub</span>
       </button>
+      <button (click)="activeTab.set('footer')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'footer'" [class.text-accent]="activeTab() === 'footer'" [class.text-accent-muted]="activeTab() !== 'footer'">
+        <span class="material-icons text-lg group-hover:scale-110 transition-transform">view_stream</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Footer Config</span>
+      </button>
 
       <div class="px-4 py-2 mt-4 tech-label opacity-50">Support & Inquiries</div>
       <button (click)="activeTab.set('chat')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'chat'" [class.text-accent]="activeTab() === 'chat'" [class.text-accent-muted]="activeTab() !== 'chat'">
@@ -93,44 +97,57 @@
       <!-- Dashboard View -->
       @if (activeTab() === 'dashboard') {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-            <div class="flex justify-between items-start mb-4">
-              <span class="tech-label">Gross Revenue</span>
-              <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
+          @if (orderService.isLoading()) {
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div class="tech-card p-6">
+                <div class="flex justify-between items-start mb-4">
+                  <app-skeleton width="40%" height="0.75rem"></app-skeleton>
+                  <app-skeleton width="20px" height="20px" className="rounded-full"></app-skeleton>
+                </div>
+                <app-skeleton width="70%" height="2rem" className="mb-2"></app-skeleton>
+                <app-skeleton width="50%" height="0.5rem"></app-skeleton>
+              </div>
+            }
+          } @else {
+            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+              <div class="flex justify-between items-start mb-4">
+                <span class="tech-label">Gross Revenue</span>
+                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
+              </div>
+              <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
+              <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
+                <span class="material-icons text-[10px]">trending_up</span>
+                +12.5% VS PREVIOUS PERIOD
+              </div>
             </div>
-            <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
-            <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
-              <span class="material-icons text-[10px]">trending_up</span>
-              +12.5% VS PREVIOUS PERIOD
+            
+            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+              <div class="flex justify-between items-start mb-4">
+                <span class="tech-label">Transaction Volume</span>
+                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">shopping_cart</span>
+              </div>
+              <div class="tech-value text-3xl font-bold mb-1">{{ orderService.orders().length }}</div>
+              <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Total processed units</div>
             </div>
-          </div>
-          
-          <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-            <div class="flex justify-between items-start mb-4">
-              <span class="tech-label">Transaction Volume</span>
-              <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">shopping_cart</span>
-            </div>
-            <div class="tech-value text-3xl font-bold mb-1">{{ orderService.orders().length }}</div>
-            <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Total processed units</div>
-          </div>
 
-          <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-            <div class="flex justify-between items-start mb-4">
-              <span class="tech-label">Active Backlog</span>
-              <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">hourglass_empty</span>
+            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+              <div class="flex justify-between items-start mb-4">
+                <span class="tech-label">Active Backlog</span>
+                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">hourglass_empty</span>
+              </div>
+              <div class="tech-value text-3xl font-bold mb-1">{{ pendingOrders().length }}</div>
+              <div class="text-[10px] text-yellow-500 font-mono uppercase tracking-tighter">Requires immediate action</div>
             </div>
-            <div class="tech-value text-3xl font-bold mb-1">{{ pendingOrders().length }}</div>
-            <div class="text-[10px] text-yellow-500 font-mono uppercase tracking-tighter">Requires immediate action</div>
-          </div>
 
-          <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-            <div class="flex justify-between items-start mb-4">
-              <span class="tech-label">Registered Clients</span>
-              <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">sensors</span>
+            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+              <div class="flex justify-between items-start mb-4">
+                <span class="tech-label">Registered Clients</span>
+                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">sensors</span>
+              </div>
+              <div class="tech-value text-3xl font-bold mb-1">{{ totalCustomers() }}</div>
+              <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Verified platform users</div>
             </div>
-            <div class="tech-value text-3xl font-bold mb-1">{{ totalCustomers() }}</div>
-            <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Verified platform users</div>
-          </div>
+          }
         </div>
 
         <div class="tech-card">
@@ -152,22 +169,34 @@
                 </tr>
               </thead>
               <tbody>
-                @for (order of recentOrders(); track order.id) {
-                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                    <td class="py-4 px-6 tech-value text-xs">{{ order.orderId }}</td>
-                    <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.customerUid | slice:0:8 }}...</td>
-                    <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total | currency:'INR' }}</td>
-                    <td class="py-4 px-6">
-                      <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
-                        {{ order.status }}
-                      </span>
-                    </td>
-                    <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
-                  </tr>
-                } @empty {
-                  <tr>
-                    <td colspan="5" class="py-12 text-center tech-label opacity-30 italic">No data records found</td>
-                  </tr>
+                @if (orderService.isLoading()) {
+                  @for (i of [1, 2, 3, 4, 5]; track i) {
+                    <tr class="border-b border-white/5">
+                      <td class="py-4 px-6"><app-skeleton width="80px"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="100px"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="60px"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="70px" height="1.25rem"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="120px"></app-skeleton></td>
+                    </tr>
+                  }
+                } @else {
+                  @for (order of recentOrders(); track order.id) {
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                      <td class="py-4 px-6 tech-value text-xs">{{ order.orderId }}</td>
+                      <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.customerUid | slice:0:8 }}...</td>
+                      <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total | currency:'INR' }}</td>
+                      <td class="py-4 px-6">
+                        <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
+                          {{ order.status }}
+                        </span>
+                      </td>
+                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="py-12 text-center tech-label opacity-30 italic">No data records found</td>
+                    </tr>
+                  }
                 }
               </tbody>
             </table>
@@ -272,33 +301,49 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (product of productService.products(); track product.id) {
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                      <td class="py-4 px-6">
-                        <img [src]="product.images && product.images.length > 0 ? product.images[0] : 'https://picsum.photos/seed/' + product.id + '/100/100'" [alt]="product.name" class="w-12 h-12 rounded border border-white/10 object-cover" referrerpolicy="no-referrer">
-                      </td>
-                      <td class="py-4 px-6">
-                        <div class="font-bold text-sm tracking-tight">{{ product.name }}</div>
-                        <div class="tech-value text-[9px] text-accent-muted uppercase">UID: {{ product.id.toString() | slice:0:8 }}</div>
-                      </td>
-                      <td class="py-4 px-6">
-                        <span class="text-[10px] font-mono px-2 py-0.5 bg-white/5 rounded border border-white/5">{{ product.category_name || 'Uncategorized' }}</span>
-                      </td>
-                      <td class="py-4 px-6 tech-value font-bold">{{ product.price | currency:'INR' }}</td>
-                      <td class="py-4 px-6">
-                        <div class="flex items-center gap-2">
-                          <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div class="h-full bg-accent" [style.width.%]="(product.stock / 100) * 100"></div>
+                  @if (productService.isLoading()) {
+                    @for (i of [1, 2, 3, 4, 5]; track i) {
+                      <tr class="border-b border-white/5">
+                        <td class="py-4 px-6"><app-skeleton width="48px" height="48px"></app-skeleton></td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="120px" height="1rem" className="mb-2"></app-skeleton>
+                          <app-skeleton width="80px" height="0.5rem"></app-skeleton>
+                        </td>
+                        <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
+                        <td class="py-4 px-6"><app-skeleton width="60px" height="1rem"></app-skeleton></td>
+                        <td class="py-4 px-6"><app-skeleton width="100px" height="0.5rem"></app-skeleton></td>
+                        <td class="py-4 px-6"><app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton></td>
+                      </tr>
+                    }
+                  } @else {
+                    @for (product of productService.products(); track product.id) {
+                      <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                        <td class="py-4 px-6">
+                          <img [src]="product.images && product.images.length > 0 ? product.images[0] : 'https://picsum.photos/seed/' + product.id + '/100/100'" [alt]="product.name" class="w-12 h-12 rounded border border-white/10 object-cover" referrerpolicy="no-referrer">
+                        </td>
+                        <td class="py-4 px-6">
+                          <div class="font-bold text-sm tracking-tight">{{ product.name }}</div>
+                          <div class="tech-value text-[9px] text-accent-muted uppercase">UID: {{ product.id.toString() | slice:0:8 }}</div>
+                        </td>
+                        <td class="py-4 px-6">
+                          <span class="text-[10px] font-mono px-2 py-0.5 bg-white/5 rounded border border-white/5">{{ product.category_name || 'Uncategorized' }}</span>
+                        </td>
+                        <td class="py-4 px-6 tech-value font-bold">{{ product.price | currency:'INR' }}</td>
+                        <td class="py-4 px-6">
+                          <div class="flex items-center gap-2">
+                            <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                              <div class="h-full bg-accent" [style.width.%]="(product.stock / 100) * 100"></div>
+                            </div>
+                            <span class="tech-value text-xs">{{ product.stock }}</span>
                           </div>
-                          <span class="tech-value text-xs">{{ product.stock }}</span>
-                        </div>
-                      </td>
-                      <td class="py-4 px-6">
-                        <button (click)="productService.deleteProduct(product.id)" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
-                          <span class="material-icons text-sm">delete_outline</span>
-                        </button>
-                      </td>
-                    </tr>
+                        </td>
+                        <td class="py-4 px-6">
+                          <button (click)="productService.deleteProduct(product.id)" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
+                            <span class="material-icons text-sm">delete_outline</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
                   }
                 </tbody>
               </table>
@@ -544,6 +589,61 @@
         </div>
       }
 
+      <!-- Footer Edit View -->
+      @if (activeTab() === 'footer') {
+        <div class="tech-card max-w-3xl mx-auto">
+          <div class="tech-header">
+            <span class="tech-label">Footer Configuration Module</span>
+          </div>
+          <div class="p-8 space-y-8">
+            <div class="space-y-2">
+              <label for="f-desc" class="tech-label">Footer Description</label>
+              <textarea id="f-desc" [(ngModel)]="footerForm().description" class="input-field text-sm leading-relaxed" rows="4" placeholder="Enter footer description..."></textarea>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="tech-label">Social Media Uplinks</span>
+                <button (click)="addSocialLink()" class="tech-label text-accent hover:underline flex items-center gap-1">
+                  <span class="material-icons text-xs">add</span> Add Link
+                </button>
+              </div>
+              
+              <div class="space-y-4">
+                @for (link of footerForm().socialLinks; track $index) {
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/5 rounded-lg border border-white/5 relative group">
+                    <button (click)="removeSocialLink($index)" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span class="material-icons text-xs">close</span>
+                    </button>
+                    <div class="space-y-1">
+                      <label [for]="'f-platform-' + $index" class="tech-label text-[9px]">Platform</label>
+                      <input [id]="'f-platform-' + $index" type="text" [(ngModel)]="link.platform" class="input-field text-xs py-2" placeholder="e.g. Facebook">
+                    </div>
+                    <div class="space-y-1">
+                      <label [for]="'f-url-' + $index" class="tech-label text-[9px]">URL</label>
+                      <input [id]="'f-url-' + $index" type="text" [(ngModel)]="link.url" class="input-field text-xs py-2" placeholder="https://...">
+                    </div>
+                    <div class="space-y-1">
+                      <label [for]="'f-icon-' + $index" class="tech-label text-[9px]">Icon (Material Icon Name)</label>
+                      <input [id]="'f-icon-' + $index" type="text" [(ngModel)]="link.icon" class="input-field text-xs py-2" placeholder="e.g. facebook">
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="f-copy" class="tech-label">Copyright Text</label>
+              <input id="f-copy" type="text" [(ngModel)]="footerForm().copyrightText" class="input-field text-sm" placeholder="© 2026 IDEA Zone 3D. All rights reserved.">
+            </div>
+
+            <div class="pt-8 border-t border-white/5">
+              <button (click)="saveFooterConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist Footer Data</button>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Categories View -->
       @if (activeTab() === 'categories') {
         <div class="space-y-8">
@@ -588,23 +688,35 @@
           }
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (cat of productService.categories(); track cat.id) {
-              <div class="tech-card group hover:border-accent/30 transition-all overflow-hidden">
-                <div class="aspect-video relative overflow-hidden">
-                  <img [src]="cat.image_url || 'https://picsum.photos/seed/' + cat.slug + '/400/225'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerpolicy="no-referrer" [alt]="cat.name">
-                  <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-                  <div class="absolute bottom-4 left-4">
-                    <h3 class="text-xl font-bold tracking-tighter italic font-serif">{{ cat.name }}</h3>
-                    <p class="tech-label text-[10px] opacity-70">{{ cat.slug }}</p>
+            @if (productService.isLoading()) {
+              @for (i of [1, 2, 3]; track i) {
+                <div class="tech-card overflow-hidden">
+                  <app-skeleton height="225px" className="rounded-none"></app-skeleton>
+                  <div class="p-4 flex justify-between items-center">
+                    <app-skeleton width="60%" height="1rem"></app-skeleton>
+                    <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
                   </div>
                 </div>
-                <div class="p-4 flex justify-between items-center">
-                  <p class="text-xs text-accent-muted line-clamp-1">{{ cat.description }}</p>
-                  <button (click)="deleteCategory(cat.id)" class="text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-colors">
-                    <span class="material-icons text-sm">delete</span>
-                  </button>
+              }
+            } @else {
+              @for (cat of productService.categories(); track cat.id) {
+                <div class="tech-card group hover:border-accent/30 transition-all overflow-hidden">
+                  <div class="aspect-video relative overflow-hidden">
+                    <img [src]="cat.image_url || 'https://picsum.photos/seed/' + cat.slug + '/400/225'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerpolicy="no-referrer" [alt]="cat.name">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+                    <div class="absolute bottom-4 left-4">
+                      <h3 class="text-xl font-bold tracking-tighter italic font-serif">{{ cat.name }}</h3>
+                      <p class="tech-label text-[10px] opacity-70">{{ cat.slug }}</p>
+                    </div>
+                  </div>
+                  <div class="p-4 flex justify-between items-center">
+                    <p class="text-xs text-accent-muted line-clamp-1">{{ cat.description }}</p>
+                    <button (click)="deleteCategory(cat.id)" class="text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-colors">
+                      <span class="material-icons text-sm">delete</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              }
             }
           </div>
         </div>
@@ -628,25 +740,42 @@
                 </tr>
               </thead>
               <tbody>
-                @for (customer of customers(); track customer.id) {
-                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-4 px-6 flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
-                        @if (customer.avatar_url) {
-                          <img [src]="customer.avatar_url" class="w-full h-full object-cover" referrerpolicy="no-referrer" [alt]="customer.display_name || 'Customer Avatar'">
-                        } @else {
-                          <span class="material-icons text-sm">person</span>
-                        }
-                      </div>
-                      <div>
-                        <div class="font-bold text-sm">{{ customer.display_name || 'Anonymous' }}</div>
-                        <div class="tech-value text-[9px] text-accent-muted">UID: {{ customer.uid | slice:0:8 }}</div>
-                      </div>
-                    </td>
-                    <td class="py-4 px-6 text-xs font-mono">{{ customer.email }}</td>
-                    <td class="py-4 px-6 text-xs font-mono">{{ customer.phone || 'N/A' }}</td>
-                    <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ customer.created_at | date:'yyyy-MM-dd' }}</td>
-                  </tr>
+                @if (orderService.isLoading()) {
+                  @for (i of [1, 2, 3, 4, 5]; track i) {
+                    <tr class="border-b border-white/5">
+                      <td class="py-4 px-6 flex items-center gap-3">
+                        <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
+                        <div>
+                          <app-skeleton width="100px" height="1rem" className="mb-2"></app-skeleton>
+                          <app-skeleton width="60px" height="0.5rem"></app-skeleton>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6"><app-skeleton width="150px" height="1rem"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="100px" height="1rem"></app-skeleton></td>
+                      <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
+                    </tr>
+                  }
+                } @else {
+                  @for (customer of customers(); track customer.id) {
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td class="py-4 px-6 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
+                          @if (customer.avatar_url) {
+                            <img [src]="customer.avatar_url" class="w-full h-full object-cover" referrerpolicy="no-referrer" [alt]="customer.display_name || 'Customer Avatar'">
+                          } @else {
+                            <span class="material-icons text-sm">person</span>
+                          }
+                        </div>
+                        <div>
+                          <div class="font-bold text-sm">{{ customer.display_name || 'Anonymous' }}</div>
+                          <div class="tech-value text-[9px] text-accent-muted">UID: {{ customer.uid | slice:0:8 }}</div>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-mono">{{ customer.email }}</td>
+                      <td class="py-4 px-6 text-xs font-mono">{{ customer.phone || 'N/A' }}</td>
+                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ customer.created_at | date:'yyyy-MM-dd' }}</td>
+                    </tr>
+                  }
                 }
               </tbody>
             </table>

@@ -1,7 +1,23 @@
 <div class="min-h-screen flex flex-col">
-  <app-header />
-  <main class="flex-grow">
-    <router-outlet />
-  </main>
-  <app-footer />
+  @if (!authService.isAuthReady()) {
+    <div class="flex-grow flex flex-col items-center justify-center p-12 space-y-8">
+      <div class="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center animate-pulse">
+        <div class="w-12 h-12 rounded-full bg-accent/20"></div>
+      </div>
+      <div class="space-y-4 w-full max-w-md">
+        <app-skeleton width="100%" height="2rem"></app-skeleton>
+        <app-skeleton width="60%" height="1rem" className="mx-auto"></app-skeleton>
+      </div>
+    </div>
+  } @else {
+    @if (!isAuthPage()) {
+      <app-header />
+    }
+    <main class="flex-grow">
+      <router-outlet />
+    </main>
+    @if (!isAuthPage()) {
+      <app-footer />
+    }
+  }
 </div>

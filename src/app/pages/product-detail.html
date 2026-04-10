@@ -104,10 +104,44 @@
     }
   </div>
 } @else {
-  <div class="min-h-[60vh] flex items-center justify-center">
-    <div class="animate-pulse text-accent-muted flex flex-col items-center gap-4">
-      <span class="material-icons text-6xl">hourglass_empty</span>
-      <p>Loading product details...</p>
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-2 mb-12">
+      <app-skeleton width="100px" height="1rem"></app-skeleton>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div class="space-y-6">
+        <app-skeleton height="600px" className="rounded-3xl"></app-skeleton>
+        <div class="grid grid-cols-4 gap-4">
+          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+        </div>
+      </div>
+
+      <div class="flex flex-col space-y-8">
+        <div>
+          <app-skeleton width="120px" height="1.5rem" className="mb-4 rounded-full"></app-skeleton>
+          <app-skeleton width="80%" height="3rem" className="mb-4"></app-skeleton>
+          <app-skeleton width="40%" height="2.5rem" className="mb-6"></app-skeleton>
+          <div class="space-y-2">
+            <app-skeleton width="100%" height="1rem"></app-skeleton>
+            <app-skeleton width="100%" height="1rem"></app-skeleton>
+            <app-skeleton width="60%" height="1rem"></app-skeleton>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <app-skeleton width="120px" height="3rem" className="rounded-xl"></app-skeleton>
+          <app-skeleton width="150px" height="1rem"></app-skeleton>
+        </div>
+
+        <div class="flex gap-4">
+          <app-skeleton width="70%" height="4rem" className="rounded-full"></app-skeleton>
+          <app-skeleton width="60px" height="4rem" className="rounded-full"></app-skeleton>
+        </div>
+      </div>
     </div>
   </div>
 }

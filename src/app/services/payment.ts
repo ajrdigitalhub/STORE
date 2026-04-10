@@ -1,5 +1,5 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { isPlatformBrowser } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 
@@ -7,24 +7,24 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class PaymentService {
-  private http = inject(HttpClient);
+  private api = inject(ApiService);
   private platformId = inject(PLATFORM_ID);
 
   async getRazorpayKey(): Promise<string> {
-    const res = await firstValueFrom(this.http.get<{ key: string }>('/api/payment/get-key'));
+    const res = await firstValueFrom(this.api.get<{ key: string }>('/payment/get-key'));
     return res.key;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createRazorpayOrder(amount: number): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return firstValueFrom(this.http.post<any>('/api/payment/create-order', { amount }));
+    return firstValueFrom(this.api.post<any>('/payment/create-order', { amount }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async verifyPayment(paymentData: any): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return firstValueFrom(this.http.post<any>('/api/payment/verify', paymentData));
+    return firstValueFrom(this.api.post<any>('/payment/verify', paymentData));
   }
 
   loadRazorpayScript(): Promise<boolean> {

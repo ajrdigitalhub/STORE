@@ -12,8 +12,24 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-10 animate-section">
-    @for (product of productService.products().slice(0, 3); track product.id) {
-      <app-product-card [product]="product"></app-product-card>
+    @if (productService.isLoading()) {
+      @for (i of [1, 2, 3]; track i) {
+        <div class="glass-card rounded-3xl overflow-hidden border border-white/5">
+          <app-skeleton height="300px" className="rounded-none"></app-skeleton>
+          <div class="p-6 space-y-4">
+            <app-skeleton width="60%" height="1.5rem"></app-skeleton>
+            <app-skeleton width="40%" height="1rem"></app-skeleton>
+            <div class="flex justify-between items-center pt-4">
+              <app-skeleton width="30%" height="1.5rem"></app-skeleton>
+              <app-skeleton width="40px" height="40px" className="rounded-full"></app-skeleton>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      @for (product of productService.products().slice(0, 3); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      }
     }
   </div>
 </section>

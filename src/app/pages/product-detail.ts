@@ -4,10 +4,11 @@ import { ProductService, Product } from '../services/product';
 import { CartService } from '../services/cart';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ProductCardComponent } from '../components/shared/product-card';
+import { SkeletonComponent } from '../components/shared/skeleton';
 
 @Component({
   selector: 'app-product-detail',
-  imports: [RouterLink, CommonModule, CurrencyPipe, ProductCardComponent],
+  imports: [RouterLink, CommonModule, CurrencyPipe, ProductCardComponent, SkeletonComponent],
   templateUrl: './product-detail.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');

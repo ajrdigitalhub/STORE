@@ -9,85 +9,106 @@ import { animate, stagger } from "motion";
   standalone: true,
   imports: [RouterLink],
   template: `
-    <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+    <section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
       <!-- Background Carousel -->
       <div class="absolute inset-0 z-0">
         @for (slide of configService.config().hero.slides; track $index) {
           <div 
-            class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-            [class.opacity-40]="currentImageIndex() === $index"
+            class="absolute inset-0 transition-all duration-1000 ease-in-out transform"
+            [class.opacity-60]="currentImageIndex() === $index"
             [class.opacity-0]="currentImageIndex() !== $index"
+            [class.scale-110]="currentImageIndex() === $index"
+            [class.scale-100]="currentImageIndex() !== $index"
           >
             <img [src]="slide.imageUrl" alt="Hero Image" class="w-full h-full object-cover" referrerpolicy="no-referrer">
           </div>
         }
-        <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black"></div>
+        <!-- Overlays -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#050505]/80 via-transparent to-[#050505]/80"></div>
+        <div class="absolute inset-0 bg-black/20"></div>
         
-        <!-- Animated Particles/Glow -->
-        <div class="absolute inset-0 pointer-events-none">
-          <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px] animate-pulse"></div>
-          <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[120px] animate-pulse delay-1000"></div>
+        <!-- Animated Glows -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+          <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-accent/20 rounded-full blur-[120px] animate-pulse"></div>
+          <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] animate-pulse delay-1000"></div>
         </div>
       </div>
 
       <!-- Content -->
-      <div class="relative z-10 flex flex-col items-center text-center max-w-6xl px-6 hero-content">
-        <div class="mb-8 inline-block animate-fade-in">
-          <span class="text-[10px] md:text-xs font-bold uppercase tracking-[0.5em] text-accent border border-accent/20 bg-accent/5 px-6 py-2 rounded-full backdrop-blur-md">
-            Future of Manufacturing
+      <div class="relative z-10 flex flex-col items-center text-center max-w-7xl px-6">
+        <div class="mb-10 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl animate-fade-in hero-badge">
+          <span class="flex h-2 w-2 rounded-full bg-accent animate-ping"></span>
+          <span class="text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-white/80">
+            Precision Engineering
           </span>
         </div>
         
         @if (configService.config().hero.slides[currentImageIndex()]; as currentSlide) {
-          <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-10 uppercase tracking-tighter leading-[0.9] text-white">
-            @let titleParts = currentSlide.title.split(' ');
-            @for (part of titleParts; track $index) {
-              <span class="block overflow-hidden">
-                <span class="inline-block title-part">{{ part }}</span>
-              </span>
-            }
-          </h1>
+          <div class="overflow-hidden mb-6">
+            <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-tighter leading-[0.85] text-white hero-title">
+              @let titleParts = currentSlide.title.split(' ');
+              @for (part of titleParts; track $index) {
+                <span class="block overflow-hidden">
+                  <span class="inline-block title-part">{{ part }}</span>
+                </span>
+              }
+            </h1>
+          </div>
           
-          <p class="text-lg md:text-xl lg:text-2xl text-accent-muted mb-12 max-w-3xl mx-auto font-light leading-relaxed opacity-90 subtitle text-balance">
-            {{ currentSlide.subtitle }}
-          </p>
+          <div class="max-w-2xl mx-auto overflow-hidden mb-12">
+            <p class="text-lg md:text-xl text-white/60 font-light leading-relaxed subtitle text-balance">
+              {{ currentSlide.subtitle }}
+            </p>
+          </div>
           
-          <div class="flex flex-wrap justify-center gap-6 cta-buttons">
-            <a [routerLink]="currentSlide.buttonLink" class="group relative px-10 py-4 overflow-hidden rounded-full bg-accent text-black font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-6 cta-buttons">
+            <a [routerLink]="currentSlide.buttonLink" class="group relative px-12 py-5 overflow-hidden rounded-full bg-white text-black font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
               <span class="relative z-10">{{ currentSlide.buttonText }}</span>
-              <div class="absolute inset-0 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <div class="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
             </a>
-            <a routerLink="/about" class="group px-10 py-4 rounded-full border border-white/20 text-white font-bold uppercase tracking-widest transition-all hover:bg-white/10 hover:border-white/40">
-              Learn More
+            <a routerLink="/about" class="group px-12 py-5 rounded-full border border-white/10 text-white font-bold uppercase tracking-widest transition-all hover:bg-white/5 hover:border-white/30 backdrop-blur-sm">
+              Our Story
             </a>
           </div>
         }
       </div>
 
-      <!-- Carousel Indicators -->
+      <!-- Carousel Progress Indicators -->
       @if ((configService.config().hero.slides.length ?? 0) > 1) {
-        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+        <div class="absolute bottom-16 left-1/2 -translate-x-1/2 z-20 flex gap-4">
           @for (slide of configService.config().hero.slides; track $index) {
             <button 
               (click)="setIndex($index)"
-              class="w-12 h-1 rounded-full transition-all duration-300"
-              [class.bg-accent]="$index === currentImageIndex()"
-              [class.bg-white/20]="$index !== currentImageIndex()"
-              aria-label="Carousel Indicator"
-            ></button>
+              class="group relative w-16 h-1 bg-white/10 rounded-full overflow-hidden transition-all duration-300 hover:h-2"
+              [attr.aria-label]="'Go to slide ' + ($index + 1)"
+            >
+              @if ($index === currentImageIndex()) {
+                <div class="absolute inset-0 bg-accent origin-left animate-progress"></div>
+              }
+              <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </button>
           }
         </div>
       }
       
-      <!-- Scroll Indicator -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce opacity-50">
-        <span class="material-icons text-white">expand_more</span>
+      <!-- Scroll Hint -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-30">
+        <span class="text-[10px] uppercase tracking-widest text-white">Scroll</span>
+        <div class="w-px h-12 bg-gradient-to-b from-white to-transparent"></div>
       </div>
     </section>
   `,
   styles: [`
     .title-part {
       display: inline-block;
+    }
+    @keyframes progress {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    .animate-progress {
+      animation: progress 5s linear forwards;
     }
   `]
 })
@@ -147,9 +168,9 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
     if (!isPlatformBrowser(this.platformId) || typeof document === 'undefined') return;
     
     const titleParts = document.querySelectorAll(".title-part");
-    if (titleParts.length > 0) {
+    if (titleParts && titleParts.length > 0) {
       animate(
-        ".title-part",
+        titleParts,
         { y: [100, 0], opacity: [0, 1] },
         { delay: stagger(0.1), duration: 0.8, ease: [0.22, 1, 0.36, 1] }
       );
@@ -158,7 +179,7 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
     const subtitle = document.querySelector(".subtitle");
     if (subtitle) {
       animate(
-        ".subtitle",
+        subtitle,
         { opacity: [0, 0.8], y: [20, 0] },
         { delay: 0.5, duration: 0.8 }
       );
@@ -167,7 +188,7 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
     const ctaButtons = document.querySelector(".cta-buttons");
     if (ctaButtons) {
       animate(
-        ".cta-buttons",
+        ctaButtons,
         { opacity: [0, 1], y: [20, 0] },
         { delay: 0.7, duration: 0.8 }
       );

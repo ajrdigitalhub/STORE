@@ -3,10 +3,11 @@ import { ProductService } from '../services/product';
 import { CartService } from '../services/cart';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ProductCardComponent } from '../components/shared/product-card';
+import { SkeletonComponent } from '../components/shared/skeleton';
 
 @Component({
   selector: 'app-product-list',
-  imports: [ReactiveFormsModule, ProductCardComponent],
+  imports: [ReactiveFormsModule, ProductCardComponent, SkeletonComponent],
   templateUrl: './product-list.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');

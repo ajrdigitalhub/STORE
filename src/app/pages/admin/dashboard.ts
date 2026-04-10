@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth';
 import { ChatService } from '../../services/chat';
 import { ConfigService, AppConfig } from '../../services/config';
 import { UploadService } from '../../services/upload';
+import { SkeletonComponent } from '../../components/shared/skeleton';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -34,7 +35,7 @@ interface Message {
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [CommonModule, FormsModule, CurrencyPipe],
+  imports: [CommonModule, FormsModule, CurrencyPipe, SkeletonComponent],
   templateUrl: './dashboard.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
@@ -50,7 +51,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   http = inject(HttpClient);
   private el = inject(ElementRef);
 
-  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'hero'>('dashboard');
+  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'hero' | 'footer'>('dashboard');
   showProductForm = signal(false);
   showCategoryForm = signal(false);
   chatMessage = '';
@@ -90,6 +91,12 @@ export class AdminDashboardComponent implements AfterViewInit {
     enabled: false
   });
 
+  footerForm = signal({
+    description: '',
+    socialLinks: [] as { platform: string; url: string; icon: string }[],
+    copyrightText: ''
+  });
+
   isUploading = signal(false);
 
   getTabDisplayName(tab: string): string {
@@ -104,7 +111,8 @@ export class AdminDashboardComponent implements AfterViewInit {
       'about': 'Corporate Profile',
       'contact': 'Communication Hub',
       'payments': 'Financial Transactions',
-      'hero': 'Visual Merchandising'
+      'hero': 'Visual Merchandising',
+      'footer': 'Footer Configuration'
     };
     return names[tab] || tab;
   }
@@ -128,6 +136,13 @@ export class AdminDashboardComponent implements AfterViewInit {
       if (!this.razorpayForm().keyId && config.razorpay) {
         this.razorpayForm.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled }));
         this.loadRazorpaySecret();
+      }
+      if (!this.footerForm().description && config.footer) {
+        this.footerForm.set({ 
+          description: config.footer.description,
+          socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
+          copyrightText: config.footer.copyrightText
+        });
       }
     }, { allowSignalWrites: true });
 
@@ -222,11 +237,13 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   private animateSidebar() {
     const navItems = this.el.nativeElement.querySelectorAll('nav button');
-    animate(
-      navItems,
-      { opacity: [0, 1], x: [-20, 0] },
-      { delay: stagger(0.05), duration: 0.5, ease: 'easeOut' }
-    );
+    if (navItems && navItems.length > 0) {
+      animate(
+        navItems,
+        { opacity: [0, 1], x: [-20, 0] },
+        { delay: stagger(0.05), duration: 0.5, ease: 'easeOut' }
+      );
+    }
   }
 
   private animateContent() {
@@ -350,6 +367,31 @@ export class AdminDashboardComponent implements AfterViewInit {
     // Save secret separately
     await this.http.post('/api/app-config/razorpay_secret', { keySecret: form.keySecret }).toPromise();
     alert('Razorpay configuration saved successfully');
+  }
+
+  async saveFooterConfig() {
+    const currentConfig = this.configService.config();
+    const newConfig: AppConfig = {
+      ...currentConfig,
+      footer: { ...this.footerForm() }
+    };
+    await this.configService.updateConfig(newConfig);
+    alert('Footer configuration saved successfully');
+  }
+
+  addSocialLink() {
+    const current = this.footerForm();
+    this.footerForm.set({
+      ...current,
+      socialLinks: [...current.socialLinks, { platform: '', url: '', icon: 'link' }]
+    });
+  }
+
+  removeSocialLink(index: number) {
+    const current = this.footerForm();
+    const newLinks = [...current.socialLinks];
+    newLinks.splice(index, 1);
+    this.footerForm.set({ ...current, socialLinks: newLinks });
   }
 
   toggleRazorpay() {

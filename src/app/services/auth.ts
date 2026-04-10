@@ -2,7 +2,7 @@ import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { auth } from '../firebase';
 import { onAuthStateChanged, User, signOut, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { firstValueFrom } from 'rxjs';
 
 export enum OperationType {
@@ -35,7 +35,7 @@ export interface UserProfile {
 })
 export class AuthService {
   private platformId = inject(PLATFORM_ID);
-  private http = inject(HttpClient);
+  private api = inject(ApiService);
   private userSignal = signal<User | null>(null);
   private profileSignal = signal<UserProfile | null>(null);
   private isAuthReadySignal = signal<boolean>(false);
@@ -67,7 +67,7 @@ export class AuthService {
   private async syncProfile(user: User) {
     try {
       // Try to get profile from our DB
-      const profile = await firstValueFrom(this.http.get<UserProfile>(`/api/auth/profile/${user.uid}`));
+      const profile = await firstValueFrom(this.api.get<UserProfile>(`/auth/profile/${user.uid}`));
       this.profileSignal.set(profile);
     } catch {
       // If not found, register them
@@ -78,7 +78,7 @@ export class AuthService {
         role: user.email === 'ajrgroupconnect@gmail.com' ? 'admin' : 'customer'
       };
       try {
-        const profile = await firstValueFrom(this.http.post<UserProfile>('/api/auth/register', newProfile));
+        const profile = await firstValueFrom(this.api.post<UserProfile>('/auth/register', newProfile));
         this.profileSignal.set(profile);
       } catch (regError) {
         console.error('Failed to sync profile', regError);

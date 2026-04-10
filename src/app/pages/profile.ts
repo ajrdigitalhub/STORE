@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { OrderService } from '../services/order';
+import { SkeletonComponent } from '../components/shared/skeleton';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink, CommonModule, CurrencyPipe],
+  imports: [RouterLink, CommonModule, CurrencyPipe, SkeletonComponent],
   templateUrl: './profile.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');

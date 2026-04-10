@@ -2,6 +2,7 @@ import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
 import { AuthService } from './auth';
+import { ApiService } from './api.service';
 
 export interface Message {
   id?: string;
@@ -16,6 +17,7 @@ export interface Message {
 })
 export class ChatService {
   private platformId = inject(PLATFORM_ID);
+  private api = inject(ApiService);
   private socket: Socket | null = null;
   private messagesSignal = signal<Message[]>([]);
   messages = this.messagesSignal.asReadonly();
@@ -23,7 +25,8 @@ export class ChatService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.socket = io();
+      const baseUrl = this.api.getBaseUrl().replace(/\/api$/, '');
+      this.socket = io(baseUrl || undefined);
       this.socket.on('message', (message: Message) => {
         this.messagesSignal.update(msgs => [...msgs, message]);
       });

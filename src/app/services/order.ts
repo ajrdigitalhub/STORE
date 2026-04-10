@@ -1,7 +1,8 @@
 import { Injectable, signal, inject, PLATFORM_ID, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { AuthService } from './auth';
+import { firstValueFrom } from 'rxjs';
 
 export interface Order {
   id?: string;
@@ -23,9 +24,10 @@ export interface Order {
 })
 export class OrderService {
   private platformId = inject(PLATFORM_ID);
-  private http = inject(HttpClient);
+  private api = inject(ApiService);
   private ordersSignal = signal<Order[]>([]);
   orders = this.ordersSignal.asReadonly();
+  isLoading = signal(false);
   private authService = inject(AuthService);
 
   constructor() {
@@ -45,24 +47,27 @@ export class OrderService {
     const profile = this.authService.profile();
     if (!profile) return;
 
-    const url = profile.role === 'admin' ? '/api/orders' : `/api/orders/customer/${profile.uid}`;
+    const url = profile.role === 'admin' ? '/orders' : `/orders/customer/${profile.uid}`;
     
-    this.http.get<Order[]>(url).subscribe({
+    this.isLoading.set(true);
+    this.api.get<Order[]>(url).subscribe({
       next: (orders) => {
         this.ordersSignal.set(orders);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Failed to load orders', error);
+        this.isLoading.set(false);
       }
     });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createOrder(order: Omit<Order, 'id'>): Promise<any> {
-    return this.http.post<Order>('/api/orders', order).toPromise();
+    return firstValueFrom(this.api.post<Order>('/orders', order));
   }
 
   async updateOrderStatus(id: string, status: Order['status']) {
-    return this.http.patch<Order>(`/api/orders/${id}/status`, { status }).toPromise();
+    return firstValueFrom(this.api.patch<Order>(`/orders/${id}/status`, { status }));
   }
 }

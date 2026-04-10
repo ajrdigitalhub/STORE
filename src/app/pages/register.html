@@ -1,12 +1,16 @@
 <div class="min-h-screen flex items-center justify-center px-6 py-12 bg-metallic-black">
   <div class="glass-card w-full max-w-md p-10">
     <div class="w-16 h-16 bg-accent text-metallic-black rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold">I</div>
-    <h1 class="text-3xl font-bold mb-2 text-center">Welcome Back</h1>
+    <h1 class="text-3xl font-bold mb-2 text-center">Create Account</h1>
     <p class="text-accent-muted mb-8 text-center text-sm">
-      Sign in to manage your orders and custom prints.
+      Join IDEA Zone 3D to start your journey.
     </p>
 
     <form (submit)="handleSubmit()" class="space-y-4 mb-8">
+      <div class="space-y-1">
+        <label for="displayName" class="tech-label text-[10px]">Full Name</label>
+        <input id="displayName" type="text" [(ngModel)]="displayName" name="displayName" class="input-field text-sm" placeholder="John Doe" required>
+      </div>
       <div class="space-y-1">
         <label for="email" class="tech-label text-[10px]">Email Address</label>
         <input id="email" type="email" [(ngModel)]="email" name="email" class="input-field text-sm" placeholder="name@example.com" required>
@@ -38,7 +42,7 @@
           <span class="animate-spin material-icons text-sm">refresh</span>
           Processing...
         } @else {
-          Sign In
+          Register
         }
       </button>
     </form>
@@ -48,14 +52,14 @@
       <div class="relative flex justify-center text-[10px] uppercase tracking-widest"><span class="bg-metallic-black px-4 text-accent-muted">Or continue with</span></div>
     </div>
 
-    <button (click)="loginWithGoogle()" [disabled]="isLoading()" class="w-full py-3 rounded border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-3 text-sm">
+    <button (click)="registerWithGoogle()" [disabled]="isLoading()" class="w-full py-3 rounded border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-3 text-sm">
       <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
       Google Account
     </button>
     
     <p class="text-center mt-8 text-xs text-accent-muted">
-      Don't have an account?
-      <a routerLink="/register" class="text-accent hover:underline font-bold ml-1">Register</a>
+      Already have an account?
+      <a routerLink="/login" class="text-accent hover:underline font-bold ml-1">Sign In</a>
     </p>
 
     <div class="mt-8 pt-8 border-t border-white/5 text-center">

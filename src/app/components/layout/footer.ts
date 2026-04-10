@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ConfigService } from '../../services/config';
 
 @Component({
   selector: 'app-footer',
@@ -9,4 +10,6 @@ import { RouterLink } from '@angular/router';
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
   `]
 })
-export class FooterComponent {}
+export class FooterComponent {
+  configService = inject(ConfigService);
+}
