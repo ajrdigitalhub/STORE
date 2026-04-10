@@ -1,32 +1,68 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
+const dotenv = require('dotenv');
+const path = require('path');
+const functions = require('firebase-functions');
+dotenv.config();
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+const { initializeSocket } = require('./socket/chat');
+const errorHandler = require('./middleware/errorHandler');
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const categoryRoutes = require('./routes/categories');
+const orderRoutes = require('./routes/orders');
+const userRoutes = require('./routes/users');
+const paymentRoutes = require('./routes/payment');
+const messageRoutes = require('./routes/messages');
+const aboutRoutes = require('./routes/about');
+const contactConfigRoutes = require('./routes/contact-config');
+const uploadRoutes = require('./routes/upload');
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const app = express();
+const server = http.createServer(app);
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
+// Initialize Socket.io
+initializeSocket(server);
+
+// Middleware
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:4200',
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/about', aboutRoutes);
+app.use('/api/contact-config', contactConfigRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Error handler
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
 // });
+
+// Export as a Cloud Function
+exports.api = functions.https.onRequest(app);
+
+// module.exports = { app, server };
