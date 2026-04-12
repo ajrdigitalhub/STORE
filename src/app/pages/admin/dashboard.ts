@@ -110,18 +110,18 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   getTabDisplayName(tab: string): string {
     const names: Record<string, string> = {
-      'dashboard': 'System Overview',
-      'orders': 'Order Management',
-      'products': 'Inventory Control',
-      'categories': 'Product Taxonomy',
-      'customers': 'Client Directory',
-      'chat': 'Support Terminal',
-      'messages': 'Inbound Inquiries',
-      'about': 'Corporate Profile',
-      'contact': 'Communication Hub',
-      'payments': 'Financial Transactions',
-      'hero': 'Visual Merchandising',
-      'footer': 'Footer Configuration'
+      'dashboard': 'Dashboard',
+      'orders': 'Orders',
+      'products': 'Product Management',
+      'categories': 'Categories Management',
+      'customers': 'Customers',
+      'chat': 'Live Chat',
+      'messages': 'Messages',
+      'about': 'About',
+      'contact': 'Contact',
+      'payments': 'Payment Settings',
+      'hero': 'Hero Section Editor',
+      'footer': 'Footer Editor'
     };
     return names[tab] || tab;
   }

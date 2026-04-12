@@ -4,66 +4,102 @@
     <div class="p-8 border-b border-white/5">
       <div class="flex items-center gap-3 mb-2">
         <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-        <h2 class="tech-label">System Control</h2>
+        <h2 class="tech-label">Admin Panel</h2>
       </div>
       <h1 class="text-xl font-bold tracking-tighter italic font-serif">IDEA Zone 3D</h1>
     </div>
-    
+
     <nav class="flex-grow p-4 space-y-1">
-      <div class="px-4 py-2 tech-label opacity-50">Core Operations</div>
-      <button (click)="activeTab.set('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'dashboard'" [class.text-accent]="activeTab() === 'dashboard'" [class.text-accent-muted]="activeTab() !== 'dashboard'">
+      <div class="px-4 py-2 tech-label opacity-50">Store Management</div>
+      <button (click)="activeTab.set('dashboard')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'dashboard'" [class.text-accent]="activeTab() === 'dashboard'"
+        [class.text-accent-muted]="activeTab() !== 'dashboard'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">dashboard</span>
-        <span class="font-medium text-xs uppercase tracking-widest">System Overview</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Dashboard</span>
       </button>
-      <button (click)="activeTab.set('orders')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'orders'" [class.text-accent]="activeTab() === 'orders'" [class.text-accent-muted]="activeTab() !== 'orders'">
+      <button (click)="activeTab.set('orders')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'orders'" [class.text-accent]="activeTab() === 'orders'"
+        [class.text-accent-muted]="activeTab() !== 'orders'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">shopping_bag</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Order Management</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Orders</span>
       </button>
-      <button (click)="activeTab.set('products')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'products'" [class.text-accent]="activeTab() === 'products'" [class.text-accent-muted]="activeTab() !== 'products'">
+      <button (click)="activeTab.set('products')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'products'" [class.text-accent]="activeTab() === 'products'"
+        [class.text-accent-muted]="activeTab() !== 'products'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">inventory_2</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Inventory Control</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Product Management</span>
       </button>
-      <button (click)="activeTab.set('categories')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'categories'" [class.text-accent]="activeTab() === 'categories'" [class.text-accent-muted]="activeTab() !== 'categories'">
+      <button (click)="activeTab.set('categories')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'categories'" [class.text-accent]="activeTab() === 'categories'"
+        [class.text-accent-muted]="activeTab() !== 'categories'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">category</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Product Taxonomy</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Categories Management</span>
       </button>
-      <button (click)="activeTab.set('customers')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'customers'" [class.text-accent]="activeTab() === 'customers'" [class.text-accent-muted]="activeTab() !== 'customers'">
+      <button (click)="activeTab.set('customers')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'customers'" [class.text-accent]="activeTab() === 'customers'"
+        [class.text-accent-muted]="activeTab() !== 'customers'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">people</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Client Directory</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Customers</span>
       </button>
-      
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Brand Identity</div>
-      <button (click)="activeTab.set('hero')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'hero'" [class.text-accent]="activeTab() === 'hero'" [class.text-accent-muted]="activeTab() !== 'hero'">
+
+      <div class="px-4 py-2 mt-4 tech-label opacity-50">Content Management</div>
+      <button (click)="activeTab.set('hero')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'hero'" [class.text-accent]="activeTab() === 'hero'"
+        [class.text-accent-muted]="activeTab() !== 'hero'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">view_quilt</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Visual Merchandising</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Hero Section</span>
       </button>
-      <button (click)="activeTab.set('about')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'about'" [class.text-accent]="activeTab() === 'about'" [class.text-accent-muted]="activeTab() !== 'about'">
+      <button (click)="activeTab.set('about')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'about'" [class.text-accent]="activeTab() === 'about'"
+        [class.text-accent-muted]="activeTab() !== 'about'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">info</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Corporate Profile</span>
+        <span class="font-medium text-xs uppercase tracking-widest">About</span>
       </button>
-      <button (click)="activeTab.set('contact')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'contact'" [class.text-accent]="activeTab() === 'contact'" [class.text-accent-muted]="activeTab() !== 'contact'">
+      <button (click)="activeTab.set('contact')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'contact'" [class.text-accent]="activeTab() === 'contact'"
+        [class.text-accent-muted]="activeTab() !== 'contact'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">call</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Communication Hub</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Contact</span>
       </button>
-      <button (click)="activeTab.set('footer')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'footer'" [class.text-accent]="activeTab() === 'footer'" [class.text-accent-muted]="activeTab() !== 'footer'">
+      <button (click)="activeTab.set('footer')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'footer'" [class.text-accent]="activeTab() === 'footer'"
+        [class.text-accent-muted]="activeTab() !== 'footer'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">view_stream</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Footer Config</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Footer</span>
       </button>
 
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Support & Inquiries</div>
-      <button (click)="activeTab.set('chat')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'chat'" [class.text-accent]="activeTab() === 'chat'" [class.text-accent-muted]="activeTab() !== 'chat'">
+      <div class="px-4 py-2 mt-4 tech-label opacity-50">Customer Service</div>
+      <button (click)="activeTab.set('chat')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'chat'" [class.text-accent]="activeTab() === 'chat'"
+        [class.text-accent-muted]="activeTab() !== 'chat'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">chat</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Live Support</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Chat</span>
       </button>
-      <button (click)="activeTab.set('messages')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'messages'" [class.text-accent]="activeTab() === 'messages'" [class.text-accent-muted]="activeTab() !== 'messages'">
+      <button (click)="activeTab.set('messages')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'messages'" [class.text-accent]="activeTab() === 'messages'"
+        [class.text-accent-muted]="activeTab() !== 'messages'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">email</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Inbound Inquiries</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Messages</span>
       </button>
 
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Financial Control</div>
-      <button (click)="activeTab.set('payments')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group" [class.bg-white/5]="activeTab() === 'payments'" [class.text-accent]="activeTab() === 'payments'" [class.text-accent-muted]="activeTab() !== 'payments'">
+      <div class="px-4 py-2 mt-4 tech-label opacity-50">Payment Settings</div>
+      <button (click)="activeTab.set('payments')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'payments'" [class.text-accent]="activeTab() === 'payments'"
+        [class.text-accent-muted]="activeTab() !== 'payments'">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">account_balance_wallet</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Payment Gateway</span>
+        <span class="font-medium text-xs uppercase tracking-widest">Payments</span>
       </button>
     </nav>
 
@@ -96,905 +132,992 @@
 
       <!-- Dashboard View -->
       @if (activeTab() === 'dashboard') {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          @if (orderService.isLoading()) {
-            @for (i of [1, 2, 3, 4]; track i) {
-              <div class="tech-card p-6">
-                <div class="flex justify-between items-start mb-4">
-                  <app-skeleton width="40%" height="0.75rem"></app-skeleton>
-                  <app-skeleton width="20px" height="20px" className="rounded-full"></app-skeleton>
-                </div>
-                <app-skeleton width="70%" height="2rem" className="mb-2"></app-skeleton>
-                <app-skeleton width="50%" height="0.5rem"></app-skeleton>
-              </div>
-            }
-          } @else {
-            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-              <div class="flex justify-between items-start mb-4">
-                <span class="tech-label">Gross Revenue</span>
-                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
-              </div>
-              <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
-              <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
-                <span class="material-icons text-[10px]">trending_up</span>
-                +12.5% VS PREVIOUS PERIOD
-              </div>
-            </div>
-            
-            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-              <div class="flex justify-between items-start mb-4">
-                <span class="tech-label">Transaction Volume</span>
-                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">shopping_cart</span>
-              </div>
-              <div class="tech-value text-3xl font-bold mb-1">{{ orderService.orders().length }}</div>
-              <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Total processed units</div>
-            </div>
-
-            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-              <div class="flex justify-between items-start mb-4">
-                <span class="tech-label">Active Backlog</span>
-                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">hourglass_empty</span>
-              </div>
-              <div class="tech-value text-3xl font-bold mb-1">{{ pendingOrders().length }}</div>
-              <div class="text-[10px] text-yellow-500 font-mono uppercase tracking-tighter">Requires immediate action</div>
-            </div>
-
-            <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
-              <div class="flex justify-between items-start mb-4">
-                <span class="tech-label">Registered Clients</span>
-                <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">sensors</span>
-              </div>
-              <div class="tech-value text-3xl font-bold mb-1">{{ totalCustomers() }}</div>
-              <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Verified platform users</div>
-            </div>
-          }
-        </div>
-
-        <div class="tech-card">
-          <div class="tech-header">
-            <span class="tech-label">Latest Transactions Log</span>
-            <button (click)="activeTab.set('orders')" class="tech-label hover:text-accent flex items-center gap-2">
-              Full Archive <span class="material-icons text-xs">arrow_forward</span>
-            </button>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        @if (orderService.isLoading()) {
+        @for (i of [1, 2, 3, 4]; track i) {
+        <div class="tech-card p-6">
+          <div class="flex justify-between items-start mb-4">
+            <app-skeleton width="40%" height="0.75rem"></app-skeleton>
+            <app-skeleton width="20px" height="20px" className="rounded-full"></app-skeleton>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-white/5 bg-white/[0.02]">
-                  <th class="py-3 px-6 tech-label">Reference</th>
-                  <th class="py-3 px-6 tech-label">Client UID</th>
-                  <th class="py-3 px-6 tech-label">Amount INR</th>
-                  <th class="py-3 px-6 tech-label">State Flag</th>
-                  <th class="py-3 px-6 tech-label">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                @if (orderService.isLoading()) {
-                  @for (i of [1, 2, 3, 4, 5]; track i) {
-                    <tr class="border-b border-white/5">
-                      <td class="py-4 px-6"><app-skeleton width="80px"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="100px"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="60px"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="70px" height="1.25rem"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="120px"></app-skeleton></td>
-                    </tr>
-                  }
-                } @else {
-                  @for (order of recentOrders(); track order.id) {
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                      <td class="py-4 px-6 tech-value text-xs">{{ order.order_number }}</td>
-                      <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.userid }}</td>
-                      <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total_amount | currency:'INR' }}</td>
-                      <td class="py-4 px-6">
-                        <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
-                          {{ order.order_status }}
-                        </span>
-                      </td>
-                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
-                    </tr>
-                  } @empty {
-                    <tr>
-                      <td colspan="5" class="py-12 text-center tech-label opacity-30 italic">No data records found</td>
-                    </tr>
-                  }
-                }
-              </tbody>
-            </table>
+          <app-skeleton width="70%" height="2rem" className="mb-2"></app-skeleton>
+          <app-skeleton width="50%" height="0.5rem"></app-skeleton>
+        </div>
+        }
+        } @else {
+        <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <span class="tech-label">Total Revenue</span>
+            <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
+          </div>
+          <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
+          <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
+            <span class="material-icons text-[10px]">trending_up</span>
+            +12.5% VS PREVIOUS PERIOD
           </div>
         </div>
+
+        <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <span class="tech-label">Total Orders</span>
+            <span
+              class="material-icons text-accent-muted group-hover:text-accent transition-colors">shopping_cart</span>
+          </div>
+          <div class="tech-value text-3xl font-bold mb-1">{{ orderService.orders().length }}</div>
+          <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Total processed units</div>
+        </div>
+
+        <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <span class="tech-label">Pending Orders</span>
+            <span
+              class="material-icons text-accent-muted group-hover:text-accent transition-colors">hourglass_empty</span>
+          </div>
+          <div class="tech-value text-3xl font-bold mb-1">{{ pendingOrders().length }}</div>
+          <div class="text-[10px] text-yellow-500 font-mono uppercase tracking-tighter">Requires immediate action</div>
+        </div>
+
+        <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <span class="tech-label">Total Customers</span>
+            <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">sensors</span>
+          </div>
+          <div class="tech-value text-3xl font-bold mb-1">{{ totalCustomers() }}</div>
+          <div class="text-[10px] text-accent-muted font-mono uppercase tracking-tighter">Verified platform users</div>
+        </div>
+        }
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-header">
+          <span class="tech-label">Recent Orders</span>
+          <button (click)="activeTab.set('orders')" class="tech-label hover:text-accent flex items-center gap-2">
+            Full Archive <span class="material-icons text-xs">arrow_forward</span>
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/5 bg-white/[0.02]">
+                <th class="py-3 px-6 tech-label">Order #</th>
+                <th class="py-3 px-6 tech-label">Customer</th>
+                <th class="py-3 px-6 tech-label">Amount</th>
+                <th class="py-3 px-6 tech-label">Status</th>
+                <th class="py-3 px-6 tech-label">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (orderService.isLoading()) {
+              @for (i of [1, 2, 3, 4, 5]; track i) {
+              <tr class="border-b border-white/5">
+                <td class="py-4 px-6"><app-skeleton width="80px"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="100px"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="60px"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="70px" height="1.25rem"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="120px"></app-skeleton></td>
+              </tr>
+              }
+              } @else {
+              @for (order of recentOrders(); track order.id) {
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                <td class="py-4 px-6 tech-value text-xs">{{ order.order_number }}</td>
+                <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.userid }}</td>
+                <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total_amount | currency:'INR' }}</td>
+                <td class="py-4 px-6">
+                  <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
+                    {{ order.order_status }}
+                  </span>
+                </td>
+                <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.created_at | date:'yyyy-MM-dd
+                  HH:mm' }}</td>
+              </tr>
+              } @empty {
+              <tr>
+                <td colspan="5" class="py-12 text-center tech-label opacity-30 italic">No data records found</td>
+              </tr>
+              }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
       }
 
       <!-- Products View -->
       @if (activeTab() === 'products') {
-        <div class="space-y-8">
-          <div class="flex justify-between items-center">
-            <div class="tech-label">Inventory Control System</div>
-            <button (click)="showProductForm.set(!showProductForm())" class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
-              <span class="material-icons text-sm">{{ showProductForm() ? 'close' : 'add' }}</span>
-              {{ showProductForm() ? 'Discard' : 'Provision New Entry' }}
-            </button>
+      <div class="space-y-8">
+        <div class="flex justify-between items-center">
+          <div class="tech-label">Product Management</div>
+          <button (click)="showProductForm.set(!showProductForm())"
+            class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
+            <span class="material-icons text-sm">{{ showProductForm() ? 'close' : 'add' }}</span>
+            {{ showProductForm() ? 'Cancel' : 'Add New Product' }}
+          </button>
+        </div>
+
+        @if (showProductForm()) {
+        <div class="tech-card border-accent/20 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div class="tech-header">
+            <span class="tech-label">Add New Product</span>
           </div>
-
-          @if (showProductForm()) {
-            <div class="tech-card border-accent/20 animate-in fade-in slide-in-from-top-4 duration-500">
-              <div class="tech-header">
-                <span class="tech-label">Resource Provisioning Module</span>
-              </div>
-              <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="space-y-4 md:col-span-2">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                      <label for="p-name" class="tech-label">Designation</label>
-                      <input id="p-name" type="text" [(ngModel)]="newProduct.name" placeholder="Enter designation" class="input-field font-mono text-sm">
-                    </div>
-                    <div class="space-y-2">
-                      <label for="p-price" class="tech-label">Valuation INR</label>
-                      <input id="p-price" type="number" [(ngModel)]="newProduct.price" placeholder="0.00" class="input-field font-mono text-sm">
-                    </div>
-                    <div class="space-y-2">
-                      <label for="p-cat" class="tech-label">Taxonomy Reference</label>
-                      <select id="p-cat" [(ngModel)]="newProduct.category_id" class="input-field font-mono text-sm bg-metallic-black">
-                        <option [value]="0">Select Taxonomy</option>
-                        @for (cat of productService.categories(); track cat.id) {
-                          <option [value]="cat.id">{{ cat.name }}</option>
-                        }
-                      </select>
-                    </div>
-                    <div class="space-y-2">
-                      <label for="p-stock" class="tech-label">Availability Units</label>
-                      <input id="p-stock" type="number" [(ngModel)]="newProduct.stock" placeholder="0" class="input-field font-mono text-sm">
-                    </div>
-                  </div>
-                  <div class="space-y-2">
-                    <label for="p-desc" class="tech-label">Specifications Manifest</label>
-                    <textarea id="p-desc" [(ngModel)]="newProduct.description" placeholder="Enter detailed specifications..." class="input-field font-mono text-sm" rows="4"></textarea>
-                  </div>
+          <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="space-y-4 md:col-span-2">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label for="p-name" class="tech-label">Product Name</label>
+                  <input id="p-name" type="text" [(ngModel)]="newProduct.name" placeholder="Enter product name"
+                    class="input-field font-mono text-sm">
                 </div>
-                
-                <div class="space-y-4">
-                  <div class="tech-label">Asset Acquisition</div>
-                  <div class="aspect-square tech-card flex flex-col items-center justify-center p-4 relative group overflow-hidden">
-                    @if (isUploading()) {
-                      <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
-                        <span class="animate-spin material-icons text-accent">refresh</span>
-                        <span class="tech-label text-[10px]">Uploading...</span>
-                      </div>
-                    }
-                    @if (newProduct.imageUrls.length > 0) {
-                      <div class="w-full h-full grid grid-cols-2 gap-2 overflow-y-auto p-1">
-                        @for (url of newProduct.imageUrls; track url) {
-                          <img [src]="url" class="w-full h-24 object-cover rounded border border-white/10" referrerpolicy="no-referrer" alt="Product Preview">
-                        }
-                      </div>
-                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button (click)="productImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Add More</button>
-                      </div>
-                    } @else {
-                      <span class="material-icons text-4xl text-white/10 mb-2">image_search</span>
-                      <button (click)="productImageInput.click()" class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
-                        Select Assets
-                      </button>
-                    }
-                    <input type="file" multiple (change)="onProductImageSelected($event)" accept="image/*" class="hidden" #productImageInput>
-                  </div>
-                  <div class="space-y-2">
-                    <label class="tech-label">Remote Source Links</label>
-                    <div class="text-[10px] text-accent-muted">{{ newProduct.imageUrls.length }} images uploaded</div>
-                  </div>
+                <div class="space-y-2">
+                  <label for="p-price" class="tech-label">Price</label>
+                  <input id="p-price" type="number" [(ngModel)]="newProduct.price" placeholder="0.00"
+                    class="input-field font-mono text-sm">
                 </div>
-
-                <div class="md:col-span-3 pt-6 border-t border-white/5 flex gap-4">
-                  <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs" [disabled]="isUploading()">
-                    {{ isUploading() ? 'Processing...' : 'Persist Record' }}
-                  </button>
-                  <button (click)="showProductForm.set(false)" class="metallic-button-outline py-2 px-8 text-xs">Discard Changes</button>
+                <div class="space-y-2">
+                  <label for="p-cat" class="tech-label">Category</label>
+                  <select id="p-cat" [(ngModel)]="newProduct.category_id"
+                    class="input-field font-mono text-sm bg-metallic-black">
+                    <option [value]="0">Select Category</option>
+                    @for (cat of productService.categories(); track cat.id) {
+                    <option [value]="cat.id">{{ cat.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label for="p-stock" class="tech-label">Stock Quantity</label>
+                  <input id="p-stock" type="number" [(ngModel)]="newProduct.stock" placeholder="0"
+                    class="input-field font-mono text-sm">
                 </div>
               </div>
+              <div class="space-y-2">
+                <label for="p-desc" class="tech-label">Description</label>
+                <textarea id="p-desc" [(ngModel)]="newProduct.description" placeholder="Enter product description..."
+                  class="input-field font-mono text-sm" rows="4"></textarea>
+              </div>
             </div>
-          }
 
-          <div class="tech-card">
-            <div class="tech-header">
-              <span class="tech-label">Asset Registry</span>
-              <span class="tech-label opacity-50">{{ productService.products().length }} Records Found</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-white/5 bg-white/[0.02]">
-                    <th class="py-3 px-6 tech-label">Preview</th>
-                    <th class="py-3 px-6 tech-label">Identifier</th>
-                    <th class="py-3 px-6 tech-label">Taxonomy</th>
-                    <th class="py-3 px-6 tech-label">Valuation</th>
-                    <th class="py-3 px-6 tech-label">Availability</th>
-                    <th class="py-3 px-6 tech-label">Operations</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @if (productService.isLoading()) {
-                    @for (i of [1, 2, 3, 4, 5]; track i) {
-                      <tr class="border-b border-white/5">
-                        <td class="py-4 px-6"><app-skeleton width="48px" height="48px"></app-skeleton></td>
-                        <td class="py-4 px-6">
-                          <app-skeleton width="120px" height="1rem" className="mb-2"></app-skeleton>
-                          <app-skeleton width="80px" height="0.5rem"></app-skeleton>
-                        </td>
-                        <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
-                        <td class="py-4 px-6"><app-skeleton width="60px" height="1rem"></app-skeleton></td>
-                        <td class="py-4 px-6"><app-skeleton width="100px" height="0.5rem"></app-skeleton></td>
-                        <td class="py-4 px-6"><app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton></td>
-                      </tr>
-                    }
-                  } @else {
-                    @for (product of productService.products(); track product.id) {
-                      <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                        <td class="py-4 px-6">
-                          <img [src]="product.images && product.images.length > 0 ? product.images[0] : 'https://picsum.photos/seed/' + product.id + '/100/100'" [alt]="product.name" class="w-12 h-12 rounded border border-white/10 object-cover" referrerpolicy="no-referrer">
-                        </td>
-                        <td class="py-4 px-6">
-                          <div class="font-bold text-sm tracking-tight">{{ product.name }}</div>
-                          <div class="tech-value text-[9px] text-accent-muted uppercase">UID: {{ product.id.toString() | slice:0:8 }}</div>
-                        </td>
-                        <td class="py-4 px-6">
-                          <span class="text-[10px] font-mono px-2 py-0.5 bg-white/5 rounded border border-white/5">{{ product.category_name || 'Uncategorized' }}</span>
-                        </td>
-                        <td class="py-4 px-6 tech-value font-bold">{{ product.price | currency:'INR' }}</td>
-                        <td class="py-4 px-6">
-                          <div class="flex items-center gap-2">
-                            <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
-                              <div class="h-full bg-accent" [style.width.%]="(product.stock / 100) * 100"></div>
-                            </div>
-                            <span class="tech-value text-xs">{{ product.stock }}</span>
-                          </div>
-                        </td>
-                        <td class="py-4 px-6">
-                          <button (click)="productService.deleteProduct(product.id)" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
-                            <span class="material-icons text-sm">delete_outline</span>
-                          </button>
-                        </td>
-                      </tr>
-                    }
+            <div class="space-y-4">
+              <div class="tech-label">Product Images</div>
+              <div
+                class="aspect-square tech-card flex flex-col items-center justify-center p-4 relative group overflow-hidden">
+                @if (isUploading()) {
+                <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                  <span class="animate-spin material-icons text-accent">refresh</span>
+                  <span class="tech-label text-[10px]">Uploading...</span>
+                </div>
+                }
+                @if (newProduct.imageUrls.length > 0) {
+                <div class="w-full h-full grid grid-cols-2 gap-2 overflow-y-auto p-1">
+                  @for (url of newProduct.imageUrls; track url) {
+                  <img [src]="url" class="w-full h-24 object-cover rounded border border-white/10"
+                    referrerpolicy="no-referrer" alt="Product Preview">
                   }
-                </tbody>
-              </table>
+                </div>
+                <div
+                  class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button (click)="productImageInput.click()"
+                    class="tech-label bg-white text-black px-3 py-1 rounded">Add More</button>
+                </div>
+                } @else {
+                <span class="material-icons text-4xl text-white/10 mb-2">image_search</span>
+                <button (click)="productImageInput.click()"
+                  class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
+                  Select Images
+                </button>
+                }
+                <input type="file" multiple (change)="onProductImageSelected($event)" accept="image/*" class="hidden"
+                  #productImageInput>
+              </div>
+              <div class="space-y-2">
+                <label class="tech-label">Image URLs</label>
+                <div class="text-[10px] text-accent-muted">{{ newProduct.imageUrls.length }} images uploaded</div>
+              </div>
+            </div>
+
+            <div class="md:col-span-3 pt-6 border-t border-white/5 flex gap-4">
+              <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs" [disabled]="isUploading()">
+                {{ isUploading() ? 'Saving...' : 'Save Product' }}
+              </button>
+              <button (click)="showProductForm.set(false)"
+                class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
             </div>
           </div>
         </div>
+        }
+
+        <div class="tech-card">
+          <div class="tech-header">
+            <span class="tech-label">Products List</span>
+            <span class="tech-label opacity-50">{{ productService.products().length }} Records Found</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/5 bg-white/[0.02]">
+                  <th class="py-3 px-6 tech-label">Image</th>
+                  <th class="py-3 px-6 tech-label">Product</th>
+                  <th class="py-3 px-6 tech-label">Category</th>
+                  <th class="py-3 px-6 tech-label">Price</th>
+                  <th class="py-3 px-6 tech-label">Stock</th>
+                  <th class="py-3 px-6 tech-label">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (productService.isLoading()) {
+                @for (i of [1, 2, 3, 4, 5]; track i) {
+                <tr class="border-b border-white/5">
+                  <td class="py-4 px-6"><app-skeleton width="48px" height="48px"></app-skeleton></td>
+                  <td class="py-4 px-6">
+                    <app-skeleton width="120px" height="1rem" className="mb-2"></app-skeleton>
+                    <app-skeleton width="80px" height="0.5rem"></app-skeleton>
+                  </td>
+                  <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
+                  <td class="py-4 px-6"><app-skeleton width="60px" height="1rem"></app-skeleton></td>
+                  <td class="py-4 px-6"><app-skeleton width="100px" height="0.5rem"></app-skeleton></td>
+                  <td class="py-4 px-6"><app-skeleton width="32px" height="32px"
+                      className="rounded-full"></app-skeleton></td>
+                </tr>
+                }
+                } @else {
+                @for (product of productService.products(); track product.id) {
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                  <td class="py-4 px-6">
+                    <img
+                      [src]="product.images && product.images.length > 0 ? product.images[0] : 'https://picsum.photos/seed/' + product.id + '/100/100'"
+                      [alt]="product.name" class="w-12 h-12 rounded border border-white/10 object-cover"
+                      referrerpolicy="no-referrer">
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="font-bold text-sm tracking-tight">{{ product.name }}</div>
+                    <div class="tech-value text-[9px] text-accent-muted uppercase">UID: {{ product.id.toString() |
+                      slice:0:8 }}</div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="text-[10px] font-mono px-2 py-0.5 bg-white/5 rounded border border-white/5">{{
+                      product.category_name || 'Uncategorized' }}</span>
+                  </td>
+                  <td class="py-4 px-6 tech-value font-bold">{{ product.price | currency:'INR' }}</td>
+                  <td class="py-4 px-6">
+                    <div class="flex items-center gap-2">
+                      <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-accent" [style.width.%]="(product.stock / 100) * 100"></div>
+                      </div>
+                      <span class="tech-value text-xs">{{ product.stock }}</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <button (click)="productService.deleteProduct(product.id)"
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
+                      <span class="material-icons text-sm">delete_outline</span>
+                    </button>
+                  </td>
+                </tr>
+                }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       }
 
       <!-- Orders View -->
       @if (activeTab() === 'orders') {
-        <div class="tech-card">
-          <div class="tech-header">
-            <span class="tech-label">Transaction Manifest</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-white/5 bg-white/[0.02]">
-                  <th class="py-3 px-6 tech-label">Reference ID</th>
-                  <th class="py-3 px-6 tech-label">Client UID</th>
-                  <th class="py-3 px-6 tech-label">Gross Amount</th>
-                  <th class="py-3 px-6 tech-label">State Flag</th>
-                  <th class="py-3 px-6 tech-label">State Transition</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (order of orderService.orders(); track order.id) {
-                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-4 px-6 tech-value text-xs font-bold">{{ order.order_number }}</td>
-                    <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.userid }}</td>
-                    <td class="py-4 px-6 tech-value font-bold">{{ order.total_amount | currency:'INR' }}</td>
-                    <td class="py-4 px-6">
-                      <span class="px-2 py-1 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20"
-                        [class.border-yellow-500/50]="order.order_status === 'pending'"
-                        [class.text-yellow-500]="order.order_status === 'pending'"
-                        [class.border-blue-500/50]="order.order_status === 'processing'"
-                        [class.text-blue-500]="order.order_status === 'processing'"
-                        [class.border-green-500/50]="order.order_status === 'delivered'"
-                        [class.text-green-500]="order.order_status === 'delivered'">
-                        {{ order.order_status }}
-                      </span>
-                    </td>
-                    <td class="py-4 px-6">
-                      <select (change)="updateOrderStatus(order.id, $any($event.target).value)" class="bg-metallic-black border border-white/10 rounded px-3 py-1.5 text-[10px] font-mono focus:border-accent outline-none transition-colors">
-                        <option value="pending" [selected]="order.order_status === 'pending'">PENDING</option>
-                        <option value="processing" [selected]="order.order_status === 'processing'">PROCESSING</option>
-                        <option value="shipped" [selected]="order.order_status === 'shipped'">SHIPPED</option>
-                        <option value="delivered" [selected]="order.order_status === 'delivered'">DELIVERED</option>
-                      </select>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+      <div class="tech-card">
+        <div class="tech-header">
+          <span class="tech-label">Orders List</span>
         </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/5 bg-white/[0.02]">
+                <th class="py-3 px-6 tech-label">Order Number</th>
+                <th class="py-3 px-6 tech-label">Customer ID</th>
+                <th class="py-3 px-6 tech-label">Total Amount</th>
+                <th class="py-3 px-6 tech-label">Status</th>
+                <th class="py-3 px-6 tech-label">Update Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orderService.orders(); track order.id) {
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <td class="py-4 px-6 tech-value text-xs font-bold">{{ order.order_number }}</td>
+                <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.userid }}</td>
+                <td class="py-4 px-6 tech-value font-bold">{{ order.total_amount | currency:'INR' }}</td>
+                <td class="py-4 px-6">
+                  <span class="px-2 py-1 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20"
+                    [class.border-yellow-500/50]="order.order_status === 'pending'"
+                    [class.text-yellow-500]="order.order_status === 'pending'"
+                    [class.border-blue-500/50]="order.order_status === 'processing'"
+                    [class.text-blue-500]="order.order_status === 'processing'"
+                    [class.border-green-500/50]="order.order_status === 'delivered'"
+                    [class.text-green-500]="order.order_status === 'delivered'">
+                    {{ order.order_status }}
+                  </span>
+                </td>
+                <td class="py-4 px-6">
+                  <select (change)="updateOrderStatus(order.id, $any($event.target).value)"
+                    class="bg-metallic-black border border-white/10 rounded px-3 py-1.5 text-[10px] font-mono focus:border-accent outline-none transition-colors">
+                    <option value="pending" [selected]="order.order_status === 'pending'">PENDING</option>
+                    <option value="processing" [selected]="order.order_status === 'processing'">PROCESSING</option>
+                    <option value="shipped" [selected]="order.order_status === 'shipped'">SHIPPED</option>
+                    <option value="delivered" [selected]="order.order_status === 'delivered'">DELIVERED</option>
+                  </select>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
       }
 
       <!-- Chat View -->
       @if (activeTab() === 'chat') {
-        <div class="tech-card h-[700px] flex flex-col">
-          <div class="tech-header">
-            <div class="flex items-center gap-3">
-              <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span class="tech-label">Support Terminal V1</span>
-            </div>
-            <span class="tech-label opacity-50">Uplink Established</span>
+      <div class="tech-card h-[700px] flex flex-col">
+        <div class="tech-header">
+          <div class="flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="tech-label">Live Chat</span>
           </div>
-          
-          <div class="flex-grow overflow-y-auto p-8 space-y-6 bg-black/20">
-            @for (msg of chatService.messages(); track msg.timestamp) {
-              <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
-                <div class="flex items-center gap-2 mb-2 px-1">
-                  <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
-                  <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
-                </div>
-                <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border" 
-                  [class.bg-accent]="msg.sender_id === authService.profile()?.id" 
-                  [class.text-metallic-black]="msg.sender_id === authService.profile()?.id" 
-                  [class.border-accent]="msg.sender_id === authService.profile()?.id"
-                  [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
-                  [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
-                  {{ msg.text }}
-                </div>
-              </div>
+          <span class="tech-label opacity-50">Online</span>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-8 space-y-6 bg-black/20">
+          @for (msg of chatService.messages(); track msg.timestamp) {
+          <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
+            <div class="flex items-center gap-2 mb-2 px-1">
+              <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
+              <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
+            </div>
+            <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border"
+              [class.bg-accent]="msg.sender_id === authService.profile()?.id"
+              [class.text-metallic-black]="msg.sender_id === authService.profile()?.id"
+              [class.border-accent]="msg.sender_id === authService.profile()?.id"
+              [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
+              [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
+              {{ msg.text }}
+            </div>
+          </div>
+          }
+        </div>
+
+        <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
+          <div class="flex flex-wrap gap-2">
+            @for (reply of quickReplies; track reply) {
+            <button (click)="chatMessage = reply; sendMessage()"
+              class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded">
+              {{ reply }}
+            </button>
             }
           </div>
-
-          <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
-            <div class="flex flex-wrap gap-2">
-              @for (reply of quickReplies; track reply) {
-                <button 
-                  (click)="chatMessage = reply; sendMessage()" 
-                  class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded"
-                >
-                  {{ reply }}
-                </button>
-              }
-            </div>
-            <div class="flex gap-4">
-              <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()" placeholder="Execute command or send message..." class="input-field font-mono text-sm">
-              <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
-                <span class="material-icons text-sm">send</span>
-                BROADCAST SIGNAL
-              </button>
-            </div>
+          <div class="flex gap-4">
+            <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()"
+              placeholder="Type your message..." class="input-field font-mono text-sm">
+            <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
+              <span class="material-icons text-sm">send</span>
+              Send Message
+            </button>
           </div>
         </div>
+      </div>
       }
 
       <!-- Hero Edit View -->
       @if (activeTab() === 'hero') {
-        <div class="space-y-8">
-          <div class="flex justify-between items-center">
-            <div class="tech-label">Merchandising Configurator</div>
-            <button (click)="addHeroSlide()" class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
-              <span class="material-icons text-sm">add_to_photos</span>
-              Provision Slide
-            </button>
-          </div>
-          
-          <div class="grid grid-cols-1 gap-8">
-            @for (slide of heroForm().slides; track $index) {
-              <div class="tech-card animate-in fade-in slide-in-from-bottom-4 duration-500" [style.animation-delay.ms]="$index * 100">
-                <div class="tech-header">
-                  <span class="tech-label">Slide Buffer {{ $index + 1 }}</span>
-                  <button (click)="removeHeroSlide($index)" class="text-red-500 hover:text-red-400 flex items-center gap-1 tech-label">
-                    <span class="material-icons text-xs">delete</span> Purge
-                  </button>
-                </div>
-                
-                <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  <div class="space-y-6">
-                    <div class="space-y-2">
-                      <label [for]="'h-title-' + $index" class="tech-label">Primary Headline</label>
-                      <input [id]="'h-title-' + $index" type="text" [(ngModel)]="slide.title" class="input-field font-serif italic text-lg" placeholder="Main Heading">
-                    </div>
-                    <div class="space-y-2">
-                      <label [for]="'h-sub-' + $index" class="tech-label">Narrative Payload</label>
-                      <textarea [id]="'h-sub-' + $index" [(ngModel)]="slide.subtitle" class="input-field text-sm" rows="3" placeholder="Description text"></textarea>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                      <div class="space-y-2">
-                        <label [for]="'h-btn-' + $index" class="tech-label">Call To Action</label>
-                        <input [id]="'h-btn-' + $index" type="text" [(ngModel)]="slide.buttonText" class="input-field font-mono text-xs" placeholder="e.g. SHOP">
-                      </div>
-                      <div class="space-y-2">
-                        <label [for]="'h-link-' + $index" class="tech-label">Destination Vector</label>
-                        <input [id]="'h-link-' + $index" type="text" [(ngModel)]="slide.buttonLink" class="input-field font-mono text-xs" placeholder="/products">
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="space-y-4">
-                    <div class="tech-label">Source Preview</div>
-                    <div class="aspect-video tech-card relative group">
-                      @if (isUploading()) {
-                        <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
-                          <span class="animate-spin material-icons text-accent">refresh</span>
-                          <span class="tech-label text-[10px]">Uploading...</span>
-                        </div>
-                      }
-                      <img [src]="slide.imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer" alt="Slide Preview">
-                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button (click)="heroSlideImageInput.click()" class="tech-label bg-white text-black px-4 py-2 rounded">Update Source</button>
-                      </div>
-                    </div>
-                    <input type="file" (change)="onHeroImageSelected($event, $index)" accept="image/*" class="hidden" #heroSlideImageInput>
-                    <div class="space-y-2">
-                      <label [for]="'h-url-' + $index" class="tech-label">Asset URI</label>
-                      <input [id]="'h-url-' + $index" type="text" [(ngModel)]="slide.imageUrl" class="input-field font-mono text-[10px]" placeholder="https://...">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
-            
-            <div class="pt-8 flex justify-center">
-              <button (click)="saveHeroConfig()" class="metallic-button py-4 px-12 text-lg tracking-widest flex items-center gap-4">
-                <span class="material-icons">save</span>
-                PERSIST CONFIG
+      <div class="space-y-8">
+        <div class="flex justify-between items-center">
+          <div class="tech-label">Hero Section Editor</div>
+          <button (click)="addHeroSlide()" class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
+            <span class="material-icons text-sm">add_to_photos</span>
+            Add Slide
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8">
+          @for (slide of heroForm().slides; track $index) {
+          <div class="tech-card animate-in fade-in slide-in-from-bottom-4 duration-500"
+            [style.animation-delay.ms]="$index * 100">
+            <div class="tech-header">
+              <span class="tech-label">Slide {{ $index + 1 }}</span>
+              <button (click)="removeHeroSlide($index)"
+                class="text-red-500 hover:text-red-400 flex items-center gap-1 tech-label">
+                <span class="material-icons text-xs">delete</span> Remove
               </button>
             </div>
-          </div>
-        </div>
-      }
 
-      <!-- About Edit View -->
-      @if (activeTab() === 'about') {
-        <div class="tech-card max-w-4xl mx-auto">
-          <div class="tech-header">
-            <span class="tech-label">Identity Management Module</span>
-          </div>
-          <div class="p-8 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div class="space-y-2">
-                <label for="a-title" class="tech-label">Corporate Headline</label>
-                <input id="a-title" type="text" [(ngModel)]="aboutForm().title" class="input-field font-serif italic text-xl" placeholder="About Us">
-              </div>
-              <div class="space-y-2">
-                <label for="a-subtitle" class="tech-label">Narrative Subtitle</label>
-                <input id="a-subtitle" type="text" [(ngModel)]="aboutForm().subtitle" class="input-field text-sm" placeholder="Short description...">
-              </div>
-            </div>
-            
-            <div class="space-y-2">
-              <label for="a-content" class="tech-label">Narrative Data Payload</label>
-              <textarea id="a-content" [(ngModel)]="aboutForm().content" class="input-field text-sm leading-relaxed" rows="6" placeholder="Company description..."></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div class="space-y-2">
-                <label for="a-mission" class="tech-label">Mission Statement</label>
-                <textarea id="a-mission" [(ngModel)]="aboutForm().mission" class="input-field text-sm" rows="3" placeholder="Our mission..."></textarea>
-              </div>
-              <div class="space-y-2">
-                <label for="a-vision" class="tech-label">Vision Statement</label>
-                <textarea id="a-vision" [(ngModel)]="aboutForm().vision" class="input-field text-sm" rows="3" placeholder="Our vision..."></textarea>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div class="flex justify-between items-center">
-                <span class="tech-label">Core Values</span>
-                <button (click)="addAboutValue()" class="tech-label text-accent hover:underline flex items-center gap-1">
-                  <span class="material-icons text-xs">add</span> Add Value
-                </button>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @for (value of aboutForm().values; track $index) {
-                  <div class="glass-card p-4 relative group">
-                    <button (click)="removeAboutValue($index)" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span class="material-icons text-xs">close</span>
-                    </button>
-                    <div class="space-y-3">
-                      <input [(ngModel)]="value.title" class="input-field text-xs py-1" placeholder="Title">
-                      <input [(ngModel)]="value.icon" class="input-field text-[10px] py-1" placeholder="Icon (Material Name)">
-                      <textarea [(ngModel)]="value.description" class="input-field text-[10px] py-1" rows="2" placeholder="Description"></textarea>
-                    </div>
+            <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div class="space-y-6">
+                <div class="space-y-2">
+                  <label [for]="'h-title-' + $index" class="tech-label">Title</label>
+                  <input [id]="'h-title-' + $index" type="text" [(ngModel)]="slide.title"
+                    class="input-field font-serif italic text-lg" placeholder="Main Heading">
+                </div>
+                <div class="space-y-2">
+                  <label [for]="'h-sub-' + $index" class="tech-label">Subtitle</label>
+                  <textarea [id]="'h-sub-' + $index" [(ngModel)]="slide.subtitle" class="input-field text-sm" rows="3"
+                    placeholder="Description text"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label [for]="'h-btn-' + $index" class="tech-label">Button Text</label>
+                    <input [id]="'h-btn-' + $index" type="text" [(ngModel)]="slide.buttonText"
+                      class="input-field font-mono text-xs" placeholder="e.g. SHOP">
                   </div>
-                }
+                  <div class="space-y-2">
+                    <label [for]="'h-link-' + $index" class="tech-label">Button Link</label>
+                    <input [id]="'h-link-' + $index" type="text" [(ngModel)]="slide.buttonLink"
+                      class="input-field font-mono text-xs" placeholder="/products">
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div class="space-y-4">
-              <div class="tech-label">Identity Asset Source</div>
-              <div class="aspect-video tech-card relative group">
-                @if (isUploading()) {
+              <div class="space-y-4">
+                <div class="tech-label">Image Preview</div>
+                <div class="aspect-video tech-card relative group">
+                  @if (isUploading()) {
                   <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
                     <span class="animate-spin material-icons text-accent">refresh</span>
                     <span class="tech-label text-[10px]">Uploading...</span>
                   </div>
-                }
-                @if (aboutForm().imageUrl) {
-                  <img [src]="aboutForm().imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer" alt="About Preview">
-                  <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button (click)="aboutImageInput.click()" class="tech-label bg-white text-black px-4 py-2 rounded">Update Asset</button>
+                  }
+                  <img [src]="slide.imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer"
+                    alt="Slide Preview">
+                  <div
+                    class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button (click)="heroSlideImageInput.click()"
+                      class="tech-label bg-white text-black px-4 py-2 rounded">Update Image</button>
                   </div>
-                } @else {
-                  <div class="w-full h-full flex items-center justify-center">
-                    <button (click)="aboutImageInput.click()" class="tech-label border border-white/20 px-6 py-3 rounded">Select Asset</button>
-                  </div>
-                }
+                </div>
+                <input type="file" (change)="onHeroImageSelected($event, $index)" accept="image/*" class="hidden"
+                  #heroSlideImageInput>
+                <div class="space-y-2">
+                  <label [for]="'h-url-' + $index" class="tech-label">Image URL</label>
+                  <input [id]="'h-url-' + $index" type="text" [(ngModel)]="slide.imageUrl"
+                    class="input-field font-mono text-[10px]" placeholder="https://...">
+                </div>
               </div>
-              <input type="file" (change)="onAboutImageSelected($event)" accept="image/*" class="hidden" #aboutImageInput>
-              <div class="space-y-2">
-                <label for="a-url" class="tech-label">Asset URI</label>
-                <input id="a-url" type="text" [(ngModel)]="aboutForm().imageUrl" placeholder="https://..." class="input-field font-mono text-[10px]">
-              </div>
-            </div>
-            <div class="pt-8 border-t border-white/5">
-              <button (click)="saveAboutConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist Identity Data</button>
             </div>
           </div>
+          }
+
+          <div class="pt-8 flex justify-center">
+            <button (click)="saveHeroConfig()"
+              class="metallic-button py-4 px-12 text-lg tracking-widest flex items-center gap-4">
+              <span class="material-icons">save</span>
+              Save Changes
+            </button>
+          </div>
         </div>
+      </div>
+      }
+
+      <!-- About Edit View -->
+      @if (activeTab() === 'about') {
+      <div class="tech-card max-w-4xl mx-auto">
+        <div class="tech-header">
+          <span class="tech-label">Identity Management Module</span>
+        </div>
+        <div class="p-8 space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+              <label for="a-title" class="tech-label">Corporate Headline</label>
+              <input id="a-title" type="text" [(ngModel)]="aboutForm().title"
+                class="input-field font-serif italic text-xl" placeholder="About Us">
+            </div>
+            <div class="space-y-2">
+              <label for="a-subtitle" class="tech-label">Narrative Subtitle</label>
+              <input id="a-subtitle" type="text" [(ngModel)]="aboutForm().subtitle" class="input-field text-sm"
+                placeholder="Short description...">
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="a-content" class="tech-label">Narrative Data Payload</label>
+            <textarea id="a-content" [(ngModel)]="aboutForm().content" class="input-field text-sm leading-relaxed"
+              rows="6" placeholder="Company description..."></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+              <label for="a-mission" class="tech-label">Mission Statement</label>
+              <textarea id="a-mission" [(ngModel)]="aboutForm().mission" class="input-field text-sm" rows="3"
+                placeholder="Our mission..."></textarea>
+            </div>
+            <div class="space-y-2">
+              <label for="a-vision" class="tech-label">Vision Statement</label>
+              <textarea id="a-vision" [(ngModel)]="aboutForm().vision" class="input-field text-sm" rows="3"
+                placeholder="Our vision..."></textarea>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="tech-label">Core Values</span>
+              <button (click)="addAboutValue()" class="tech-label text-accent hover:underline flex items-center gap-1">
+                <span class="material-icons text-xs">add</span> Add Value
+              </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              @for (value of aboutForm().values; track $index) {
+              <div class="glass-card p-4 relative group">
+                <button (click)="removeAboutValue($index)"
+                  class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="material-icons text-xs">close</span>
+                </button>
+                <div class="space-y-3">
+                  <input [(ngModel)]="value.title" class="input-field text-xs py-1" placeholder="Title">
+                  <input [(ngModel)]="value.icon" class="input-field text-[10px] py-1"
+                    placeholder="Icon (Material Name)">
+                  <textarea [(ngModel)]="value.description" class="input-field text-[10px] py-1" rows="2"
+                    placeholder="Description"></textarea>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="tech-label">Identity Asset Source</div>
+            <div class="aspect-video tech-card relative group">
+              @if (isUploading()) {
+              <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                <span class="animate-spin material-icons text-accent">refresh</span>
+                <span class="tech-label text-[10px]">Uploading...</span>
+              </div>
+              }
+              @if (aboutForm().imageUrl) {
+              <img [src]="aboutForm().imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer"
+                alt="About Preview">
+              <div
+                class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button (click)="aboutImageInput.click()"
+                  class="tech-label bg-white text-black px-4 py-2 rounded">Update Asset</button>
+              </div>
+              } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <button (click)="aboutImageInput.click()"
+                  class="tech-label border border-white/20 px-6 py-3 rounded">Select Asset</button>
+              </div>
+              }
+            </div>
+            <input type="file" (change)="onAboutImageSelected($event)" accept="image/*" class="hidden" #aboutImageInput>
+            <div class="space-y-2">
+              <label for="a-url" class="tech-label">Asset URI</label>
+              <input id="a-url" type="text" [(ngModel)]="aboutForm().imageUrl" placeholder="https://..."
+                class="input-field font-mono text-[10px]">
+            </div>
+          </div>
+          <div class="pt-8 border-t border-white/5">
+            <button (click)="saveAboutConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist
+              Identity Data</button>
+          </div>
+        </div>
+      </div>
       }
 
       <!-- Contact Edit View -->
       @if (activeTab() === 'contact') {
-        <div class="tech-card max-w-3xl mx-auto">
-          <div class="tech-header">
-            <span class="tech-label">Communication Protocol Config</span>
+      <div class="tech-card max-w-3xl mx-auto">
+        <div class="tech-header">
+          <span class="tech-label">Communication Protocol Config</span>
+        </div>
+        <div class="p-8 space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+              <label for="c-email" class="tech-label">Email Uplink</label>
+              <input id="c-email" type="email" [(ngModel)]="contactForm().email" class="input-field font-mono text-sm"
+                placeholder="contact@example.com">
+            </div>
+            <div class="space-y-2">
+              <label for="c-phone" class="tech-label">Voice Uplink</label>
+              <input id="c-phone" type="text" [(ngModel)]="contactForm().phone" class="input-field font-mono text-sm"
+                placeholder="+1 (555) 123-4567">
+            </div>
           </div>
-          <div class="p-8 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div class="space-y-2">
-                <label for="c-email" class="tech-label">Email Uplink</label>
-                <input id="c-email" type="email" [(ngModel)]="contactForm().email" class="input-field font-mono text-sm" placeholder="contact@example.com">
-              </div>
-              <div class="space-y-2">
-                <label for="c-phone" class="tech-label">Voice Uplink</label>
-                <input id="c-phone" type="text" [(ngModel)]="contactForm().phone" class="input-field font-mono text-sm" placeholder="+1 (555) 123-4567">
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label for="c-addr" class="tech-label">Physical Location Data</label>
-              <textarea id="c-addr" [(ngModel)]="contactForm().address" class="input-field text-sm" rows="3" placeholder="123 Street Name..."></textarea>
-            </div>
-            <div class="space-y-2">
-              <label for="c-map" class="tech-label">Geospatial Embed Payload</label>
-              <input id="c-map" type="text" [(ngModel)]="contactForm().mapUrl" class="input-field font-mono text-[10px]" placeholder="https://www.google.com/maps/embed?...">
-            </div>
-            <div class="pt-8 border-t border-white/5">
-              <button (click)="saveContactConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist Protocol Data</button>
-            </div>
+          <div class="space-y-2">
+            <label for="c-addr" class="tech-label">Physical Location Data</label>
+            <textarea id="c-addr" [(ngModel)]="contactForm().address" class="input-field text-sm" rows="3"
+              placeholder="123 Street Name..."></textarea>
+          </div>
+          <div class="space-y-2">
+            <label for="c-map" class="tech-label">Geospatial Embed Payload</label>
+            <input id="c-map" type="text" [(ngModel)]="contactForm().mapUrl" class="input-field font-mono text-[10px]"
+              placeholder="https://www.google.com/maps/embed?...">
+          </div>
+          <div class="pt-8 border-t border-white/5">
+            <button (click)="saveContactConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist
+              Protocol Data</button>
           </div>
         </div>
+      </div>
       }
 
       <!-- Footer Edit View -->
       @if (activeTab() === 'footer') {
-        <div class="tech-card max-w-3xl mx-auto">
-          <div class="tech-header">
-            <span class="tech-label">Footer Configuration Module</span>
+      <div class="tech-card max-w-3xl mx-auto">
+        <div class="tech-header">
+          <span class="tech-label">Footer Configuration Module</span>
+        </div>
+        <div class="p-8 space-y-8">
+          <div class="space-y-2">
+            <label for="f-desc" class="tech-label">Footer Description</label>
+            <textarea id="f-desc" [(ngModel)]="footerForm().description" class="input-field text-sm leading-relaxed"
+              rows="4" placeholder="Enter footer description..."></textarea>
           </div>
-          <div class="p-8 space-y-8">
-            <div class="space-y-2">
-              <label for="f-desc" class="tech-label">Footer Description</label>
-              <textarea id="f-desc" [(ngModel)]="footerForm().description" class="input-field text-sm leading-relaxed" rows="4" placeholder="Enter footer description..."></textarea>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="tech-label">Social Media Uplinks</span>
+              <button (click)="addSocialLink()" class="tech-label text-accent hover:underline flex items-center gap-1">
+                <span class="material-icons text-xs">add</span> Add Link
+              </button>
             </div>
-            
+
             <div class="space-y-4">
-              <div class="flex justify-between items-center">
-                <span class="tech-label">Social Media Uplinks</span>
-                <button (click)="addSocialLink()" class="tech-label text-accent hover:underline flex items-center gap-1">
-                  <span class="material-icons text-xs">add</span> Add Link
+              @for (link of footerForm().socialLinks; track $index) {
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/5 rounded-lg border border-white/5 relative group">
+                <button (click)="removeSocialLink($index)"
+                  class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="material-icons text-xs">close</span>
                 </button>
+                <div class="space-y-1">
+                  <label [for]="'f-platform-' + $index" class="tech-label text-[9px]">Platform</label>
+                  <input [id]="'f-platform-' + $index" type="text" [(ngModel)]="link.platform"
+                    class="input-field text-xs py-2" placeholder="e.g. Facebook">
+                </div>
+                <div class="space-y-1">
+                  <label [for]="'f-url-' + $index" class="tech-label text-[9px]">URL</label>
+                  <input [id]="'f-url-' + $index" type="text" [(ngModel)]="link.url" class="input-field text-xs py-2"
+                    placeholder="https://...">
+                </div>
+                <div class="space-y-1">
+                  <label [for]="'f-icon-' + $index" class="tech-label text-[9px]">Icon (Material Icon Name)</label>
+                  <input [id]="'f-icon-' + $index" type="text" [(ngModel)]="link.icon" class="input-field text-xs py-2"
+                    placeholder="e.g. facebook">
+                </div>
               </div>
-              
-              <div class="space-y-4">
-                @for (link of footerForm().socialLinks; track $index) {
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/5 rounded-lg border border-white/5 relative group">
-                    <button (click)="removeSocialLink($index)" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span class="material-icons text-xs">close</span>
-                    </button>
-                    <div class="space-y-1">
-                      <label [for]="'f-platform-' + $index" class="tech-label text-[9px]">Platform</label>
-                      <input [id]="'f-platform-' + $index" type="text" [(ngModel)]="link.platform" class="input-field text-xs py-2" placeholder="e.g. Facebook">
-                    </div>
-                    <div class="space-y-1">
-                      <label [for]="'f-url-' + $index" class="tech-label text-[9px]">URL</label>
-                      <input [id]="'f-url-' + $index" type="text" [(ngModel)]="link.url" class="input-field text-xs py-2" placeholder="https://...">
-                    </div>
-                    <div class="space-y-1">
-                      <label [for]="'f-icon-' + $index" class="tech-label text-[9px]">Icon (Material Icon Name)</label>
-                      <input [id]="'f-icon-' + $index" type="text" [(ngModel)]="link.icon" class="input-field text-xs py-2" placeholder="e.g. facebook">
-                    </div>
-                  </div>
-                }
-              </div>
+              }
             </div>
+          </div>
 
-            <div class="space-y-2">
-              <label for="f-copy" class="tech-label">Copyright Text</label>
-              <input id="f-copy" type="text" [(ngModel)]="footerForm().copyrightText" class="input-field text-sm" placeholder="© 2026 IDEA Zone 3D. All rights reserved.">
-            </div>
+          <div class="space-y-2">
+            <label for="f-copy" class="tech-label">Copyright Text</label>
+            <input id="f-copy" type="text" [(ngModel)]="footerForm().copyrightText" class="input-field text-sm"
+              placeholder="© 2026 IDEA Zone 3D. All rights reserved.">
+          </div>
 
-            <div class="pt-8 border-t border-white/5">
-              <button (click)="saveFooterConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist Footer Data</button>
-            </div>
+          <div class="pt-8 border-t border-white/5">
+            <button (click)="saveFooterConfig()" class="metallic-button w-full py-4 tracking-widest uppercase">Persist
+              Footer Data</button>
           </div>
         </div>
+      </div>
       }
 
       <!-- Categories View -->
       @if (activeTab() === 'categories') {
-        <div class="space-y-8">
-          <div class="flex justify-between items-center">
-            <div class="tech-label">Taxonomy Hierarchy Manager</div>
-            <button (click)="showCategoryForm.set(!showCategoryForm())" class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
-              <span class="material-icons text-sm">{{ showCategoryForm() ? 'close' : 'add' }}</span>
-              {{ showCategoryForm() ? 'Discard' : 'Provision Taxonomy' }}
-            </button>
-          </div>
+      <div class="space-y-8">
+        <div class="flex justify-between items-center">
+          <div class="tech-label">Taxonomy Hierarchy Manager</div>
+          <button (click)="showCategoryForm.set(!showCategoryForm())"
+            class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
+            <span class="material-icons text-sm">{{ showCategoryForm() ? 'close' : 'add' }}</span>
+            {{ showCategoryForm() ? 'Discard' : 'Provision Taxonomy' }}
+          </button>
+        </div>
 
-          @if (showCategoryForm()) {
-            <div class="tech-card border-accent/20 animate-in fade-in slide-in-from-top-4 duration-500">
-              <div class="tech-header">
-                <span class="tech-label">Taxonomy Provisioning Module</span>
+        @if (showCategoryForm()) {
+        <div class="tech-card border-accent/20 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div class="tech-header">
+            <span class="tech-label">Taxonomy Provisioning Module</span>
+          </div>
+          <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label for="c-name" class="tech-label">Designation</label>
+                <input id="c-name" type="text" [(ngModel)]="newCategory.name" placeholder="Enter name"
+                  class="input-field font-mono text-sm">
               </div>
-              <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                  <div class="space-y-2">
-                    <label for="c-name" class="tech-label">Designation</label>
-                    <input id="c-name" type="text" [(ngModel)]="newCategory.name" placeholder="Enter name" class="input-field font-mono text-sm">
-                  </div>
-                  <div class="space-y-2">
-                    <label for="c-desc" class="tech-label">Narrative Description</label>
-                    <textarea id="c-desc" [(ngModel)]="newCategory.description" placeholder="Enter description..." class="input-field font-mono text-sm" rows="3"></textarea>
-                  </div>
-                </div>
-                <div class="space-y-4">
-                  <div class="tech-label">Asset Source URI</div>
-                  <div class="aspect-video tech-card flex flex-col items-center justify-center p-4 relative group">
-                    @if (isUploading()) {
-                      <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
-                        <span class="animate-spin material-icons text-accent">refresh</span>
-                        <span class="tech-label text-[10px]">Uploading...</span>
-                      </div>
-                    }
-                    @if (newCategory.image) {
-                      <img [src]="newCategory.image" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Category Preview">
-                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button (click)="categoryImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Modify Source</button>
-                      </div>
-                    } @else {
-                      <span class="material-icons text-4xl text-white/10 mb-2">image</span>
-                      <button (click)="categoryImageInput.click()" class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
-                        Select Asset
-                      </button>
-                    }
-                    <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden" #categoryImageInput>
-                  </div>
-                  <input type="text" [(ngModel)]="newCategory.image" placeholder="https://..." class="input-field font-mono text-[10px]">
-                </div>
-                <div class="md:col-span-2 pt-6 border-t border-white/5 flex gap-4">
-                  <button (click)="saveCategory()" class="metallic-button py-2 px-8 text-xs uppercase">Persist Taxonomy</button>
-                  <button (click)="showCategoryForm.set(false)" class="metallic-button-outline py-2 px-8 text-xs uppercase">Discard</button>
-                </div>
+              <div class="space-y-2">
+                <label for="c-desc" class="tech-label">Narrative Description</label>
+                <textarea id="c-desc" [(ngModel)]="newCategory.description" placeholder="Enter description..."
+                  class="input-field font-mono text-sm" rows="3"></textarea>
               </div>
             </div>
-          }
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @if (productService.isLoading()) {
-              @for (i of [1, 2, 3]; track i) {
-                <div class="tech-card overflow-hidden">
-                  <app-skeleton height="225px" className="rounded-none"></app-skeleton>
-                  <div class="p-4 flex justify-between items-center">
-                    <app-skeleton width="60%" height="1rem"></app-skeleton>
-                    <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
-                  </div>
+            <div class="space-y-4">
+              <div class="tech-label">Asset Source URI</div>
+              <div class="aspect-video tech-card flex flex-col items-center justify-center p-4 relative group">
+                @if (isUploading()) {
+                <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                  <span class="animate-spin material-icons text-accent">refresh</span>
+                  <span class="tech-label text-[10px]">Uploading...</span>
                 </div>
-              }
-            } @else {
-                  @for (cat of productService.categories(); track cat.id) {
-                <div class="tech-card group hover:border-accent/30 transition-all overflow-hidden">
-                  <div class="aspect-video relative overflow-hidden">
-                    <img [src]="cat.image || 'https://picsum.photos/seed/' + cat.id + '/400/225'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerpolicy="no-referrer" [alt]="cat.name">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-                    <div class="absolute bottom-4 left-4">
-                      <h3 class="text-xl font-bold tracking-tighter italic font-serif">{{ cat.name }}</h3>
-                    </div>
-                  </div>
-                  <div class="p-4 flex justify-between items-center">
-                    <p class="text-xs text-accent-muted line-clamp-1">{{ cat.description }}</p>
-                    <button (click)="deleteCategory(cat.id)" class="text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-colors">
-                      <span class="material-icons text-sm">delete</span>
-                    </button>
-                  </div>
+                }
+                @if (newCategory.image) {
+                <img [src]="newCategory.image" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer"
+                  alt="Category Preview">
+                <div
+                  class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button (click)="categoryImageInput.click()"
+                    class="tech-label bg-white text-black px-3 py-1 rounded">Modify Source</button>
                 </div>
-              }
-            }
+                } @else {
+                <span class="material-icons text-4xl text-white/10 mb-2">image</span>
+                <button (click)="categoryImageInput.click()"
+                  class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
+                  Select Asset
+                </button>
+                }
+                <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden"
+                  #categoryImageInput>
+              </div>
+              <input type="text" [(ngModel)]="newCategory.image" placeholder="https://..."
+                class="input-field font-mono text-[10px]">
+            </div>
+            <div class="md:col-span-2 pt-6 border-t border-white/5 flex gap-4">
+              <button (click)="saveCategory()" class="metallic-button py-2 px-8 text-xs uppercase">Persist
+                Taxonomy</button>
+              <button (click)="showCategoryForm.set(false)"
+                class="metallic-button-outline py-2 px-8 text-xs uppercase">Discard</button>
+            </div>
           </div>
         </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @if (productService.isLoading()) {
+          @for (i of [1, 2, 3]; track i) {
+          <div class="tech-card overflow-hidden">
+            <app-skeleton height="225px" className="rounded-none"></app-skeleton>
+            <div class="p-4 flex justify-between items-center">
+              <app-skeleton width="60%" height="1rem"></app-skeleton>
+              <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
+            </div>
+          </div>
+          }
+          } @else {
+          @for (cat of productService.categories(); track cat.id) {
+          <div class="tech-card group hover:border-accent/30 transition-all overflow-hidden">
+            <div class="aspect-video relative overflow-hidden">
+              <img [src]="cat.image || 'https://picsum.photos/seed/' + cat.id + '/400/225'"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                referrerpolicy="no-referrer" [alt]="cat.name">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-4 left-4">
+                <h3 class="text-xl font-bold tracking-tighter italic font-serif">{{ cat.name }}</h3>
+              </div>
+            </div>
+            <div class="p-4 flex justify-between items-center">
+              <p class="text-xs text-accent-muted line-clamp-1">{{ cat.description }}</p>
+              <button (click)="deleteCategory(cat.id)"
+                class="text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-colors">
+                <span class="material-icons text-sm">delete</span>
+              </button>
+            </div>
+          </div>
+          }
+          }
+        </div>
+      </div>
       }
 
       <!-- Customers View -->
       @if (activeTab() === 'customers') {
-        <div class="tech-card">
-          <div class="tech-header">
-            <span class="tech-label">Client Identity Registry</span>
-            <span class="tech-label opacity-50">{{ customers().length }} Records Found</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-white/5 bg-white/[0.02]">
-                  <th class="py-3 px-6 tech-label">Client Identity</th>
-                  <th class="py-3 px-6 tech-label">Email Uplink</th>
-                  <th class="py-3 px-6 tech-label">Voice Uplink</th>
-                  <th class="py-3 px-6 tech-label">Enrollment Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                @if (orderService.isLoading()) {
-                  @for (i of [1, 2, 3, 4, 5]; track i) {
-                    <tr class="border-b border-white/5">
-                      <td class="py-4 px-6 flex items-center gap-3">
-                        <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
-                        <div>
-                          <app-skeleton width="100px" height="1rem" className="mb-2"></app-skeleton>
-                          <app-skeleton width="60px" height="0.5rem"></app-skeleton>
-                        </div>
-                      </td>
-                      <td class="py-4 px-6"><app-skeleton width="150px" height="1rem"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="100px" height="1rem"></app-skeleton></td>
-                      <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
-                    </tr>
-                  }
-                } @else {
-                  @for (customer of customers(); track customer.id) {
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td class="py-4 px-6 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
-                          <span class="material-icons text-sm">person</span>
-                        </div>
-                        <div>
-                          <div class="font-bold text-sm">{{ customer.name || 'Anonymous' }}</div>
-                          <div class="tech-value text-[9px] text-accent-muted">ID: {{ customer.id }}</div>
-                        </div>
-                      </td>
-                      <td class="py-4 px-6 text-xs font-mono">{{ customer.email }}</td>
-                      <td class="py-4 px-6 text-xs font-mono">{{ customer.phone || 'N/A' }}</td>
-                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ customer.created_at | date:'yyyy-MM-dd' }}</td>
-                    </tr>
-                  }
-                }
-              </tbody>
-            </table>
-          </div>
+      <div class="tech-card">
+        <div class="tech-header">
+          <span class="tech-label">Client Identity Registry</span>
+          <span class="tech-label opacity-50">{{ customers().length }} Records Found</span>
         </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/5 bg-white/[0.02]">
+                <th class="py-3 px-6 tech-label">Client Identity</th>
+                <th class="py-3 px-6 tech-label">Email Uplink</th>
+                <th class="py-3 px-6 tech-label">Voice Uplink</th>
+                <th class="py-3 px-6 tech-label">Enrollment Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (orderService.isLoading()) {
+              @for (i of [1, 2, 3, 4, 5]; track i) {
+              <tr class="border-b border-white/5">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
+                  <div>
+                    <app-skeleton width="100px" height="1rem" className="mb-2"></app-skeleton>
+                    <app-skeleton width="60px" height="0.5rem"></app-skeleton>
+                  </div>
+                </td>
+                <td class="py-4 px-6"><app-skeleton width="150px" height="1rem"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="100px" height="1rem"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
+              </tr>
+              }
+              } @else {
+              @for (customer of customers(); track customer.id) {
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
+                    <span class="material-icons text-sm">person</span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm">{{ customer.name || 'Anonymous' }}</div>
+                    <div class="tech-value text-[9px] text-accent-muted">ID: {{ customer.id }}</div>
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-xs font-mono">{{ customer.email }}</td>
+                <td class="py-4 px-6 text-xs font-mono">{{ customer.phone || 'N/A' }}</td>
+                <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ customer.created_at |
+                  date:'yyyy-MM-dd' }}</td>
+              </tr>
+              }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
       }
 
       <!-- Messages View -->
       @if (activeTab() === 'messages') {
-        <div class="space-y-6">
-          <div class="tech-label">Inbound Inquiry Queue</div>
-          <div class="grid grid-cols-1 gap-4">
-            @for (msg of messages(); track msg.id) {
-              <div class="tech-card p-6 group hover:border-accent/30 transition-all" [class.opacity-60]="msg.status === 'read'">
-                <div class="flex justify-between items-start mb-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                      <span class="material-icons text-accent-muted">email</span>
-                    </div>
-                    <div>
-                      <h3 class="font-bold text-sm">{{ msg.name }}</h3>
-                      <p class="text-[10px] text-accent-muted font-mono">{{ msg.email }}</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <div class="tech-value text-[10px] text-accent-muted mb-1">{{ msg.created_at | date:'MMM dd, HH:mm' }}</div>
-                    @if (msg.status !== 'read') {
-                      <span class="px-2 py-0.5 bg-accent text-metallic-black text-[8px] font-bold uppercase rounded-sm">New Inquiry</span>
-                    }
-                  </div>
+      <div class="space-y-6">
+        <div class="tech-label">Inbound Inquiry Queue</div>
+        <div class="grid grid-cols-1 gap-4">
+          @for (msg of messages(); track msg.id) {
+          <div class="tech-card p-6 group hover:border-accent/30 transition-all"
+            [class.opacity-60]="msg.status === 'read'">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                  <span class="material-icons text-accent-muted">email</span>
                 </div>
-                <div class="mb-4">
-                  <div class="tech-label text-[10px] mb-1">Subject: {{ msg.subject }}</div>
-                  <p class="text-xs text-accent-muted leading-relaxed italic">"{{ msg.message }}"</p>
-                </div>
-                <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
-                  @if (msg.status !== 'read') {
-                    <button (click)="markMessageAsRead(msg.id)" class="tech-label hover:text-accent flex items-center gap-1">
-                      <span class="material-icons text-xs">done_all</span> Mark Read
-                    </button>
-                  }
-                  <button (click)="deleteMessage(msg.id)" class="tech-label text-red-500 hover:text-red-400 flex items-center gap-1">
-                    <span class="material-icons text-xs">delete</span> Purge Record
-                  </button>
+                <div>
+                  <h3 class="font-bold text-sm">{{ msg.name }}</h3>
+                  <p class="text-[10px] text-accent-muted font-mono">{{ msg.email }}</p>
                 </div>
               </div>
-            } @empty {
-              <div class="tech-card p-12 text-center opacity-30 italic">No inbound messages in queue</div>
-            }
+              <div class="text-right">
+                <div class="tech-value text-[10px] text-accent-muted mb-1">{{ msg.created_at | date:'MMM dd, HH:mm' }}
+                </div>
+                @if (msg.status !== 'read') {
+                <span class="px-2 py-0.5 bg-accent text-metallic-black text-[8px] font-bold uppercase rounded-sm">New
+                  Inquiry</span>
+                }
+              </div>
+            </div>
+            <div class="mb-4">
+              <div class="tech-label text-[10px] mb-1">Subject: {{ msg.subject }}</div>
+              <p class="text-xs text-accent-muted leading-relaxed italic">"{{ msg.message }}"</p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+              @if (msg.status !== 'read') {
+              <button (click)="markMessageAsRead(msg.id)" class="tech-label hover:text-accent flex items-center gap-1">
+                <span class="material-icons text-xs">done_all</span> Mark Read
+              </button>
+              }
+              <button (click)="deleteMessage(msg.id)"
+                class="tech-label text-red-500 hover:text-red-400 flex items-center gap-1">
+                <span class="material-icons text-xs">delete</span> Purge Record
+              </button>
+            </div>
           </div>
+          } @empty {
+          <div class="tech-card p-12 text-center opacity-30 italic">No inbound messages in queue</div>
+          }
         </div>
+      </div>
       }
 
       <!-- Payments View -->
       @if (activeTab() === 'payments') {
-        <div class="tech-card max-w-3xl mx-auto">
-          <div class="tech-header">
-            <span class="tech-label">Razorpay Gateway Configuration</span>
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full" [class.bg-green-500]="razorpayForm().enabled" [class.bg-red-500]="!razorpayForm().enabled"></div>
-              <span class="tech-label text-[10px]">{{ razorpayForm().enabled ? 'ACTIVE' : 'INACTIVE' }}</span>
+      <div class="tech-card max-w-3xl mx-auto">
+        <div class="tech-header">
+          <span class="tech-label">Razorpay Gateway Configuration</span>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full" [class.bg-green-500]="razorpayForm().enabled"
+              [class.bg-red-500]="!razorpayForm().enabled"></div>
+            <span class="tech-label text-[10px]">{{ razorpayForm().enabled ? 'ACTIVE' : 'INACTIVE' }}</span>
+          </div>
+        </div>
+        <div class="p-8 space-y-8">
+          <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+            <div>
+              <h3 class="font-bold text-sm">Enable Razorpay</h3>
+              <p class="text-[10px] text-accent-muted font-mono">Toggle payment gateway status</p>
+            </div>
+            <button (click)="toggleRazorpay()" class="w-12 h-6 rounded-full transition-colors relative"
+              [class.bg-accent]="razorpayForm().enabled" [class.bg-white/10]="!razorpayForm().enabled">
+              <div class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all"
+                [class.left-7]="razorpayForm().enabled" [class.left-1]="!razorpayForm().enabled"></div>
+            </button>
+          </div>
+
+          <div class="space-y-6">
+            <div class="space-y-2">
+              <label for="rzp-id" class="tech-label">Razorpay Key ID</label>
+              <div class="relative">
+                <span
+                  class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">vpn_key</span>
+                <input id="rzp-id" type="text" [(ngModel)]="razorpayForm().keyId"
+                  class="input-field pl-10 font-mono text-xs" placeholder="rzp_test_...">
+              </div>
+              <p class="text-[9px] text-accent-muted italic">Public identifier for your Razorpay account.</p>
+            </div>
+
+            <div class="space-y-2">
+              <label for="rzp-secret" class="tech-label">Razorpay Key Secret</label>
+              <div class="relative">
+                <span
+                  class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">lock</span>
+                <input id="rzp-secret" type="password" [(ngModel)]="razorpayForm().keySecret"
+                  class="input-field pl-10 font-mono text-xs" placeholder="••••••••••••••••">
+              </div>
+              <p class="text-[9px] text-red-400/70 italic">CRITICAL: Keep this secret secure. Never share it.</p>
             </div>
           </div>
-          <div class="p-8 space-y-8">
-            <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
-              <div>
-                <h3 class="font-bold text-sm">Enable Razorpay</h3>
-                <p class="text-[10px] text-accent-muted font-mono">Toggle payment gateway status</p>
-              </div>
-              <button (click)="toggleRazorpay()" 
-                class="w-12 h-6 rounded-full transition-colors relative"
-                [class.bg-accent]="razorpayForm().enabled"
-                [class.bg-white/10]="!razorpayForm().enabled">
-                <div class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all"
-                  [class.left-7]="razorpayForm().enabled"
-                  [class.left-1]="!razorpayForm().enabled"></div>
-              </button>
-            </div>
 
-            <div class="space-y-6">
-              <div class="space-y-2">
-                <label for="rzp-id" class="tech-label">Razorpay Key ID</label>
-                <div class="relative">
-                  <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">vpn_key</span>
-                  <input id="rzp-id" type="text" [(ngModel)]="razorpayForm().keyId" class="input-field pl-10 font-mono text-xs" placeholder="rzp_test_...">
-                </div>
-                <p class="text-[9px] text-accent-muted italic">Public identifier for your Razorpay account.</p>
-              </div>
+          <div class="pt-8 border-t border-white/5">
+            <button (click)="saveRazorpayConfig()"
+              class="metallic-button w-full py-4 tracking-widest uppercase flex items-center justify-center gap-3">
+              <span class="material-icons text-sm">save</span>
+              Initialize Gateway Config
+            </button>
+          </div>
 
-              <div class="space-y-2">
-                <label for="rzp-secret" class="tech-label">Razorpay Key Secret</label>
-                <div class="relative">
-                  <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">lock</span>
-                  <input id="rzp-secret" type="password" [(ngModel)]="razorpayForm().keySecret" class="input-field pl-10 font-mono text-xs" placeholder="••••••••••••••••">
-                </div>
-                <p class="text-[9px] text-red-400/70 italic">CRITICAL: Keep this secret secure. Never share it.</p>
-              </div>
-            </div>
-
-            <div class="pt-8 border-t border-white/5">
-              <button (click)="saveRazorpayConfig()" class="metallic-button w-full py-4 tracking-widest uppercase flex items-center justify-center gap-3">
-                <span class="material-icons text-sm">save</span>
-                Initialize Gateway Config
-              </button>
-            </div>
-
-            <div class="p-4 bg-accent/5 rounded border border-accent/10">
-              <div class="flex gap-3">
-                <span class="material-icons text-accent text-sm">info</span>
-                <p class="text-[10px] text-accent-muted leading-relaxed">
-                  Configuration changes will take effect immediately across all client terminals. Ensure keys are valid to prevent transaction failures.
-                </p>
-              </div>
+          <div class="p-4 bg-accent/5 rounded border border-accent/10">
+            <div class="flex gap-3">
+              <span class="material-icons text-accent text-sm">info</span>
+              <p class="text-[10px] text-accent-muted leading-relaxed">
+                Configuration changes will take effect immediately across all client terminals. Ensure keys are valid to
+                prevent transaction failures.
+              </p>
             </div>
           </div>
         </div>
+      </div>
       }
 
       <!-- Placeholder View -->
       @if ([''].includes(activeTab())) {
-        <div class="tech-card p-24 text-center">
-          <div class="inline-block p-6 rounded-full bg-white/5 mb-8 animate-pulse">
-            <span class="material-icons text-6xl text-accent-muted">terminal</span>
-          </div>
-          <h2 class="text-4xl font-bold tracking-tighter italic font-serif mb-4 uppercase">Subsystem Offline</h2>
-          <p class="tech-label opacity-50 max-w-md mx-auto leading-relaxed">
-            The requested subsystem [{{ activeTab() | uppercase }}] is currently undergoing maintenance or is not yet initialized in the current build.
-          </p>
-          <div class="mt-12 flex justify-center gap-4">
-            <div class="w-1 h-1 bg-accent rounded-full"></div>
-            <div class="w-1 h-1 bg-accent rounded-full opacity-50"></div>
-            <div class="w-1 h-1 bg-accent rounded-full opacity-20"></div>
-          </div>
+      <div class="tech-card p-24 text-center">
+        <div class="inline-block p-6 rounded-full bg-white/5 mb-8 animate-pulse">
+          <span class="material-icons text-6xl text-accent-muted">terminal</span>
         </div>
+        <h2 class="text-4xl font-bold tracking-tighter italic font-serif mb-4 uppercase">Subsystem Offline</h2>
+        <p class="tech-label opacity-50 max-w-md mx-auto leading-relaxed">
+          The requested subsystem [{{ activeTab() | uppercase }}] is currently undergoing maintenance or is not yet
+          initialized in the current build.
+        </p>
+        <div class="mt-12 flex justify-center gap-4">
+          <div class="w-1 h-1 bg-accent rounded-full"></div>
+          <div class="w-1 h-1 bg-accent rounded-full opacity-50"></div>
+          <div class="w-1 h-1 bg-accent rounded-full opacity-20"></div>
+        </div>
+      </div>
       }
     </div>
   </main>
