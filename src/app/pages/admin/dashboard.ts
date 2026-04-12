@@ -61,7 +61,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Thank you for reaching out to IDEA Zone 3D!'
   ];
 
-  newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
+  newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
   newCategory = { name: '', description: '', image: '' };
   
   customers = signal<Customer[]>([]);
@@ -203,12 +203,12 @@ export class AdminDashboardComponent implements AfterViewInit {
       category_id: this.newProduct.category_id,
       stock: this.newProduct.stock,
       description: this.newProduct.description,
-      images: [this.newProduct.imageUrl],
+      images: this.newProduct.imageUrls,
       featured: true,
       active: true
     });
     this.showProductForm.set(false);
-    this.newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
+    this.newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] };
   }
 
   async saveCategory() {
@@ -286,12 +286,12 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async onProductImageSelected(event: Event) {
     const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
+    const files = target.files;
+    if (files && files.length > 0) {
       this.isUploading.set(true);
       try {
-        const url = await this.uploadService.uploadImage(file);
-        this.newProduct.imageUrl = url;
+        const urls = await this.uploadService.uploadImages(files);
+        this.newProduct.imageUrls = [...this.newProduct.imageUrls, ...urls];
       } catch (error) {
         console.error('Upload failed', error);
         alert('Image upload failed');

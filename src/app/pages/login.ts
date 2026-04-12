@@ -18,18 +18,22 @@ export class LoginComponent {
   
   isLoading = signal(false);
   showPassword = signal(false);
+  errorMessage = signal<string | null>(null);
   
   email = '';
   password = '';
 
   async loginWithGoogle() {
     this.isLoading.set(true);
+    this.errorMessage.set(null);
     try {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/']);
-    } catch (error: unknown) {
-      console.error(error instanceof Error ? error.message : error);
-      alert('Login failed. Please try again.');
+    } catch (error: any) {
+      console.error(error);
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        this.errorMessage.set('Login failed. Please try again.');
+      }
     } finally {
       this.isLoading.set(false);
     }
@@ -39,12 +43,13 @@ export class LoginComponent {
     if (!this.email || !this.password) return;
 
     this.isLoading.set(true);
+    this.errorMessage.set(null);
     try {
       await this.authService.loginWithEmail(this.email, this.password);
       this.router.navigate(['/']);
-    } catch (error: unknown) {
-      console.error(error instanceof Error ? error.message : error);
-      alert('Login failed. Check your credentials.');
+    } catch (error: any) {
+      console.error(error);
+      this.errorMessage.set('Login failed. Check your credentials.');
     } finally {
       this.isLoading.set(false);
     }

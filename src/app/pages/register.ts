@@ -19,6 +19,7 @@ export class RegisterComponent {
   
   isLoading = signal(false);
   showPassword = signal(false);
+  errorMessage = signal<string | null>(null);
   
   email = '';
   password = '';
@@ -26,12 +27,15 @@ export class RegisterComponent {
 
   async registerWithGoogle() {
     this.isLoading.set(true);
+    this.errorMessage.set(null);
     try {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/']);
-    } catch (error: unknown) {
-      console.error(error instanceof Error ? error.message : error);
-      alert('Registration failed. Please try again.');
+    } catch (error: any) {
+      console.error(error);
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        this.errorMessage.set('Registration failed. Please try again.');
+      }
     } finally {
       this.isLoading.set(false);
     }
@@ -41,12 +45,13 @@ export class RegisterComponent {
     if (!this.email || !this.password || !this.displayName) return;
 
     this.isLoading.set(true);
+    this.errorMessage.set(null);
     try {
       await this.authService.registerWithEmail(this.email, this.password, this.displayName);
       this.router.navigate(['/']);
-    } catch (error: unknown) {
-      console.error(error instanceof Error ? error.message : error);
-      alert('Registration failed. Please check your details.');
+    } catch (error: any) {
+      console.error(error);
+      this.errorMessage.set('Registration failed. Please check your details.');
     } finally {
       this.isLoading.set(false);
     }

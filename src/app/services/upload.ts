@@ -13,6 +13,16 @@ export class UploadService {
     formData.append('image', file);
 
     const response = await firstValueFrom(this.api.post<{ success: boolean; url: string; fileName: string }>('/upload', formData));
-    return response.url;
+    return response.url || (response as any).urls?.[0];
+  }
+
+  async uploadImages(files: FileList | File[]): Promise<string[]> {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i]);
+    }
+
+    const response = await firstValueFrom(this.api.post<{ success: boolean; urls: string[]; files: any[] }>('/upload', formData));
+    return response.urls;
   }
 }

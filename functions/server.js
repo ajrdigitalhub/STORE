@@ -17,6 +17,8 @@ const paymentRoutes = require('./routes/payment');
 const messageRoutes = require('./routes/messages');
 const contactConfigRoutes = require('./routes/contact-config');
 const paymentConfigRoutes = require('./routes/paymentConfig');
+const appConfigRoutes = require('./routes/app-config');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const server = http.createServer(app);

@@ -5,13 +5,13 @@ const { bucket } = require('../firebase');
 const router = express.Router();
 
 router.post('/', (req, res) => {
-  // 1. Check if rawBody exists (standard for Firebase Functions)
   if (!req.rawBody) {
     return res.status(400).json({ error: 'No request body found.' });
   }
 
   const busboy = Busboy({ headers: req.headers });
-  let fileProcessed = false;
+  const uploadPromises = [];
+  const uploadedFiles = [];
 
   busboy.on('file', (name, file, info) => {
     const { filename, mimeType } = info;
@@ -24,38 +24,46 @@ router.post('/', (req, res) => {
       resumable: false
     });
 
-    blobStream.on('error', (err) => {
-      console.error('Blob stream error:', err);
+    const uploadPromise = new Promise((resolve, reject) => {
+      blobStream.on('error', (err) => {
+        console.error('Blob stream error:', err);
+        reject(err);
+      });
+
+      blobStream.on('finish', async () => {
+        try {
+          const [url] = await blob.getSignedUrl({
+            action: 'read',
+            expires: '03-01-2500'
+          });
+          uploadedFiles.push({ url, fileName: newFileName });
+          resolve();
+        } catch (err) {
+          console.error('Error generating URL:', err);
+          reject(err);
+        }
+      });
+    });
+
+    uploadPromises.push(uploadPromise);
+    file.pipe(blobStream);
+  });
+
+  busboy.on('finish', async () => {
+    try {
+      await Promise.all(uploadPromises);
+      if (!res.headersSent) {
+        res.json({
+          success: true,
+          urls: uploadedFiles.map(f => f.url),
+          files: uploadedFiles
+        });
+      }
+    } catch (err) {
       if (!res.headersSent) {
         res.status(500).json({ error: 'Upload failed', message: err.message });
       }
-    });
-
-    blobStream.on('finish', async () => {
-      fileProcessed = true;
-      try {
-        // Generating Signed URL for Uniform Access buckets
-        const [url] = await blob.getSignedUrl({
-          action: 'read',
-          expires: '03-01-2500'
-        });
-
-        if (!res.headersSent) {
-          res.json({
-            success: true,
-            url: url,
-            fileName: newFileName
-          });
-        }
-      } catch (err) {
-        console.error('Error generating URL:', err);
-        if (!res.headersSent) {
-          res.status(500).json({ error: 'Could not generate file URL' });
-        }
-      }
-    });
-
-    file.pipe(blobStream);
+    }
   });
 
   busboy.on('error', (err) => {
@@ -65,8 +73,6 @@ router.post('/', (req, res) => {
     }
   });
 
-  // 2. Instead of req.pipe(busboy), use busboy.end(req.rawBody)
-  // This pushes the already-buffered body into Busboy
   busboy.end(req.rawBody);
 });
 

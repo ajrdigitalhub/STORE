@@ -253,29 +253,33 @@
                 
                 <div class="space-y-4">
                   <div class="tech-label">Asset Acquisition</div>
-                  <div class="aspect-square tech-card flex flex-col items-center justify-center p-4 relative group">
+                  <div class="aspect-square tech-card flex flex-col items-center justify-center p-4 relative group overflow-hidden">
                     @if (isUploading()) {
                       <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
                         <span class="animate-spin material-icons text-accent">refresh</span>
                         <span class="tech-label text-[10px]">Uploading...</span>
                       </div>
                     }
-                    @if (newProduct.imageUrl) {
-                      <img [src]="newProduct.imageUrl" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Product Preview">
+                    @if (newProduct.imageUrls.length > 0) {
+                      <div class="w-full h-full grid grid-cols-2 gap-2 overflow-y-auto p-1">
+                        @for (url of newProduct.imageUrls; track url) {
+                          <img [src]="url" class="w-full h-24 object-cover rounded border border-white/10" referrerpolicy="no-referrer" alt="Product Preview">
+                        }
+                      </div>
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button (click)="productImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Modify Source</button>
+                        <button (click)="productImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Add More</button>
                       </div>
                     } @else {
-                      <span class="material-icons text-4xl text-white/10 mb-2">image</span>
+                      <span class="material-icons text-4xl text-white/10 mb-2">image_search</span>
                       <button (click)="productImageInput.click()" class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
-                        Select Asset
+                        Select Assets
                       </button>
                     }
-                    <input type="file" (change)="onProductImageSelected($event)" accept="image/*" class="hidden" #productImageInput>
+                    <input type="file" multiple (change)="onProductImageSelected($event)" accept="image/*" class="hidden" #productImageInput>
                   </div>
                   <div class="space-y-2">
-                    <label for="p-url" class="tech-label">Remote Source Link</label>
-                    <input id="p-url" type="text" [(ngModel)]="newProduct.imageUrl" placeholder="https://..." class="input-field font-mono text-[10px]">
+                    <label class="tech-label">Remote Source Links</label>
+                    <div class="text-[10px] text-accent-muted">{{ newProduct.imageUrls.length }} images uploaded</div>
                   </div>
                 </div>
 

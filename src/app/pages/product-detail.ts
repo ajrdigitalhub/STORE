@@ -22,6 +22,9 @@ export class ProductDetailComponent {
   product = signal<Product | null>(null);
   selectedImage = signal<string | null>(null);
   quantity = signal<number>(1);
+  isZoomed = signal<boolean>(false);
+  zoomBackgroundPosition = signal<string>('0% 0%');
+
   specifications = computed(() => {
     const p = this.product();
     if (!p) return [];
@@ -57,6 +60,22 @@ export class ProductDetailComponent {
 
   updateQuantity(delta: number) {
     this.quantity.update(q => Math.max(1, q + delta));
+  }
+
+  onMouseMove(event: MouseEvent) {
+    const target = event.currentTarget as HTMLElement;
+    const { left, top, width, height } = target.getBoundingClientRect();
+    const x = ((event.clientX - left) / width) * 100;
+    const y = ((event.clientY - top) / height) * 100;
+    this.zoomBackgroundPosition.set(`${x}% ${y}%`);
+  }
+
+  onMouseEnter() {
+    this.isZoomed.set(true);
+  }
+
+  onMouseLeave() {
+    this.isZoomed.set(false);
   }
 
   addToCart() {
