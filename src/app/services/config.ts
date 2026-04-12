@@ -17,8 +17,12 @@ export interface HeroConfig {
 
 export interface AboutConfig {
   title: string;
+  subtitle: string;
   content: string;
   imageUrl: string;
+  mission: string;
+  vision: string;
+  values: { title: string; description: string; icon: string }[];
 }
 
 export interface ContactConfig {
@@ -88,8 +92,16 @@ export class ConfigService {
     },
     about: {
       title: 'About IDEA Zone 3D',
-      content: 'We are pioneers in the 3D printing industry, providing high-quality prints and materials for creators, engineers, and hobbyists alike.',
-      imageUrl: 'https://picsum.photos/seed/about/800/600'
+      subtitle: 'Pioneering the future of additive manufacturing with precision and passion.',
+      content: 'Founded in 2020, IDEA Zone 3D started with a simple mission: to make industrial-grade 3D printing accessible to everyone. What began as a small workshop with two printers has evolved into a state-of-the-art fabrication hub serving clients across the globe.\n\nWe believe that the only limit to what you can create should be your imagination. Our team of engineers and designers works tirelessly to push the boundaries of what\'s possible with 3D printing technology, from rapid prototyping to final production parts.',
+      imageUrl: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=2000',
+      mission: 'To empower creators by providing the most advanced, reliable, and accessible 3D printing solutions in the industry.',
+      vision: 'To become the global standard for on-demand manufacturing, where any idea can be transformed into a physical reality within hours.',
+      values: [
+        { title: 'Precision', description: 'We maintain aerospace-grade tolerances in every print we produce.', icon: 'biotech' },
+        { title: 'Innovation', description: 'Constantly exploring new materials and printing techniques.', icon: 'lightbulb' },
+        { title: 'Sustainability', description: 'Committed to using eco-friendly materials and reducing waste.', icon: 'eco' }
+      ]
     },
     contact: {
       email: 'contact@ideazone3d.com',

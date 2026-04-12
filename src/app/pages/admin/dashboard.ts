@@ -55,6 +55,13 @@ export class AdminDashboardComponent implements AfterViewInit {
   showProductForm = signal(false);
   showCategoryForm = signal(false);
   chatMessage = '';
+  quickReplies = [
+    'Hello! How can I assist you today?',
+    'Your order is currently being processed.',
+    'We offer a variety of materials including PLA, PETG, and ABS.',
+    'Please share your order ID for further assistance.',
+    'Thank you for reaching out to IDEA Zone 3D!'
+  ];
 
   newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
   newCategory = { name: '', slug: '', description: '', image_url: '' };
@@ -74,8 +81,12 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   aboutForm = signal({
     title: '',
+    subtitle: '',
     content: '',
-    imageUrl: ''
+    imageUrl: '',
+    mission: '',
+    vision: '',
+    values: [] as { title: string; description: string; icon: string }[]
   });
 
   contactForm = signal({
@@ -128,7 +139,10 @@ export class AdminDashboardComponent implements AfterViewInit {
         });
       }
       if (!this.aboutForm().title && config.about) {
-        this.aboutForm.set({ ...config.about });
+        this.aboutForm.set({ 
+          ...config.about,
+          values: JSON.parse(JSON.stringify(config.about.values || []))
+        });
       }
       if (!this.contactForm().email && config.contact) {
         this.contactForm.set({ ...config.contact });
@@ -339,6 +353,22 @@ export class AdminDashboardComponent implements AfterViewInit {
       about: { ...this.aboutForm() }
     };
     await this.configService.updateConfig(newConfig);
+    alert('About configuration saved successfully');
+  }
+
+  addAboutValue() {
+    const current = this.aboutForm();
+    this.aboutForm.set({
+      ...current,
+      values: [...current.values, { title: '', description: '', icon: 'star' }]
+    });
+  }
+
+  removeAboutValue(index: number) {
+    const current = this.aboutForm();
+    const newValues = [...current.values];
+    newValues.splice(index, 1);
+    this.aboutForm.set({ ...current, values: newValues });
   }
 
   async saveContactConfig() {
@@ -396,6 +426,23 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   toggleRazorpay() {
     this.razorpayForm.update(f => ({ ...f, enabled: !f.enabled }));
+  }
+
+  async onCategoryImageSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.isUploading.set(true);
+      try {
+        const url = await this.uploadService.uploadImage(file);
+        this.newCategory.image_url = url;
+      } catch (error) {
+        console.error('Upload failed', error);
+        alert('Image upload failed');
+      } finally {
+        this.isUploading.set(false);
+      }
+    }
   }
 
   async onAboutImageSelected(event: Event) {

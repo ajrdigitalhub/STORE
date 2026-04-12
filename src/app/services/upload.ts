@@ -12,10 +12,7 @@ export class UploadService {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await firstValueFrom(
-      this.api.post<{ url: string }>('/upload', formData)
-    );
-    
+    const response = await firstValueFrom(this.api.post<{ success: boolean; url: string; fileName: string }>('/upload', formData));
     return response.url;
   }
 }

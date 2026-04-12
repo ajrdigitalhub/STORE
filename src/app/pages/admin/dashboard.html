@@ -254,6 +254,12 @@
                 <div class="space-y-4">
                   <div class="tech-label">Asset Acquisition</div>
                   <div class="aspect-square tech-card flex flex-col items-center justify-center p-4 relative group">
+                    @if (isUploading()) {
+                      <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                        <span class="animate-spin material-icons text-accent">refresh</span>
+                        <span class="tech-label text-[10px]">Uploading...</span>
+                      </div>
+                    }
                     @if (newProduct.imageUrl) {
                       <img [src]="newProduct.imageUrl" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Product Preview">
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -432,7 +438,17 @@
             }
           </div>
 
-          <div class="p-6 border-t border-white/5 bg-white/[0.02]">
+          <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
+            <div class="flex flex-wrap gap-2">
+              @for (reply of quickReplies; track reply) {
+                <button 
+                  (click)="chatMessage = reply; sendMessage()" 
+                  class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded"
+                >
+                  {{ reply }}
+                </button>
+              }
+            </div>
             <div class="flex gap-4">
               <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()" placeholder="Execute command or send message..." class="input-field font-mono text-sm">
               <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
@@ -490,6 +506,12 @@
                   <div class="space-y-4">
                     <div class="tech-label">Source Preview</div>
                     <div class="aspect-video tech-card relative group">
+                      @if (isUploading()) {
+                        <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                          <span class="animate-spin material-icons text-accent">refresh</span>
+                          <span class="tech-label text-[10px]">Uploading...</span>
+                        </div>
+                      }
                       <img [src]="slide.imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer" alt="Slide Preview">
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button (click)="heroSlideImageInput.click()" class="tech-label bg-white text-black px-4 py-2 rounded">Update Source</button>
@@ -517,22 +539,70 @@
 
       <!-- About Edit View -->
       @if (activeTab() === 'about') {
-        <div class="tech-card max-w-3xl mx-auto">
+        <div class="tech-card max-w-4xl mx-auto">
           <div class="tech-header">
             <span class="tech-label">Identity Management Module</span>
           </div>
           <div class="p-8 space-y-8">
-            <div class="space-y-2">
-              <label for="a-title" class="tech-label">Corporate Headline</label>
-              <input id="a-title" type="text" [(ngModel)]="aboutForm().title" class="input-field font-serif italic text-xl" placeholder="About Us">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label for="a-title" class="tech-label">Corporate Headline</label>
+                <input id="a-title" type="text" [(ngModel)]="aboutForm().title" class="input-field font-serif italic text-xl" placeholder="About Us">
+              </div>
+              <div class="space-y-2">
+                <label for="a-subtitle" class="tech-label">Narrative Subtitle</label>
+                <input id="a-subtitle" type="text" [(ngModel)]="aboutForm().subtitle" class="input-field text-sm" placeholder="Short description...">
+              </div>
             </div>
+            
             <div class="space-y-2">
               <label for="a-content" class="tech-label">Narrative Data Payload</label>
-              <textarea id="a-content" [(ngModel)]="aboutForm().content" class="input-field text-sm leading-relaxed" rows="8" placeholder="Company description..."></textarea>
+              <textarea id="a-content" [(ngModel)]="aboutForm().content" class="input-field text-sm leading-relaxed" rows="6" placeholder="Company description..."></textarea>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label for="a-mission" class="tech-label">Mission Statement</label>
+                <textarea id="a-mission" [(ngModel)]="aboutForm().mission" class="input-field text-sm" rows="3" placeholder="Our mission..."></textarea>
+              </div>
+              <div class="space-y-2">
+                <label for="a-vision" class="tech-label">Vision Statement</label>
+                <textarea id="a-vision" [(ngModel)]="aboutForm().vision" class="input-field text-sm" rows="3" placeholder="Our vision..."></textarea>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="tech-label">Core Values</span>
+                <button (click)="addAboutValue()" class="tech-label text-accent hover:underline flex items-center gap-1">
+                  <span class="material-icons text-xs">add</span> Add Value
+                </button>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @for (value of aboutForm().values; track $index) {
+                  <div class="glass-card p-4 relative group">
+                    <button (click)="removeAboutValue($index)" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span class="material-icons text-xs">close</span>
+                    </button>
+                    <div class="space-y-3">
+                      <input [(ngModel)]="value.title" class="input-field text-xs py-1" placeholder="Title">
+                      <input [(ngModel)]="value.icon" class="input-field text-[10px] py-1" placeholder="Icon (Material Name)">
+                      <textarea [(ngModel)]="value.description" class="input-field text-[10px] py-1" rows="2" placeholder="Description"></textarea>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
             <div class="space-y-4">
               <div class="tech-label">Identity Asset Source</div>
               <div class="aspect-video tech-card relative group">
+                @if (isUploading()) {
+                  <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                    <span class="animate-spin material-icons text-accent">refresh</span>
+                    <span class="tech-label text-[10px]">Uploading...</span>
+                  </div>
+                }
                 @if (aboutForm().imageUrl) {
                   <img [src]="aboutForm().imageUrl" class="w-full h-full object-cover" referrerpolicy="no-referrer" alt="About Preview">
                   <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -677,7 +747,27 @@
                 </div>
                 <div class="space-y-4">
                   <div class="tech-label">Asset Source URI</div>
-                  <input type="text" [(ngModel)]="newCategory.image_url" placeholder="https://..." class="input-field font-mono text-sm">
+                  <div class="aspect-video tech-card flex flex-col items-center justify-center p-4 relative group">
+                    @if (isUploading()) {
+                      <div class="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-2">
+                        <span class="animate-spin material-icons text-accent">refresh</span>
+                        <span class="tech-label text-[10px]">Uploading...</span>
+                      </div>
+                    }
+                    @if (newCategory.image_url) {
+                      <img [src]="newCategory.image_url" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Category Preview">
+                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button (click)="categoryImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Modify Source</button>
+                      </div>
+                    } @else {
+                      <span class="material-icons text-4xl text-white/10 mb-2">image</span>
+                      <button (click)="categoryImageInput.click()" class="tech-label border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
+                        Select Asset
+                      </button>
+                    }
+                    <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden" #categoryImageInput>
+                  </div>
+                  <input type="text" [(ngModel)]="newCategory.image_url" placeholder="https://..." class="input-field font-mono text-[10px]">
                 </div>
                 <div class="md:col-span-2 pt-6 border-t border-white/5 flex gap-4">
                   <button (click)="saveCategory()" class="metallic-button py-2 px-8 text-xs uppercase">Persist Taxonomy</button>

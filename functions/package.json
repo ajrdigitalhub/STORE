@@ -1,15 +1,18 @@
 {
   "type": "module",
   "name": "functions",
-  "main": "main.js",
+  "main": "server.js",
   "engines": {
     "node": "22"
   },
   "scripts": {
-    "serve": "firebase emulators:start --only functions",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log",
-    "start": "node main.js"
+  "lint": "eslint .",
+  "serve": "firebase emulators:start --only functions",
+  "shell": "firebase functions:shell",
+  "start": "npm run shell",
+  "deploy": "firebase deploy --only functions",
+  "logs": "firebase functions:log",
+  "dev": "nodemon local-server.js"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0",
@@ -20,6 +23,13 @@
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
+    "@types/pg": "^8.20.0"
   },
   "private": true
 }

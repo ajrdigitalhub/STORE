@@ -2,55 +2,63 @@ import { createApp } from './app.js';
 import express from 'express';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
-import * as functions from 'firebase-functions/v2'; // Use v2 explicitly
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = createApp();
-
-// Path to Angular assets - Ensure this folder is COPIED into the functions folder during build
-const browserDistPath = join(__dirname, 'dist/browser');
-
-if (existsSync(browserDistPath)) {
-  console.log('✅ Static assets found. Serving frontend.');
-  app.use(express.static(browserDistPath));
-} else {
-  console.warn('⚠️ Warning: dist/browser folder not found. API mode only.');
-}
-
-// Health check for Cloud Run
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// API Routes (Assuming your createApp handles these)
-// app.use('/api', apiRoutes);
-
-// SPA fallback: Only serve index.html if it exists and it's not an API call
-app.get('*', (req, res) => {
-  const indexPath = join(browserDistPath, 'index.html');
-
-  if (!req.path.startsWith('/api') && existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).json({
-      error: 'Not Found',
-      message: 'API route not defined or frontend assets missing.'
-    });
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
   }
 });
-const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('message', (message) => {
+    console.log('Message received:', message);
+    // Broadcast message to everyone (including sender for simplicity in this demo, 
+    // or you can use socket.broadcast.emit to send to others)
+    io.emit('message', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 });
 
+const port = process.env['PORT'] || 3000;
+const isProduction = process.env['NODE_ENV'] === 'production';
 
-// ✅ Export for Firebase Functions 2nd Gen
-// export const api = functions.https.onRequest({
-//   region: 'us-central1',
-//   memory: '512MiB',
-//   maxInstances: 10 // Good practice to limit costs
-// }, app);
+if (isProduction) {
+  // Serve Angular static files from dist/app/browser
+  const browserDistPath = join(__dirname, '../dist/app/browser');
+  app.use(express.static(browserDistPath));
+
+  // Fallback to index.html for SPA routing
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(join(browserDistPath, 'index.html'), (err) => {
+      if (err) {
+        res.status(404).send('Application not built yet. Please run npm run build.');
+      }
+    });
+  });
+}
+
+// Only listen if this file is run directly
+if (process.argv[1] && (process.argv[1].endsWith('main.ts') || process.argv[1].endsWith('main.js') || process.argv[1].endsWith('server.mjs'))) {
+  httpServer.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
+
+export default app;
+export { app };

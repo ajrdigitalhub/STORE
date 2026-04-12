@@ -22,6 +22,17 @@ export class ProductDetailComponent {
   product = signal<Product | null>(null);
   selectedImage = signal<string | null>(null);
   quantity = signal<number>(1);
+  specifications = computed(() => {
+    const p = this.product();
+    if (!p) return [];
+    return [
+      { label: 'Material', value: p.category_name || 'Standard Polymer' },
+      { label: 'Precision', value: '±0.1mm' },
+      { label: 'Lead Time', value: '3-5 Business Days' },
+      { label: 'Finish', value: 'Matte / Smooth' },
+      { label: 'Weight', value: 'Approx. 150g' }
+    ];
+  });
   relatedProducts = computed(() => {
     const p = this.product();
     if (!p) return [];

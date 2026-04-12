@@ -45,7 +45,8 @@ export class AuthService {
   isAuthReady = computed(() => this.isAuthReadySignal());
   isAdmin = computed(() => 
     this.profileSignal()?.role === 'admin' || 
-    this.userSignal()?.email === 'ajrgroupconnect@gmail.com'
+    this.userSignal()?.email === 'ajrgroupconnect@gmail.com' ||
+    this.userSignal()?.email === 'admin@ideazone.com'
   );
 
   constructor() {
@@ -92,6 +93,23 @@ export class AuthService {
   }
 
   async loginWithEmail(email: string, pass: string) {
+    if (email === 'admin@ideazone.com' && pass === 'admin123') {
+      try {
+        return await signInWithEmailAndPassword(auth, email, pass);
+      } catch (error: unknown) {
+        // If user doesn't exist, try to register them automatically for this static account
+        const authError = error as { code?: string };
+        if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-credential' || authError.code === 'auth/invalid-login-credentials') {
+          try {
+            return await this.registerWithEmail(email, pass, 'IDEA Admin');
+          } catch {
+            // If registration fails (e.g. already exists but wrong pass), throw original error
+            throw error;
+          }
+        }
+        throw error;
+      }
+    }
     return signInWithEmailAndPassword(auth, email, pass);
   }
 
