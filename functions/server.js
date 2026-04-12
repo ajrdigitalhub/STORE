@@ -86,7 +86,7 @@ app.use(express.static(browserDistPath));
 app.get(/^(?!\/api).*/, (req, res) => {
   const indexPath = path.join(browserDistPath, 'index.html');
   const csrIndexPath = path.join(browserDistPath, 'index.csr.html');
-  
+
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else if (require('fs').existsSync(csrIndexPath)) {

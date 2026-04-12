@@ -70,12 +70,10 @@ export class OrderService {
     const profile = this.authService.profile();
     if (!profile) return;
 
-    const url = profile.role === 'admin' ? '/orders' : `/orders/customer/${profile.id}`;
-    
     this.isLoading.set(true);
-    this.api.get<Order[]>(url).subscribe({
-      next: (orders) => {
-        this.ordersSignal.set(orders);
+    this.api.get<{orders: Order[], total: number}>('/orders').subscribe({
+      next: (response) => {
+        this.ordersSignal.set(response.orders || []);
         this.isLoading.set(false);
       },
       error: (error) => {

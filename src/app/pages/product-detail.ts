@@ -46,9 +46,17 @@ export class ProductDetailComponent {
   });
 
   constructor() {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe(async params => {
       const id = Number(params['id']);
-      const p = this.productService.products().find(p => p.id === id);
+      let p = this.productService.products().find(p => p.id === id);
+      
+      if (!p) {
+        const fetchedProduct = await this.productService.getProduct(id);
+        if (fetchedProduct) {
+          p = fetchedProduct;
+        }
+      }
+
       if (p) {
         this.product.set(p);
         if (p.images && p.images.length > 0) {

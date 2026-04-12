@@ -56,7 +56,21 @@ router.post('/login', [
 
     const { email, password } = req.body;
 
-    const user = await User.findByEmail(email);
+    let user = await User.findByEmail(email);
+
+    // Auto-seed admin user if trying to login with admin@ideazone.com and it doesn't exist
+    if (!user && email === 'admin@ideazone.com') {
+      user = await User.create({
+        name: 'Admin',
+        email: 'admin@ideazone.com',
+        password: 'admin123',
+      });
+      // Update role to admin
+      const pool = require('../db');
+      await pool.query('UPDATE users SET role = $1 WHERE email = $2', ['admin', 'admin@ideazone.com']);
+      user.role = 'admin';
+    }
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
@@ -96,13 +110,14 @@ router.get('/profile', auth, async (req, res, next) => {
 router.post('/google-sync', async (req, res, next) => {
   try {
     const { email, name, uid } = req.body;
-    
+
     let user = await User.findByEmail(email);
     if (!user) {
       // Create user if not exists
       // Generate a random password for Google users
       const randomPass = Math.random().toString(36).slice(-10);
-      user = await User.create({ name, email, password: randomPass });
+      const finalName = name || email.split('@')[0] || 'User';
+      user = await User.create({ name: finalName, email, password: randomPass });
     }
 
     const token = jwt.sign(

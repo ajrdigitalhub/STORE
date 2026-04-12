@@ -51,7 +51,7 @@ CREATE INDEX idx_products_search ON products USING gin(to_tsvector('english', na
 -- Orders table
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     items JSONB NOT NULL DEFAULT '[]'::jsonb,
     total_amount DECIMAL(10,2) NOT NULL,
     shipping_address JSONB,
@@ -129,7 +129,7 @@ CREATE TABLE config (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_orders_userid ON orders(userid);
+CREATE INDEX idx_orders_user_id ON orders(user_id);
 CREATE INDEX idx_orders_order_number ON orders(order_number);
 CREATE INDEX idx_orders_payment_status ON orders(payment_status);
 CREATE INDEX idx_orders_order_status ON orders(order_status);

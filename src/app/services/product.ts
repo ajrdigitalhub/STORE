@@ -103,6 +103,16 @@ export class ProductService {
     });
   }
 
+  async getProduct(id: number): Promise<Product | null> {
+    try {
+      const response = await firstValueFrom(this.api.get<Product>(`/products/${id}`));
+      return response;
+    } catch (error) {
+      console.error(`Failed to load product ${id}`, error);
+      return null;
+    }
+  }
+
   async addProduct(product: Omit<Product, 'id' | 'created_at'>) {
     const res = await firstValueFrom(this.api.post<Product>('/products', product));
     this.loadProducts();

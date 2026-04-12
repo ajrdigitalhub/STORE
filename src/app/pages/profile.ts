@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { OrderService } from '../services/order';
 import { SkeletonComponent } from '../components/shared/skeleton';
@@ -16,4 +16,10 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 export class ProfileComponent {
   authService = inject(AuthService);
   orderService = inject(OrderService);
+  router = inject(Router);
+
+  async logout() {
+    await this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

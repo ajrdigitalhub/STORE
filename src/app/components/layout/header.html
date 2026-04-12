@@ -28,12 +28,13 @@
         }
       </a>
 
-      @if (authService.user()) {
+      @if (authService.profile()) {
         <div class="hidden md:flex items-center gap-4">
           @if (authService.isAdmin()) {
             <a routerLink="/admin" class="text-xs font-bold uppercase tracking-widest text-accent hover:text-white transition-colors">Admin</a>
           }
-          <button (click)="authService.logout()" class="bg-metallic-light/50 border border-white/10 px-4 py-2 rounded-lg text-xs font-bold hover:bg-white/10 transition-all">
+          <a routerLink="/profile" class="text-xs font-bold uppercase tracking-widest text-accent-muted hover:text-white transition-colors">My Account</a>
+          <button (click)="logout()" class="bg-metallic-light/50 border border-white/10 px-4 py-2 rounded-lg text-xs font-bold hover:bg-white/10 transition-all">
             Logout
           </button>
         </div>
@@ -48,8 +49,9 @@
       <a routerLink="/products" (click)="toggleMenu()" class="text-sm font-bold text-accent-muted hover:text-white">Products</a>
       <a routerLink="/about" (click)="toggleMenu()" class="text-sm font-bold text-accent-muted hover:text-white">About</a>
       <a routerLink="/contact" (click)="toggleMenu()" class="text-sm font-bold text-accent-muted hover:text-white">Contact</a>
-      @if (authService.user()) {
-        <button (click)="authService.logout(); toggleMenu()" class="text-sm font-bold text-red-500 hover:text-white">Logout</button>
+      @if (authService.profile()) {
+        <a routerLink="/profile" (click)="toggleMenu()" class="text-sm font-bold text-accent-muted hover:text-white">My Account</a>
+        <button (click)="logout(); toggleMenu()" class="text-sm font-bold text-red-500 hover:text-white">Logout</button>
       } @else {
         <a routerLink="/login" (click)="toggleMenu()" class="text-sm font-bold text-accent hover:text-white">Login</a>
       }

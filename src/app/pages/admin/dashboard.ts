@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, effect, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, inject, signal, computed, effect, untracked, AfterViewInit, ElementRef } from '@angular/core';
 import { ProductService } from '../../services/product';
 import { OrderService, Order } from '../../services/order';
 import { AuthService } from '../../services/auth';
@@ -63,7 +63,7 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
   newCategory = { name: '', description: '', image: '' };
-  
+
   customers = signal<Customer[]>([]);
   messages = signal<Message[]>([]);
 
@@ -129,41 +129,46 @@ export class AdminDashboardComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       const config = this.configService.config();
-      const currentHero = config.hero;
-      // Only sync if form is currently empty (initial load)
-      if (this.heroForm().slides.length === 0 && currentHero?.slides) {
-        this.heroForm.set({ 
-          slides: JSON.parse(JSON.stringify(currentHero.slides))
-        });
-      }
-      if (!this.aboutForm().title && config.about) {
-        this.aboutForm.set({ 
-          ...config.about,
-          values: JSON.parse(JSON.stringify(config.about.values || []))
-        });
-      }
-      if (!this.contactForm().email && config.contact) {
-        this.contactForm.set({ ...config.contact });
-      }
-      if (!this.razorpayForm().keyId && config.razorpay) {
-        this.razorpayForm.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled }));
-        this.loadRazorpaySecret();
-      }
-      if (!this.footerForm().description && config.footer) {
-        this.footerForm.set({ 
-          description: config.footer.description,
-          socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
-          copyrightText: config.footer.copyrightText
-        });
-      }
+
+      untracked(() => {
+        const currentHero = config.hero;
+        // Only sync if form is currently empty (initial load)
+        if (this.heroForm().slides.length === 0 && currentHero?.slides) {
+          this.heroForm.set({
+            slides: JSON.parse(JSON.stringify(currentHero.slides))
+          });
+        }
+        if (!this.aboutForm().title && config.about?.title) {
+          this.aboutForm.set({
+            ...config.about,
+            values: JSON.parse(JSON.stringify(config.about.values || []))
+          });
+        }
+        if (!this.contactForm().email && config.contact?.email) {
+          this.contactForm.set({ ...config.contact });
+        }
+        if (!this.razorpayForm().keyId && config.razorpay?.keyId) {
+          this.razorpayForm.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled }));
+          this.loadRazorpaySecret();
+        }
+        if (!this.footerForm().description && config.footer?.description) {
+          this.footerForm.set({
+            description: config.footer.description,
+            socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
+            copyrightText: config.footer.copyrightText
+          });
+        }
+      });
     }, { allowSignalWrites: true });
 
     // Animate tab changes
     effect(() => {
       const tab = this.activeTab();
-      if (tab === 'customers') this.loadCustomers();
-      if (tab === 'messages') this.loadMessages();
-      setTimeout(() => this.animateContent(), 0);
+      untracked(() => {
+        if (tab === 'customers') this.loadCustomers();
+        if (tab === 'messages') this.loadMessages();
+        setTimeout(() => this.animateContent(), 0);
+      });
     });
   }
 
@@ -387,7 +392,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   async saveRazorpayConfig() {
     const currentConfig = this.configService.config();
     const form = this.razorpayForm();
-    
+
     const newConfig: AppConfig = {
       ...currentConfig,
       razorpay: {
@@ -395,9 +400,9 @@ export class AdminDashboardComponent implements AfterViewInit {
         enabled: form.enabled
       }
     };
-    
+
     await this.configService.updateConfig(newConfig);
-    
+
     // Save secret separately
     await this.http.post('/api/app-config/razorpay_secret', { keySecret: form.keySecret }).toPromise();
     alert('Razorpay configuration saved successfully');

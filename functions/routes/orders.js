@@ -14,7 +14,7 @@ router.post('/', auth, async (req, res, next) => {
     }
 
     const order = await Order.create({
-      userid: req.userId,
+      user_id: req.userId,
       items,
       total_amount: totalAmount,
       shipping_address: shippingAddress,
@@ -39,11 +39,11 @@ router.get('/', auth, async (req, res, next) => {
       result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
     }
 
-    res.json({ 
-      orders: result.orders, 
-      total: result.total, 
-      page: Number(page), 
-      pages: Math.ceil(result.total / Number(limit)) 
+    res.json({
+      orders: result.orders,
+      total: result.total,
+      page: Number(page),
+      pages: Math.ceil(result.total / Number(limit))
     });
   } catch (error) {
     next(error);
@@ -57,7 +57,7 @@ router.get('/:id', auth, async (req, res, next) => {
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
     // Customer can only see own orders
-    if (req.user.role !== 'admin' && order.userid !== req.userId) {
+    if (req.user.role !== 'admin' && order.user_id !== req.userId) {
       return res.status(403).json({ message: 'Access denied' });
     }
 

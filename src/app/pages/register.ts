@@ -25,12 +25,14 @@ export class RegisterComponent {
   password = '';
   displayName = '';
 
+  showWelcomePopup = signal(false);
+
   async registerWithGoogle() {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
       await this.authService.loginWithGoogle();
-      this.router.navigate(['/']);
+      this.showWelcomePopup.set(true);
     } catch (error: any) {
       console.error(error);
       if (error?.code !== 'auth/popup-closed-by-user') {
@@ -48,12 +50,17 @@ export class RegisterComponent {
     this.errorMessage.set(null);
     try {
       await this.authService.registerWithEmail(this.email, this.password, this.displayName);
-      this.router.navigate(['/']);
+      this.showWelcomePopup.set(true);
     } catch (error: any) {
       console.error(error);
       this.errorMessage.set('Registration failed. Please check your details.');
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  closeWelcomePopup() {
+    this.showWelcomePopup.set(false);
+    this.router.navigate(['/']);
   }
 }

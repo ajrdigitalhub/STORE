@@ -105,7 +105,11 @@ export class AuthService {
 
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    if (result.user) {
+      await this.syncFirebaseUser(result.user);
+    }
+    return result;
   }
 
   async loginWithEmail(email: string, pass: string) {
@@ -130,6 +134,10 @@ export class AuthService {
     localStorage.removeItem('auth_token');
     this.profileSignal.set(null);
     this.userSignal.set(null);
-    return signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.error('Firebase signout error', e);
+    }
   }
 }

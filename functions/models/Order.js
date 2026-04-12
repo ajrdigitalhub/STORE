@@ -3,7 +3,7 @@ const pool = require('../db');
 class Order {
   constructor(data) {
     this.id = data.id;
-    this.userid = data.userid;
+    this.user_id = data.user_id || data.userid; // Handle both for backward compatibility
     this.items = data.items || [];
     this.total_amount = parseFloat(data.total_amount);
     this.shipping_address = data.shipping_address;
@@ -40,7 +40,8 @@ class Order {
     try {
       await client.query('BEGIN');
 
-      const { userid, items, total_amount, shipping_address, payment_method = 'cod' } = orderData;
+      const { user_id, userid, items, total_amount, shipping_address, payment_method = 'cod' } = orderData;
+      const finalUserId = user_id || userid;
 
       // Validate stock for all items
       for (const item of items) {
@@ -63,11 +64,11 @@ class Order {
 
       // Create order
       const query = `
-        INSERT INTO orders (userid, items, total_amount, shipping_address, payment_method, order_number)
+        INSERT INTO orders (user_id, items, total_amount, shipping_address, payment_method, order_number)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
       `;
-      const values = [userid, JSON.stringify(items), total_amount, JSON.stringify(shipping_address), payment_method, orderNumber];
+      const values = [finalUserId, JSON.stringify(items), total_amount, JSON.stringify(shipping_address), payment_method, orderNumber];
 
       const result = await client.query(query, values);
 
@@ -87,7 +88,7 @@ class Order {
     const query = `
       SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
-      JOIN users u ON o.userid = u.id
+      JOIN users u ON o.user_id = u.id
       WHERE o.id = $1
     `;
     const result = await pool.query(query, [id]);
@@ -100,7 +101,7 @@ class Order {
     const query = `
       SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
-      JOIN users u ON o.userid = u.id
+      JOIN users u ON o.user_id = u.id
       WHERE o.order_number = $1
     `;
     const result = await pool.query(query, [orderNumber]);
@@ -113,11 +114,11 @@ class Order {
     const offset = (page - 1) * limit;
     const query = `
       SELECT * FROM orders
-      WHERE userid = $1
+      WHERE user_id = $1
       ORDER BY created_at DESC
       LIMIT $2 OFFSET $3
     `;
-    const countQuery = 'SELECT COUNT(*) FROM orders WHERE userid = $1';
+    const countQuery = 'SELECT COUNT(*) FROM orders WHERE user_id = $1';
 
     const [ordersResult, countResult] = await Promise.all([
       pool.query(query, [userId, limit, offset]),
@@ -138,7 +139,7 @@ class Order {
     let query = `
       SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
-      JOIN users u ON o.userid = u.id
+      JOIN users u ON o.user_id = u.id
       WHERE 1=1
     `;
     let countQuery = `
@@ -309,7 +310,7 @@ class Order {
     const query = `
       SELECT o.*, u.name as user_name
       FROM orders o
-      JOIN users u ON o.userid = u.id
+      JOIN users u ON o.user_id = u.id
       ORDER BY o.created_at DESC
       LIMIT $1
     `;
