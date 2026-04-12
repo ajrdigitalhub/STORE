@@ -17,7 +17,7 @@ export interface Product {
   description: string;
   price: number;
   compare_price?: number;
-  categoryid: number;
+  category_id: number;
   category_name?: string;
   images: string[];
   stock: number;

@@ -46,6 +46,8 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/contact-config', contactConfigRoutes);
 app.use('/api/payment-config', paymentConfigRoutes);
+app.use('/api/app-config', appConfigRoutes);
+app.use('/api/users', userRoutes);
 
 // Socket.io
 // io.on('connection', (socket) => {

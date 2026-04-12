@@ -233,7 +233,7 @@
                     </div>
                     <div class="space-y-2">
                       <label for="p-cat" class="tech-label">Taxonomy Reference</label>
-                      <select id="p-cat" [(ngModel)]="newProduct.categoryid" class="input-field font-mono text-sm bg-metallic-black">
+                      <select id="p-cat" [(ngModel)]="newProduct.category_id" class="input-field font-mono text-sm bg-metallic-black">
                         <option [value]="0">Select Taxonomy</option>
                         @for (cat of productService.categories(); track cat.id) {
                           <option [value]="cat.id">{{ cat.name }}</option>

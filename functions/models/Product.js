@@ -7,7 +7,7 @@ class Product {
     this.description = data.description;
     this.price = parseFloat(data.price);
     this.compare_price = data.compare_price ? parseFloat(data.compare_price) : null;
-    this.id = data.id;
+    this.category_id = data.category_id;
     this.images = data.images || [];
     this.stock = parseInt(data.stock) || 0;
     this.variants = data.variants || [];
@@ -26,13 +26,13 @@ class Product {
     const { 
       name, description, price, compare_price, images = [], 
       stock = 0, variants = [], featured = false, active = true,
-      specification = {}, tags = [], categoryid
+      specification = {}, tags = [], category_id
     } = productData;
 
     const query = `
       INSERT INTO products (
         name, description, price, compare_price, images, 
-        stock, variants, featured, active, specification, tags, categoryid
+        stock, variants, featured, active, specification, tags, category_id
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
@@ -40,7 +40,7 @@ class Product {
     const values = [
       name, description, price, compare_price, JSON.stringify(images), 
       stock, JSON.stringify(variants), featured, active, 
-      JSON.stringify(specification), JSON.stringify(tags), categoryid
+      JSON.stringify(specification), JSON.stringify(tags), category_id
     ];
 
     const result = await pool.query(query, values);
@@ -52,7 +52,7 @@ class Product {
     const query = `
       SELECT p.*, c.name as category_name, c.description as category_description
       FROM products p
-      LEFT JOIN categories c ON p.categoryid = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.id = $1 AND p.active = true
     `;
     const result = await pool.query(query, [id]);
@@ -66,12 +66,12 @@ class Product {
     let query = `
       SELECT p.*, c.name as category_name
       FROM products p
-      LEFT JOIN categories c ON p.categoryid = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.active = true
     `;
     let countQuery = `
       SELECT COUNT(*) FROM products p 
-      LEFT JOIN categories c ON p.categoryid = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.active = true
     `;
     const values = [];
@@ -86,7 +86,7 @@ class Product {
 
     if (category) {
       query += ` AND c.name ILIKE $${paramIndex}`;
-      countQuery += ` AND EXISTS (SELECT 1 FROM categories WHERE id = p.id AND name ILIKE $${paramIndex})`;
+      countQuery += ` AND EXISTS (SELECT 1 FROM categories WHERE id = p.category_id AND name ILIKE $${paramIndex})`;
       values.push(`%${category}%`);
       paramIndex++;
     }
@@ -188,7 +188,7 @@ class Product {
     const query = `
       SELECT p.*, c.name as category_name
       FROM products p
-      LEFT JOIN categories c ON p.categoryid = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.active = true AND p.featured = true
       ORDER BY p.created_at DESC
       LIMIT $1

@@ -4,23 +4,9 @@ const path = require('path');
 const { bucket } = require('../firebase');
 const router = express.Router();
 
-// Middleware to capture raw body for busboy.end(req.rawBody)
-const rawBodyMiddleware = (req, res, next) => {
-  let data = Buffer.alloc(0);
-  req.on('data', (chunk) => {
-    data = Buffer.concat([data, chunk]);
-  });
-  req.on('end', () => {
-    req.rawBody = data;
-    next();
-  });
-  req.on('error', (err) => {
-    next(err);
-  });
-};
-
-router.post('/', rawBodyMiddleware, (req, res) => {
-  if (!req.rawBody || req.rawBody.length === 0) {
+router.post('/', (req, res) => {
+  // 1. Check if rawBody exists (standard for Firebase Functions)
+  if (!req.rawBody) {
     return res.status(400).json({ error: 'No request body found.' });
   }
 
@@ -48,6 +34,7 @@ router.post('/', rawBodyMiddleware, (req, res) => {
     blobStream.on('finish', async () => {
       fileProcessed = true;
       try {
+        // Generating Signed URL for Uniform Access buckets
         const [url] = await blob.getSignedUrl({
           action: 'read',
           expires: '03-01-2500'
@@ -78,12 +65,8 @@ router.post('/', rawBodyMiddleware, (req, res) => {
     }
   });
 
-  busboy.on('finish', () => {
-    if (!fileProcessed && !res.headersSent) {
-      res.status(400).json({ error: 'No file found in request' });
-    }
-  });
-
+  // 2. Instead of req.pipe(busboy), use busboy.end(req.rawBody)
+  // This pushes the already-buffered body into Busboy
   busboy.end(req.rawBody);
 });
 

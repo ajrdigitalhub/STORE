@@ -3,7 +3,7 @@ const pool = require('../db');
 class Chat {
   constructor(data) {
     this.id = data.id;
-    this.customerid = data.customerid;
+    this.customer_id = data.customer_id;
     this.customer_name = data.customer_name;
     this.messages = data.messages || [];
     this.last_message = data.last_message;
@@ -15,16 +15,16 @@ class Chat {
 
   // Create new chat
   static async create(chatData) {
-    const { customerid, customer_name, messages = [] } = chatData;
+    const { customer_id, customer_name, messages = [] } = chatData;
     const lastMessage = messages.length > 0 ? messages[messages.length - 1].text : '';
     const lastMessageAt = messages.length > 0 ? new Date() : new Date();
 
     const query = `
-      INSERT INTO chats (customerid, customer_name, messages, last_message, last_message_at)
+      INSERT INTO chats (customer_id, customer_name, messages, last_message, last_message_at)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
-    const values = [customerid, customer_name, JSON.stringify(messages), lastMessage, lastMessageAt];
+    const values = [customer_id, customer_name, JSON.stringify(messages), lastMessage, lastMessageAt];
 
     const result = await pool.query(query, values);
     return new Chat(result.rows[0]);
@@ -32,7 +32,7 @@ class Chat {
 
   // Find by customer ID
   static async findByCustomer(customerId) {
-    const query = 'SELECT * FROM chats WHERE customerid = $1';
+    const query = 'SELECT * FROM chats WHERE customer_id = $1';
     const result = await pool.query(query, [customerId]);
     if (result.rows.length === 0) return null;
     return new Chat(result.rows[0]);
@@ -83,7 +83,7 @@ class Chat {
 
   // Get chat history for customer
   static async getHistory(customerId) {
-    const query = 'SELECT * FROM chats WHERE customerid = $1';
+    const query = 'SELECT * FROM chats WHERE customer_id = $1';
     const result = await pool.query(query, [customerId]);
     if (result.rows.length === 0) return null;
     return new Chat(result.rows[0]);

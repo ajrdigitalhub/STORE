@@ -1,70 +1,106 @@
-<div class="min-h-screen flex items-center justify-center px-6 py-12 bg-metallic-black">
-  <div class="glass-card w-full max-w-md p-10">
-    <div class="w-16 h-16 bg-accent text-metallic-black rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold">I</div>
-    <h1 class="text-3xl font-bold mb-2 text-center">Welcome Back</h1>
-    <p class="text-accent-muted mb-8 text-center text-sm">
-      Sign in to manage your orders and custom prints.
+<div class="min-h-screen flex items-center justify-center px-4 py-4 sm:py-8 bg-metallic-black relative overflow-hidden">
+  <!-- Background ambient glow -->
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-fuchsia-900/20 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-900/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+
+  <div class="glass-card w-full max-w-md p-6 sm:p-8 relative z-10 border-t border-l border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] backdrop-blur-xl transform transition-all duration-500 hover:shadow-[0_0_40px_rgba(192,38,211,0.15)]">
+    
+    <!-- Idea Zone 3D Glowing Logo -->
+    <div class="relative w-24 h-24 mx-auto mb-5 group" style="perspective: 1000px;">
+      <!-- Glowing aura -->
+      <div class="absolute inset-0 bg-fuchsia-500/20 blur-xl rounded-full animate-pulse group-hover:bg-fuchsia-400/40 transition-all duration-700"></div>
+      
+      <!-- 3D Container -->
+      <div class="w-full h-full relative transition-transform duration-700 ease-out transform-gpu group-hover:rotate-y-12 group-hover:-rotate-x-12" style="transform-style: preserve-3d;">
+        <!-- Front Face -->
+        <div class="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-cyan-600/10 backdrop-blur-md rounded-2xl border border-fuchsia-400/30 flex items-center justify-center shadow-[0_0_30px_rgba(192,38,211,0.2)]" style="transform: translateZ(20px);">
+          <div class="text-center transform transition-transform duration-500 group-hover:scale-110">
+            <span class="block text-2xl font-black text-white tracking-tighter" style="text-shadow: 0 0 8px #e879f9, 0 0 16px #c026d3, 0 0 24px #a21caf;">IDEA</span>
+            <span class="block text-xs font-bold text-cyan-100 tracking-[0.3em] mt-0.5" style="text-shadow: 0 0 6px #22d3ee, 0 0 12px #06b6d4;">ZONE</span>
+            <span class="absolute -right-3 -top-2 text-[10px] font-black text-white" style="text-shadow: 0 0 6px #e879f9, 0 0 12px #c026d3;">3D</span>
+          </div>
+        </div>
+        <!-- Depth layers -->
+        <div class="absolute inset-0 bg-fuchsia-900/20 rounded-2xl border border-fuchsia-800/30" style="transform: translateZ(10px);"></div>
+        <div class="absolute inset-0 bg-black/50 rounded-2xl border border-white/5" style="transform: translateZ(0px);"></div>
+      </div>
+    </div>
+
+    <h1 class="text-2xl font-display font-bold mb-1 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-accent-muted">Welcome Back</h1>
+    <p class="text-accent-muted mb-5 text-center text-xs font-light">
+      Enter the <span class="text-fuchsia-400 font-medium">Idea Zone</span> to manage your 3D prints.
     </p>
 
-    <form (submit)="handleSubmit()" class="space-y-4 mb-8">
-      <div class="space-y-1">
-        <label for="email" class="tech-label text-[10px]">Email Address</label>
-        <input id="email" type="email" [(ngModel)]="email" name="email" class="input-field text-sm" placeholder="name@example.com" required>
-      </div>
-      <div class="space-y-1">
-        <label for="password" class="tech-label text-[10px]">Password</label>
+    <form (submit)="handleSubmit()" class="space-y-4 mb-5">
+      <div class="space-y-1.5 group">
+        <label for="email" class="tech-label text-[10px] group-focus-within:text-fuchsia-400 transition-colors">Email Address</label>
         <div class="relative">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 material-icons text-accent-muted text-sm group-focus-within:text-fuchsia-400 transition-colors">email</span>
+          <input id="email" type="email" [(ngModel)]="email" name="email" class="input-field text-sm pl-10 bg-black/40 border-white/10 focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all" placeholder="name@example.com" required>
+        </div>
+      </div>
+      <div class="space-y-1.5 group">
+        <label for="password" class="tech-label text-[10px] group-focus-within:text-fuchsia-400 transition-colors">Password</label>
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 material-icons text-accent-muted text-sm group-focus-within:text-fuchsia-400 transition-colors">lock</span>
           <input 
             id="password" 
             [type]="showPassword() ? 'text' : 'password'" 
             [(ngModel)]="password" 
             name="password" 
-            class="input-field text-sm pr-12" 
+            class="input-field text-sm pl-10 pr-12 bg-black/40 border-white/10 focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all" 
             placeholder="••••••••" 
             required
           >
           <button 
             type="button" 
             (click)="showPassword.set(!showPassword())"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-accent-muted hover:text-accent transition-colors focus:outline-none"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-accent-muted hover:text-fuchsia-400 transition-colors focus:outline-none"
           >
             <span class="material-icons text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
           </button>
         </div>
       </div>
       
-      <button type="submit" [disabled]="isLoading()" class="metallic-button w-full py-3 mt-4 flex items-center justify-center gap-2">
+      <button type="submit" [disabled]="isLoading()" class="w-full py-2.5 mt-4 bg-gradient-to-r from-fuchsia-600 to-cyan-600 hover:from-fuchsia-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(192,38,211,0.3)] hover:shadow-[0_0_25px_rgba(192,38,211,0.5)] flex items-center justify-center gap-2">
         @if (isLoading()) {
           <span class="animate-spin material-icons text-sm">refresh</span>
-          Processing...
+          Authenticating...
         } @else {
-          Sign In
+          Initialize Session
+          <span class="material-icons text-sm">arrow_forward</span>
         }
       </button>
     </form>
 
-    <div class="relative mb-8">
+    <div class="relative mb-5">
       <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
-      <div class="relative flex justify-center text-[10px] uppercase tracking-widest"><span class="bg-metallic-black px-4 text-accent-muted">Or continue with</span></div>
+      <div class="relative flex justify-center text-[10px] uppercase tracking-widest"><span class="bg-metallic-gray/50 px-4 text-accent-muted backdrop-blur-md rounded-full">Or connect via</span></div>
     </div>
 
-    <button (click)="loginWithGoogle()" [disabled]="isLoading()" class="w-full py-3 rounded border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-3 text-sm">
-      <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
-      Google Account
+    <button (click)="loginWithGoogle()" [disabled]="isLoading()" class="w-full py-2.5 rounded-xl border border-white/10 bg-black/40 hover:bg-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-3 text-sm group">
+      <img src="https://www.google.com/favicon.ico" class="w-4 h-4 group-hover:scale-110 transition-transform" alt="Google">
+      Google Authorization
     </button>
     
-    <p class="text-center mt-8 text-xs text-accent-muted">
-      Don't have an account?
-      <a routerLink="/register" class="text-accent hover:underline font-bold ml-1">Register</a>
+    <p class="text-center mt-5 text-xs text-accent-muted">
+      New to Idea Zone?
+      <a routerLink="/register" class="text-fuchsia-400 hover:text-fuchsia-300 hover:underline font-bold ml-1 transition-colors">Create Account</a>
     </p>
 
-    <div class="mt-8 pt-8 border-t border-white/5 text-center">
-      <div class="bg-accent/5 rounded-xl p-4 mb-6 border border-accent/10">
-        <p class="text-[10px] uppercase tracking-widest text-accent mb-2">Admin Credentials</p>
-        <p class="text-xs text-accent-muted">Email: <span class="text-white font-mono">admin@ideazone.com</span></p>
-        <p class="text-xs text-accent-muted">Pass: <span class="text-white font-mono">admin123</span></p>
+    <div class="mt-5 pt-4 border-t border-white/10 text-center">
+      <div class="bg-fuchsia-900/10 rounded-xl p-3 mb-4 border border-fuchsia-500/20 hover:border-fuchsia-500/40 transition-colors">
+        <p class="text-[10px] uppercase tracking-widest text-fuchsia-400 mb-1.5 flex items-center justify-center gap-1">
+          <span class="material-icons text-[12px]">admin_panel_settings</span>
+          Admin Access
+        </p>
+        <p class="text-xs text-accent-muted">Email: <span class="text-white font-mono bg-black/50 px-2 py-0.5 rounded">admin@ideazone.com</span></p>
+        <p class="text-xs text-accent-muted mt-1">Pass: <span class="text-white font-mono bg-black/50 px-2 py-0.5 rounded">admin123</span></p>
       </div>
-      <a routerLink="/" class="text-[10px] uppercase tracking-widest text-accent-muted hover:text-accent transition-colors">Continue as Guest</a>
+      <a routerLink="/" class="text-[10px] uppercase tracking-widest text-accent-muted hover:text-fuchsia-400 transition-colors flex items-center justify-center gap-1">
+        Continue as Guest
+        <span class="material-icons text-[12px]">arrow_right_alt</span>
+      </a>
     </div>
   </div>
 </div>

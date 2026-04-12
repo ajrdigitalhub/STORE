@@ -61,7 +61,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Thank you for reaching out to IDEA Zone 3D!'
   ];
 
-  newProduct = { name: '', price: 0, categoryid: 0, stock: 0, description: '', imageUrl: '' };
+  newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
   newCategory = { name: '', description: '', image: '' };
   
   customers = signal<Customer[]>([]);
@@ -200,7 +200,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     await this.productService.addProduct({
       name: this.newProduct.name,
       price: this.newProduct.price,
-      categoryid: this.newProduct.categoryid,
+      category_id: this.newProduct.category_id,
       stock: this.newProduct.stock,
       description: this.newProduct.description,
       images: [this.newProduct.imageUrl],
@@ -208,7 +208,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       active: true
     });
     this.showProductForm.set(false);
-    this.newProduct = { name: '', price: 0, categoryid: 0, stock: 0, description: '', imageUrl: '' };
+    this.newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
   }
 
   async saveCategory() {

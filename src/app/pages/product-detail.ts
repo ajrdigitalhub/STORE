@@ -39,7 +39,7 @@ export class ProductDetailComponent {
   relatedProducts = computed(() => {
     const p = this.product();
     if (!p) return [];
-    return this.productService.products().filter(prod => prod.categoryid === p.categoryid && prod.id !== p.id).slice(0, 4);
+    return this.productService.products().filter(prod => prod.category_id === p.category_id && prod.id !== p.id).slice(0, 4);
   });
 
   constructor() {

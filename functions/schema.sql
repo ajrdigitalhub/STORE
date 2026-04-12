@@ -31,7 +31,7 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
     compare_price DECIMAL(10,2),
-    categoryid INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
     images JSONB DEFAULT '[]'::jsonb,
     stock INTEGER DEFAULT 0,
     variants JSONB DEFAULT '[]'::jsonb,
@@ -69,7 +69,7 @@ CREATE TABLE orders (
 -- Chats table
 CREATE TABLE chats (
     id SERIAL PRIMARY KEY,
-    customerid INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    customer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     customer_name VARCHAR(255),
     messages JSONB DEFAULT '[]'::jsonb,
     last_message TEXT,
@@ -133,9 +133,9 @@ CREATE INDEX idx_orders_userid ON orders(userid);
 CREATE INDEX idx_orders_order_number ON orders(order_number);
 CREATE INDEX idx_orders_payment_status ON orders(payment_status);
 CREATE INDEX idx_orders_order_status ON orders(order_status);
-CREATE INDEX idx_chats_customerid ON chats(customerid);
+CREATE INDEX idx_chats_customer_id ON chats(customer_id);
 CREATE INDEX idx_chats_is_active ON chats(is_active);
-CREATE INDEX idx_products_categoryid ON products(categoryid);
+CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_products_active ON products(active);
 CREATE INDEX idx_products_featured ON products(featured);
 

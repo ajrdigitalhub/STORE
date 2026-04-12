@@ -1,0 +1,22 @@
+[debug] [2026-04-12T12:34:06.392Z] ----------------------------------------------------------------------
+[debug] [2026-04-12T12:34:06.396Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\acer\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2026-04-12T12:34:06.397Z] CLI Version:   15.10.1
+[debug] [2026-04-12T12:34:06.397Z] Platform:      win32
+[debug] [2026-04-12T12:34:06.397Z] Node Version:  v20.20.1
+[debug] [2026-04-12T12:34:06.397Z] Time:          Sun Apr 12 2026 18:04:06 GMT+0530 (India Standard Time)
+[debug] [2026-04-12T12:34:06.398Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-12T12:34:10.586Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-12T12:34:10.586Z] > authorizing via signed-in user (ajrdigitalhub@gmail.com)
+[debug] [2026-04-12T12:34:10.587Z] [iam] checking project ideaazone3d for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2026-04-12T12:34:10.588Z] Checked if tokens are valid: true, expires at: 1776000160630
+[debug] [2026-04-12T12:34:10.588Z] Checked if tokens are valid: true, expires at: 1776000160630
+[debug] [2026-04-12T12:34:10.590Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ideaazone3d:testIamPermissions [none]
+[debug] [2026-04-12T12:34:10.590Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ideaazone3d:testIamPermissions  x-goog-user-project=ideaazone3d
+[debug] [2026-04-12T12:34:10.590Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ideaazone3d:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-04-12T12:34:12.279Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ideaazone3d:testIamPermissions 200
+[debug] [2026-04-12T12:34:12.279Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ideaazone3d:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-04-12T12:34:12.280Z] Checked if tokens are valid: true, expires at: 1776000160630
+[debug] [2026-04-12T12:34:12.281Z] Checked if tokens are valid: true, expires at: 1776000160630
+[debug] [2026-04-12T12:34:12.281Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/ideaazone3d/serviceAccounts/ideaazone3d@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-04-12T12:34:12.282Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/ideaazone3d/serviceAccounts/ideaazone3d@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}

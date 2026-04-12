@@ -52,7 +52,7 @@ router.post('/', adminAuth, async (req, res, next) => {
 
     const product = await Product.create({
       name, description, price: Number(price), compare_price: Number(comparePrice || 0),
-      categoryid: category, stock: Number(stock || 0), images: images || [], variants: variants || [],
+      category_id: category, stock: Number(stock || 0), images: images || [], variants: variants || [],
       featured: featured === true || featured === 'true',
       specification: specification || {},
       tags: tags || []
@@ -70,7 +70,7 @@ router.put('/:id', adminAuth, async (req, res, next) => {
 
     const updateData = {
       name, description, price: Number(price), compare_price: Number(comparePrice || 0),
-      categoryid: category, stock: Number(stock || 0), images: images || [],
+      category_id: category, stock: Number(stock || 0), images: images || [],
       variants: variants || [], featured: featured === true || featured === 'true',
       specification: specification || {},
       tags: tags || []
