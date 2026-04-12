@@ -1,63 +1,134 @@
-import { Router } from 'express';
-import { query } from '../db.js';
-import { authenticate, isAdmin, optionalAuthenticate } from '../auth.js';
+const express = require('express');
+const Order = require('../models/Order');
+const Product = require('../models/Product');
+const { auth, adminAuth } = require('../middleware/auth');
+const { getIO } = require('../socket/chat');
 
-const router = Router();
+const router = express.Router();
 
-router.get('/', authenticate, isAdmin, async (req, res) => {
+// POST /api/orders — create order (customer)
+router.post('/', auth, async (req, res, next) => {
   try {
-    const result = await query('SELECT * FROM orders ORDER BY created_at DESC');
-    res.json(result.rows);
+    const { items, shippingAddress, paymentMethod, totalAmount } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: 'Order must have at least one item' });
+    }
+
+    const order = await Order.create({
+      userid: req.userId,
+      items,
+      total_amount: totalAmount,
+      shipping_address: shippingAddress,
+      payment_method: paymentMethod
+    });
+
+    // Emit to admin
+    const io = getIO();
+    if (io) {
+      io.to('admin-room').emit('admin:orderUpdate', {
+        type: 'new',
+        order
+      });
+    }
+
+    res.status(201).json(order);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to load orders', details: error });
+    next(error);
   }
 });
 
-router.get('/customer/:uid', authenticate, async (req, res) => {
-  const { uid } = req.params;
-  const user = req.user;
-
-  // Only allow user to see their own orders, or admin to see any
-  if (user.uid !== uid && user.role !== 'admin' && user.email !== 'ajrgroupconnect@gmail.com') {
-    res.status(403).json({ error: 'Unauthorized access to orders' });
-    return;
-  }
-
+// GET /api/orders — customer's orders
+router.get('/', auth, async (req, res, next) => {
   try {
-    const result = await query('SELECT * FROM orders WHERE customer_uid = $1 ORDER BY created_at DESC', [uid]);
-    res.json(result.rows);
+    const { page = 1, limit = 10 } = req.query;
+
+    let orders, total;
+    if (req.user.role === 'admin') {
+      const result = await Order.findAll({ page: Number(page), limit: Number(limit) });
+      orders = result.orders;
+      total = result.total;
+    } else {
+      const result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
+      orders = result.orders;
+      total = result.total;
+    }
+
+    res.json({ orders, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to load customer orders', details: error });
+    next(error);
   }
 });
 
-router.post('/', optionalAuthenticate, async (req, res) => {
-  const { orderId, customerUid, total, status, paymentStatus, paymentMethod, shippingAddress, items } = req.body;
-  const user = req.user;
-  
-  // Use user.uid if authenticated, otherwise use provided customerUid or null
-  const finalUid = user?.uid || (customerUid !== 'guest' ? customerUid : null) || null;
-
+// GET /api/orders/:id
+router.get('/:id', auth, async (req, res, next) => {
   try {
-    const result = await query(
-      'INSERT INTO orders (order_id, customer_uid, total, status, payment_status, payment_method, shipping_address, items) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [orderId, finalUid, total, status, paymentStatus, paymentMethod, JSON.stringify(shippingAddress), JSON.stringify(items)]
-    );
-    res.status(201).json(result.rows[0]);
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Customer can only see own orders
+    if (req.user.role !== 'admin' && order.userid !== req.userId) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    res.json(order);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create order', details: error });
+    next(error);
   }
 });
 
-router.patch('/:id/status', authenticate, isAdmin, async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
+// PUT /api/orders/:id/status — admin update order status
+router.put('/:id/status', adminAuth, async (req, res, next) => {
   try {
-    const result = await query('UPDATE orders SET status = $1 WHERE id = $2 RETURNING *', [status, id]);
-    res.json(result.rows[0]);
+    const { orderStatus } = req.body;
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
+    if (!validStatuses.includes(orderStatus)) {
+      return res.status(400).json({ message: 'Invalid order status' });
+    }
+
+    const order = await Order.updateStatus(req.params.id, { orderStatus });
+
+    // Emit to customer and admin
+    const io = getIO();
+    if (io) {
+      // To customer
+      io.to(order.userid.toString()).emit('customer:orderUpdate', {
+        type: 'status',
+        orderId: order.id,
+        status: orderStatus,
+        order
+      });
+      // To admin (to update their list/dashboard)
+      io.to('admin-room').emit('admin:orderUpdate', {
+        type: 'status',
+        orderId: order.id,
+        status: orderStatus,
+        order
+      });
+    }
+
+    res.json(order);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update order status', details: error });
+    next(error);
   }
 });
 
-export const orderRoutes = router;
+// GET /api/orders/admin/stats — admin dashboard stats
+router.get('/admin/stats', adminAuth, async (req, res, next) => {
+  try {
+    const stats = await Order.getStats();
+    const recentOrders = await Order.getRecent(5);
+
+    res.json({
+      totalOrders: stats.total_orders,
+      pendingOrders: stats.pending_orders,
+      totalRevenue: stats.total_revenue,
+      recentOrders
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;

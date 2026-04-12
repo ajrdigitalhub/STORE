@@ -1,62 +1,44 @@
-import { Router } from 'express';
-import { pool } from '../db.js';
-import { authenticate, isAdmin } from '../auth.js';
+const express = require('express');
+const User = require('../models/User');
+const Order = require('../models/Order');
+const { adminAuth } = require('../middleware/auth');
 
-const router = Router();
+const router = express.Router();
 
-// Get all customers (Admin only)
-router.get('/', authenticate, isAdmin, async (req, res) => {
+// GET /api/users — admin only, list all customers
+router.get('/', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT id, uid, email, display_name, role, avatar_url, phone, address, created_at FROM users WHERE role = $1 ORDER BY created_at DESC', ['customer']);
-    res.json(result.rows);
+    const { page = 1, limit = 20, search } = req.query;
+
+    const result = await User.findAll({ page: Number(page), limit: Number(limit), search });
+
+    res.json({ users: result.users, total: result.total, page: Number(page), pages: Math.ceil(result.total / Number(limit)) });
   } catch (error) {
-    console.error('Error fetching customers:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Get current user profile
-router.get('/profile', authenticate, async (req, res) => {
-  const uid = req.user?.uid;
-  if (!uid) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
+// GET /api/users/count — admin: total customer count
+router.get('/count', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT id, uid, email, display_name, role, avatar_url, phone, address, created_at FROM users WHERE uid = $1', [uid]);
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'User not found' });
-      return;
-    }
-    res.json(result.rows[0]);
+    const count = await User.count();
+    res.json({ count });
   } catch (error) {
-    console.error('Error fetching profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Update current user profile
-router.put('/profile', authenticate, async (req, res) => {
-  const uid = req.user?.uid;
-  if (!uid) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-  const { display_name, avatar_url, phone, address } = req.body;
+// GET /api/users/:id — admin only
+router.get('/:id', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query(
-      'UPDATE users SET display_name = $1, avatar_url = $2, phone = $3, address = $4 WHERE uid = $5 RETURNING id, uid, email, display_name, role, avatar_url, phone, address, created_at',
-      [display_name, avatar_url, phone, JSON.stringify(address), uid]
-    );
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'User not found' });
-      return;
-    }
-    res.json(result.rows[0]);
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const orders = await Order.findByUser(user.id, { limit: 10 });
+    res.json({ user, orders: orders.orders });
   } catch (error) {
-    console.error('Error updating profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-export default router;
+module.exports = router;

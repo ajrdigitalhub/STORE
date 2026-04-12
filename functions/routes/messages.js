@@ -1,65 +1,61 @@
-import { Router } from 'express';
-import { pool } from '../db.js';
-import { authenticate, isAdmin } from '../auth.js';
+const express = require('express');
+const Message = require('../models/Message');
+const { adminAuth } = require('../middleware/auth');
 
-const router = Router();
+const router = express.Router();
 
-// Get all messages (Admin only)
-router.get('/', authenticate, isAdmin, async (req, res) => {
+// POST /api/messages - Public: Submit a contact query
+router.post('/', async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
-    res.json(result.rows);
+    const { name, email, subject, message } = req.body;
+    const newMessage = await Message.create({ name, email, subject, message });
+    res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Submit a message (Public)
-router.post('/', async (req, res) => {
-  const { name, email, subject, message } = req.body;
+// GET /api/messages - Admin: Get all contact queries
+router.get('/', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query(
-      'INSERT INTO messages (name, email, subject, message) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, email, subject, message]
-    );
-    res.status(201).json(result.rows[0]);
+    const { page = 1, limit = 10, status } = req.query;
+    const result = await Message.findAll({ page: Number(page), limit: Number(limit), status });
+    res.json({
+      messages: result.messages,
+      total: result.total,
+      page: result.page,
+      pages: Math.ceil(result.total / Number(limit))
+    });
   } catch (error) {
-    console.error('Error submitting message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Mark message as read (Admin only)
-router.put('/:id/read', authenticate, isAdmin, async (req, res) => {
-  const { id } = req.params;
+// PATCH /api/messages/:id - Admin: Update message status
+router.patch('/:id', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query('UPDATE messages SET is_read = true WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Message not found' });
-      return;
+    const { status } = req.body;
+    const message = await Message.updateStatus(req.params.id, status);
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
     }
-    res.json(result.rows[0]);
+    res.json(message);
   } catch (error) {
-    console.error('Error updating message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Delete a message (Admin only)
-router.delete('/:id', authenticate, isAdmin, async (req, res) => {
-  const { id } = req.params;
+// DELETE /api/messages/:id - Admin: Delete a message
+router.delete('/:id', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query('DELETE FROM messages WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Message not found' });
-      return;
+    const deleted = await Message.delete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Message not found' });
     }
     res.json({ message: 'Message deleted successfully' });
   } catch (error) {
-    console.error('Error deleting message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-export default router;
+module.exports = router;

@@ -1,69 +1,62 @@
-import { Router } from 'express';
-import { pool } from '../db.js';
-import { authenticate, isAdmin } from '../auth.js';
+const express = require('express');
+const Category = require('../models/Category');
+const { adminAuth } = require('../middleware/auth');
 
-const router = Router();
+const router = express.Router();
 
-// Get all categories
-router.get('/', async (req, res) => {
+// GET /api/categories
+router.get('/', async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT * FROM categories ORDER BY name ASC');
-    res.json(result.rows);
+    const categories = await Category.findAllActive();
+    res.json(categories);
   } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Create a category (Admin only)
-router.post('/', authenticate, isAdmin, async (req, res) => {
-  const { name, slug, description, image_url } = req.body;
+// GET /api/categories/:id
+router.get('/:id', async (req, res, next) => {
   try {
-    const result = await pool.query(
-      'INSERT INTO categories (name, slug, description, image_url) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, slug, description, image_url]
-    );
-    res.status(201).json(result.rows[0]);
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).json({ message: 'Category not found' });
+    res.json(category);
   } catch (error) {
-    console.error('Error creating category:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Update a category (Admin only)
-router.put('/:id', authenticate, isAdmin, async (req, res) => {
-  const { id } = req.params;
-  const { name, slug, description, image_url } = req.body;
+// POST /api/categories — admin only
+router.post('/', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query(
-      'UPDATE categories SET name = $1, slug = $2, description = $3, image_url = $4 WHERE id = $5 RETURNING *',
-      [name, slug, description, image_url, id]
-    );
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Category not found' });
-      return;
-    }
-    res.json(result.rows[0]);
+    const { name, description, image } = req.body;
+    const category = await Category.create({ name, description, image });
+    res.status(201).json(category);
   } catch (error) {
-    console.error('Error updating category:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-// Delete a category (Admin only)
-router.delete('/:id', authenticate, isAdmin, async (req, res) => {
-  const { id } = req.params;
+// PUT /api/categories/:id — admin only
+router.put('/:id', adminAuth, async (req, res, next) => {
   try {
-    const result = await pool.query('DELETE FROM categories WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Category not found' });
-      return;
-    }
+    const { name, description, image, active } = req.body;
+    const category = await Category.update(req.params.id, { name, description, image, active });
+    if (!category) return res.status(404).json({ message: 'Category not found' });
+    res.json(category);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/categories/:id — admin only
+router.delete('/:id', adminAuth, async (req, res, next) => {
+  try {
+    const deleted = await Category.delete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Category not found' });
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
-    console.error('Error deleting category:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 });
 
-export default router;
+module.exports = router;

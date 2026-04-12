@@ -1,12 +1,6 @@
-import { Pool } from 'pg';
-import path from 'path';
-import { fileURLToPath } from 'node:url';
-import dotenv from 'dotenv';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, '.env') });
+const { Pool } = require('pg');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const pool = new Pool({
   user: process.env.PG_USER,
@@ -17,6 +11,4 @@ const pool = new Pool({
   ssl: process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
-export const query = (text, params) => pool.query(text, params);
-export { pool };
-export default pool;
+module.exports = pool;

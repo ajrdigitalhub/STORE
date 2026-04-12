@@ -1,43 +1,23 @@
-import { Router } from 'express';
-import Busboy from 'busboy';
-import path from 'path';
-import { bucket } from '../firebase.js';
+const express = require('express');
+const Busboy = require('busboy');
+const path = require('path');
+const { bucket } = require('../firebaseAdmin');
+const router = express.Router();
 
-const router = Router();
-
-// Middleware to capture raw body for busboy.end(req.rawBody)
-// Note: This buffers the entire file in memory.
-const rawBodyMiddleware = (req, res, next) => {
-  let data = Buffer.alloc(0);
-  req.on('data', (chunk) => {
-    data = Buffer.concat([data, chunk]);
-  });
-  req.on('end', () => {
-    req.rawBody = data;
-    next();
-  });
-  req.on('error', (err) => {
-    next(err);
-  });
-};
-
-router.post('/', rawBodyMiddleware, (req, res) => {
-  // 1. Check if rawBody exists (standard for Firebase Functions)
-  if (!req.rawBody || req.rawBody.length === 0) {
-    return res.status(400).json({ error: 'No request body found.' });
-  }
-
+router.post('/', (req, res) => {
   const busboy = Busboy({ headers: req.headers });
-  let fileProcessed = false;
+  let fileUploaded = false;
 
   busboy.on('file', (name, file, info) => {
-    const { filename, mimeType } = info;
+    const { filename, encoding, mimeType } = info;
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const newFileName = uniqueSuffix + path.extname(filename);
 
     const blob = bucket.file(`uploads/${newFileName}`);
     const blobStream = blob.createWriteStream({
-      metadata: { contentType: mimeType },
+      metadata: {
+        contentType: mimeType
+      },
       resumable: false
     });
 
@@ -49,21 +29,20 @@ router.post('/', rawBodyMiddleware, (req, res) => {
     });
 
     blobStream.on('finish', async () => {
-      fileProcessed = true;
+      fileUploaded = true;
       try {
-        // Generating Signed URL for Uniform Access buckets
+        // FIX: Removed blob.makePublic() as it crashes on Uniform Access buckets.
+        // Instead, we generate a Signed URL.
         const [url] = await blob.getSignedUrl({
           action: 'read',
-          expires: '03-01-2500'
+          expires: '03-01-2500' // Far future date
         });
 
-        if (!res.headersSent) {
-          res.json({
-            success: true,
-            url: url,
-            fileName: newFileName
-          });
-        }
+        res.json({
+          success: true,
+          url: url,
+          fileName: newFileName
+        });
       } catch (err) {
         console.error('Error generating URL:', err);
         if (!res.headersSent) {
@@ -78,19 +57,16 @@ router.post('/', rawBodyMiddleware, (req, res) => {
   busboy.on('error', (err) => {
     console.error('Busboy error:', err);
     if (!res.headersSent) {
-      res.status(500).json({ error: `Parsing failed: ${err.message}` });
+      res.status(500).json({ error: 'Parsing failed' });
     }
   });
 
   busboy.on('finish', () => {
-    if (!fileProcessed && !res.headersSent) {
-      res.status(400).json({ error: 'No file found in request' });
-    }
+    // Note: If multiple files are uploaded, you might need a different 
+    // counter logic, but for a single file, this works.
   });
 
-  // 2. Instead of req.pipe(busboy), use busboy.end(req.rawBody)
-  // This pushes the already-buffered body into Busboy
-  busboy.end(req.rawBody);
+  req.pipe(busboy);
 });
 
-export const uploadRoutes = router;
+module.exports = router;

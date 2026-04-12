@@ -1,6 +1,68 @@
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
+const dotenv = require('dotenv');
+const path = require('path');
+const functions = require('firebase-functions');
+dotenv.config();
 
+const { initializeSocket } = require('./socket/chat');
+const errorHandler = require('./middleware/errorHandler');
 
-const functions = require("firebase-functions");
-const app = require("./app");
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const categoryRoutes = require('./routes/categories');
+const orderRoutes = require('./routes/orders');
+const userRoutes = require('./routes/users');
+const paymentRoutes = require('./routes/payment');
+const messageRoutes = require('./routes/messages');
+const aboutRoutes = require('./routes/about');
+const contactConfigRoutes = require('./routes/contact-config');
+const uploadRoutes = require('./routes/upload');
 
-exports.api2 = functions.https.onRequest(app);
+const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io
+initializeSocket(server);
+
+// Middleware
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:4200',
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/about', aboutRoutes);
+app.use('/api/contact-config', contactConfigRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Error handler
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+
+// Export as a Cloud Function
+exports.api = functions.https.onRequest(app);
+
+// module.exports = { app, server };
