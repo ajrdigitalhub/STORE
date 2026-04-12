@@ -2,45 +2,55 @@ import { createApp } from './app.js';
 import express from 'express';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as functions from 'firebase-functions';
+import { existsSync } from 'node:fs';
+import * as functions from 'firebase-functions/v2'; // Use v2 explicitly
 
-// Fix __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Create Express app
 const app = createApp();
 
-// Detect environment
-const isProduction = process.env.NODE_ENV === 'production';
+// Path to Angular assets - Ensure this folder is COPIED into the functions folder during build
+const browserDistPath = join(__dirname, 'dist/browser');
 
-if (isProduction) {
-  const browserDistPath = join(__dirname, '../dist/app/browser');
-
-  // Serve static Angular files
+if (existsSync(browserDistPath)) {
+  console.log('✅ Static assets found. Serving frontend.');
   app.use(express.static(browserDistPath));
-
-  // SPA fallback (Angular routing)
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-
-    res.sendFile(join(browserDistPath, 'index.html'), (err) => {
-      if (err) {
-        console.error('Error serving index.html:', err);
-        res.status(500).send('App not built. Run npm run build.');
-      }
-    });
-  });
+} else {
+  console.warn('⚠️ Warning: dist/browser folder not found. API mode only.');
 }
 
-// Optional: Health check endpoint (helps Cloud Run)
+// Health check for Cloud Run
 app.get('/health', (req, res) => {
-  res.status(200).send('OKk');
+  res.status(200).send('OK');
 });
 
-// ✅ Export for Firebase Functions (2nd gen / Cloud Run)
+// API Routes (Assuming your createApp handles these)
+// app.use('/api', apiRoutes);
+
+// SPA fallback: Only serve index.html if it exists and it's not an API call
+app.get('*', (req, res) => {
+  const indexPath = join(browserDistPath, 'index.html');
+
+  if (!req.path.startsWith('/api') && existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({
+      error: 'Not Found',
+      message: 'API route not defined or frontend assets missing.'
+    });
+  }
+});
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 
-export const api = functions.https.onRequest(app);
+// ✅ Export for Firebase Functions 2nd Gen
+// export const api = functions.https.onRequest({
+//   region: 'us-central1',
+//   memory: '512MiB',
+//   maxInstances: 10 // Good practice to limit costs
+// }, app);

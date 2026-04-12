@@ -2,7 +2,6 @@
   "functions": [
     {
       "codebase": "default",
-      "disallowLegacyRuntimeConfig": true,
       "ignore": [
         "node_modules",
         ".git",
@@ -10,8 +9,8 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "source": "functions",
-      "predeploy": []
+      "predeploy": [],
+      "source": "functions"
     }
   ],
   "hosting": {
@@ -29,6 +28,17 @@
     ],
     "predeploy": [
       "npm run build"
+    ]
+  },
+  "apphosting": {
+    "backendId": "ideazone",
+    "rootDir": "/",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "functions"
     ]
   }
 }

@@ -1,68 +1,108 @@
-const express = require('express');
-const cors = require('cors');
-const http = require('http');
-const dotenv = require('dotenv');
-const path = require('path');
-const functions = require('firebase-functions');
-dotenv.config();
-
-const { initializeSocket } = require('./socket/chat');
-const errorHandler = require('./middleware/errorHandler');
-
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const categoryRoutes = require('./routes/categories');
-const orderRoutes = require('./routes/orders');
-const userRoutes = require('./routes/users');
-const paymentRoutes = require('./routes/payment');
-const messageRoutes = require('./routes/messages');
-const aboutRoutes = require('./routes/about');
-const contactConfigRoutes = require('./routes/contact-config');
-const uploadRoutes = require('./routes/upload');
-
-const app = express();
-const server = http.createServer(app);
-
-// Initialize Socket.io
-initializeSocket(server);
-
-// Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:4200',
-  credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+import express from 'express';
+import cors from 'cors';
+import fs from 'fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as functions from 'firebase-functions';
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/about', aboutRoutes);
-app.use('/api/contact-config', contactConfigRoutes);
-app.use('/api/upload', uploadRoutes);
+import { productRoutes } from './routes/products.js';
+import { paymentRoutes } from './routes/payments.js';
+import { uploadRoutes } from './routes/upload.js';
+import { orderRoutes } from './routes/orders.js';
+import { authRoutes } from './routes/auth.js';
+import { configRoutes } from './routes/config.js';
+import categoryRoutes from './routes/categories.js';
+import userRoutes from './routes/users.js';
+import messageRoutes from './routes/messages.js';
+import reviewRoutes from './routes/reviews.js';
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// Config
+import { serverConfig } from './config.js';
 
-// Error handler
-app.use(errorHandler);
+// Fix __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Start server
-const PORT = process.env.PORT || 5000;
+export const createApp = () => {
+  const app = express();
 
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+  console.log('🚀 Initializing Express app...');
 
-// Export as a Cloud Function
-exports.api = functions.https.onRequest(app);
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-// module.exports = { app, server };
+  // ✅ Health check (VERY IMPORTANT for Cloud Run)
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+
+  // ✅ Safe static uploads (prevents crash if folder missing)
+  try {
+    const uploadsPath = join(__dirname, '../public/uploads');
+
+    if (fs.existsSync(uploadsPath)) {
+      app.use('/uploads', express.static(uploadsPath));
+      console.log('📁 Serving uploads from:', uploadsPath);
+    } else {
+      console.warn('⚠️ uploads folder not found:', uploadsPath);
+    }
+  } catch (err) {
+    console.error('❌ Error setting up uploads folder:', err);
+  }
+
+  // Runtime Config APIs
+  app.get('/api/runtime-config', (req, res) => {
+    res.json(serverConfig);
+  });
+
+  app.post('/api/runtime-config', (req, res) => {
+    try {
+      if (req.body && typeof req.body.useMockData === 'boolean') {
+        serverConfig.useMockData = req.body.useMockData;
+        res.json(serverConfig);
+      } else {
+        res.status(400).json({ error: 'Invalid config' });
+      }
+    } catch (err) {
+      console.error('❌ Runtime config error:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  // ✅ Safe route loader (prevents crash if any route fails)
+  const safeUse = (path, route) => {
+    try {
+      if (route) {
+        app.use(path, route);
+        console.log(`✅ Loaded route: ${path}`);
+      } else {
+        console.warn(`⚠️ Route undefined: ${path}`);
+      }
+    } catch (err) {
+      console.error(`❌ Failed to load route ${path}:`, err);
+    }
+  };
+
+  // API Routes (wrapped safely)
+  safeUse('/api/products', productRoutes);
+  safeUse('/api/payment', paymentRoutes);
+  safeUse('/api/upload', uploadRoutes);
+  safeUse('/api/orders', orderRoutes);
+  safeUse('/api/auth', authRoutes);
+  safeUse('/api/app-config', configRoutes);
+  safeUse('/api/categories', categoryRoutes);
+  safeUse('/api/users', userRoutes);
+  safeUse('/api/messages', messageRoutes);
+  safeUse('/api/reviews', reviewRoutes);
+
+  // ✅ Global error handler (prevents crashes)
+  app.use((err, req, res, next) => {
+    console.error('🔥 Unhandled Error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
+
+  return app;
+};
