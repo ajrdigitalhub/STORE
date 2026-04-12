@@ -4,19 +4,42 @@ import { ApiService } from './api.service';
 import { AuthService } from './auth';
 import { firstValueFrom } from 'rxjs';
 
+export interface OrderItem {
+  product: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+export interface ShippingAddress {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
 export interface Order {
-  id?: string;
-  orderId: string;
-  customerUid: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  items: any[];
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  paymentStatus: 'unpaid' | 'paid' | 'refunded';
-  paymentMethod: 'COD' | 'Razorpay';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  shippingAddress: any;
-  createdAt: string;
+  id: number;
+  userid: number;
+  items: OrderItem[];
+  total_amount: number;
+  shipping_address: ShippingAddress;
+  payment_method: 'razorpay' | 'cod';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  order_number: string;
+  razorpay_orderid?: string;
+  razorpay_paymentid?: string;
+  razorpay_signature?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  user_name?: string;
+  user_email?: string;
 }
 
 @Injectable({
@@ -47,7 +70,7 @@ export class OrderService {
     const profile = this.authService.profile();
     if (!profile) return;
 
-    const url = profile.role === 'admin' ? '/orders' : `/orders/customer/${profile.uid}`;
+    const url = profile.role === 'admin' ? '/orders' : `/orders/customer/${profile.id}`;
     
     this.isLoading.set(true);
     this.api.get<Order[]>(url).subscribe({
@@ -62,12 +85,19 @@ export class OrderService {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createOrder(order: Omit<Order, 'id'>): Promise<any> {
-    return firstValueFrom(this.api.post<Order>('/orders', order));
+  async createOrder(order: Omit<Order, 'id' | 'order_number' | 'created_at' | 'updated_at'>): Promise<Order> {
+    // Map frontend fields to backend expected fields if necessary, 
+    // but we already updated the Order interface to match backend.
+    const payload = {
+      items: order.items,
+      shippingAddress: order.shipping_address,
+      paymentMethod: order.payment_method,
+      totalAmount: order.total_amount
+    };
+    return firstValueFrom(this.api.post<Order>('/orders', payload));
   }
 
-  async updateOrderStatus(id: string, status: Order['status']) {
-    return firstValueFrom(this.api.patch<Order>(`/orders/${id}/status`, { status }));
+  async updateOrderStatus(id: number, orderStatus: Order['order_status'], paymentStatus?: Order['payment_status']) {
+    return firstValueFrom(this.api.put<Order>(`/orders/${id}/status`, { orderStatus, paymentStatus }));
   }
 }

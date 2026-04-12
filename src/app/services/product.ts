@@ -6,9 +6,9 @@ import { firstValueFrom } from 'rxjs';
 export interface Category {
   id: number;
   name: string;
-  slug: string;
   description?: string;
-  image_url?: string;
+  image?: string;
+  active: boolean;
 }
 
 export interface Product {
@@ -16,12 +16,18 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  category_id: number;
+  compare_price?: number;
+  categoryid: number;
   category_name?: string;
   images: string[];
   stock: number;
-  is_featured: boolean;
+  featured: boolean;
+  active: boolean;
   created_at: string;
+  specification?: Record<string, string>;
+  tags?: string[];
+  rating?: number;
+  reviews_count?: number;
 }
 
 @Injectable({
@@ -74,9 +80,9 @@ export class ProductService {
 
   private loadProducts() {
     this.isLoading.set(true);
-    this.api.get<Product[]>('/products').subscribe({
-      next: (products) => {
-        this.productsSignal.set(products);
+    this.api.get<{products: Product[], total: number}>('/products').subscribe({
+      next: (response) => {
+        this.productsSignal.set(response.products);
         this.isLoading.set(false);
       },
       error: (error) => {

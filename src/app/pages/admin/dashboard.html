@@ -73,7 +73,7 @@
           <span class="material-icons text-sm">person</span>
         </div>
         <div class="flex-grow min-w-0">
-          <p class="text-xs font-bold truncate">{{ authService.profile()?.displayName || 'Admin User' }}</p>
+          <p class="text-xs font-bold truncate">{{ authService.profile()?.name || 'Admin User' }}</p>
           <p class="text-[10px] text-accent-muted truncate">System Administrator</p>
         </div>
       </div>
@@ -182,15 +182,15 @@
                 } @else {
                   @for (order of recentOrders(); track order.id) {
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                      <td class="py-4 px-6 tech-value text-xs">{{ order.orderId }}</td>
-                      <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.customerUid | slice:0:8 }}...</td>
-                      <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total | currency:'INR' }}</td>
+                      <td class="py-4 px-6 tech-value text-xs">{{ order.order_number }}</td>
+                      <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.userid }}</td>
+                      <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total_amount | currency:'INR' }}</td>
                       <td class="py-4 px-6">
                         <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
-                          {{ order.status }}
+                          {{ order.order_status }}
                         </span>
                       </td>
-                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
+                      <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
                     </tr>
                   } @empty {
                     <tr>
@@ -233,7 +233,7 @@
                     </div>
                     <div class="space-y-2">
                       <label for="p-cat" class="tech-label">Taxonomy Reference</label>
-                      <select id="p-cat" [(ngModel)]="newProduct.category_id" class="input-field font-mono text-sm bg-metallic-black">
+                      <select id="p-cat" [(ngModel)]="newProduct.categoryid" class="input-field font-mono text-sm bg-metallic-black">
                         <option [value]="0">Select Taxonomy</option>
                         @for (cat of productService.categories(); track cat.id) {
                           <option [value]="cat.id">{{ cat.name }}</option>
@@ -378,26 +378,26 @@
               <tbody>
                 @for (order of orderService.orders(); track order.id) {
                   <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-4 px-6 tech-value text-xs font-bold">{{ order.orderId }}</td>
-                    <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.customerUid }}</td>
-                    <td class="py-4 px-6 tech-value font-bold">{{ order.total | currency:'INR' }}</td>
+                    <td class="py-4 px-6 tech-value text-xs font-bold">{{ order.order_number }}</td>
+                    <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.userid }}</td>
+                    <td class="py-4 px-6 tech-value font-bold">{{ order.total_amount | currency:'INR' }}</td>
                     <td class="py-4 px-6">
                       <span class="px-2 py-1 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20"
-                        [class.border-yellow-500/50]="order.status === 'pending'"
-                        [class.text-yellow-500]="order.status === 'pending'"
-                        [class.border-blue-500/50]="order.status === 'processing'"
-                        [class.text-blue-500]="order.status === 'processing'"
-                        [class.border-green-500/50]="order.status === 'delivered'"
-                        [class.text-green-500]="order.status === 'delivered'">
-                        {{ order.status }}
+                        [class.border-yellow-500/50]="order.order_status === 'pending'"
+                        [class.text-yellow-500]="order.order_status === 'pending'"
+                        [class.border-blue-500/50]="order.order_status === 'processing'"
+                        [class.text-blue-500]="order.order_status === 'processing'"
+                        [class.border-green-500/50]="order.order_status === 'delivered'"
+                        [class.text-green-500]="order.order_status === 'delivered'">
+                        {{ order.order_status }}
                       </span>
                     </td>
                     <td class="py-4 px-6">
-                      <select (change)="updateOrderStatus(order.id!, $any($event.target).value)" class="bg-metallic-black border border-white/10 rounded px-3 py-1.5 text-[10px] font-mono focus:border-accent outline-none transition-colors">
-                        <option value="pending" [selected]="order.status === 'pending'">PENDING</option>
-                        <option value="processing" [selected]="order.status === 'processing'">PROCESSING</option>
-                        <option value="shipped" [selected]="order.status === 'shipped'">SHIPPED</option>
-                        <option value="delivered" [selected]="order.status === 'delivered'">DELIVERED</option>
+                      <select (change)="updateOrderStatus(order.id, $any($event.target).value)" class="bg-metallic-black border border-white/10 rounded px-3 py-1.5 text-[10px] font-mono focus:border-accent outline-none transition-colors">
+                        <option value="pending" [selected]="order.order_status === 'pending'">PENDING</option>
+                        <option value="processing" [selected]="order.order_status === 'processing'">PROCESSING</option>
+                        <option value="shipped" [selected]="order.order_status === 'shipped'">SHIPPED</option>
+                        <option value="delivered" [selected]="order.order_status === 'delivered'">DELIVERED</option>
                       </select>
                     </td>
                   </tr>
@@ -421,17 +421,17 @@
           
           <div class="flex-grow overflow-y-auto p-8 space-y-6 bg-black/20">
             @for (msg of chatService.messages(); track msg.timestamp) {
-              <div class="flex flex-col" [class.items-end]="msg.senderUid === authService.profile()?.uid">
+              <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
                 <div class="flex items-center gap-2 mb-2 px-1">
-                  <span class="tech-label text-[8px] opacity-70">{{ msg.senderName }}</span>
+                  <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
                   <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
                 </div>
                 <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border" 
-                  [class.bg-accent]="msg.senderUid === authService.profile()?.uid" 
-                  [class.text-metallic-black]="msg.senderUid === authService.profile()?.uid" 
-                  [class.border-accent]="msg.senderUid === authService.profile()?.uid"
-                  [class.bg-white/5]="msg.senderUid !== authService.profile()?.uid"
-                  [class.border-white/10]="msg.senderUid !== authService.profile()?.uid">
+                  [class.bg-accent]="msg.sender_id === authService.profile()?.id" 
+                  [class.text-metallic-black]="msg.sender_id === authService.profile()?.id" 
+                  [class.border-accent]="msg.sender_id === authService.profile()?.id"
+                  [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
+                  [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
                   {{ msg.text }}
                 </div>
               </div>
@@ -737,10 +737,6 @@
                     <input id="c-name" type="text" [(ngModel)]="newCategory.name" placeholder="Enter name" class="input-field font-mono text-sm">
                   </div>
                   <div class="space-y-2">
-                    <label for="c-slug" class="tech-label">Routing Slug</label>
-                    <input id="c-slug" type="text" [(ngModel)]="newCategory.slug" placeholder="category-slug" class="input-field font-mono text-sm">
-                  </div>
-                  <div class="space-y-2">
                     <label for="c-desc" class="tech-label">Narrative Description</label>
                     <textarea id="c-desc" [(ngModel)]="newCategory.description" placeholder="Enter description..." class="input-field font-mono text-sm" rows="3"></textarea>
                   </div>
@@ -754,8 +750,8 @@
                         <span class="tech-label text-[10px]">Uploading...</span>
                       </div>
                     }
-                    @if (newCategory.image_url) {
-                      <img [src]="newCategory.image_url" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Category Preview">
+                    @if (newCategory.image) {
+                      <img [src]="newCategory.image" class="w-full h-full object-cover rounded" referrerpolicy="no-referrer" alt="Category Preview">
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button (click)="categoryImageInput.click()" class="tech-label bg-white text-black px-3 py-1 rounded">Modify Source</button>
                       </div>
@@ -767,7 +763,7 @@
                     }
                     <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden" #categoryImageInput>
                   </div>
-                  <input type="text" [(ngModel)]="newCategory.image_url" placeholder="https://..." class="input-field font-mono text-[10px]">
+                  <input type="text" [(ngModel)]="newCategory.image" placeholder="https://..." class="input-field font-mono text-[10px]">
                 </div>
                 <div class="md:col-span-2 pt-6 border-t border-white/5 flex gap-4">
                   <button (click)="saveCategory()" class="metallic-button py-2 px-8 text-xs uppercase">Persist Taxonomy</button>
@@ -789,14 +785,13 @@
                 </div>
               }
             } @else {
-              @for (cat of productService.categories(); track cat.id) {
+                  @for (cat of productService.categories(); track cat.id) {
                 <div class="tech-card group hover:border-accent/30 transition-all overflow-hidden">
                   <div class="aspect-video relative overflow-hidden">
-                    <img [src]="cat.image_url || 'https://picsum.photos/seed/' + cat.slug + '/400/225'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerpolicy="no-referrer" [alt]="cat.name">
+                    <img [src]="cat.image || 'https://picsum.photos/seed/' + cat.id + '/400/225'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerpolicy="no-referrer" [alt]="cat.name">
                     <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
                     <div class="absolute bottom-4 left-4">
                       <h3 class="text-xl font-bold tracking-tighter italic font-serif">{{ cat.name }}</h3>
-                      <p class="tech-label text-[10px] opacity-70">{{ cat.slug }}</p>
                     </div>
                   </div>
                   <div class="p-4 flex justify-between items-center">
@@ -850,15 +845,11 @@
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td class="py-4 px-6 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
-                          @if (customer.avatar_url) {
-                            <img [src]="customer.avatar_url" class="w-full h-full object-cover" referrerpolicy="no-referrer" [alt]="customer.display_name || 'Customer Avatar'">
-                          } @else {
-                            <span class="material-icons text-sm">person</span>
-                          }
+                          <span class="material-icons text-sm">person</span>
                         </div>
                         <div>
-                          <div class="font-bold text-sm">{{ customer.display_name || 'Anonymous' }}</div>
-                          <div class="tech-value text-[9px] text-accent-muted">UID: {{ customer.uid | slice:0:8 }}</div>
+                          <div class="font-bold text-sm">{{ customer.name || 'Anonymous' }}</div>
+                          <div class="tech-value text-[9px] text-accent-muted">ID: {{ customer.id }}</div>
                         </div>
                       </td>
                       <td class="py-4 px-6 text-xs font-mono">{{ customer.email }}</td>
@@ -879,7 +870,7 @@
           <div class="tech-label">Inbound Inquiry Queue</div>
           <div class="grid grid-cols-1 gap-4">
             @for (msg of messages(); track msg.id) {
-              <div class="tech-card p-6 group hover:border-accent/30 transition-all" [class.opacity-60]="msg.is_read">
+              <div class="tech-card p-6 group hover:border-accent/30 transition-all" [class.opacity-60]="msg.status === 'read'">
                 <div class="flex justify-between items-start mb-4">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
@@ -892,7 +883,7 @@
                   </div>
                   <div class="text-right">
                     <div class="tech-value text-[10px] text-accent-muted mb-1">{{ msg.created_at | date:'MMM dd, HH:mm' }}</div>
-                    @if (!msg.is_read) {
+                    @if (msg.status !== 'read') {
                       <span class="px-2 py-0.5 bg-accent text-metallic-black text-[8px] font-bold uppercase rounded-sm">New Inquiry</span>
                     }
                   </div>
@@ -902,7 +893,7 @@
                   <p class="text-xs text-accent-muted leading-relaxed italic">"{{ msg.message }}"</p>
                 </div>
                 <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
-                  @if (!msg.is_read) {
+                  @if (msg.status !== 'read') {
                     <button (click)="markMessageAsRead(msg.id)" class="tech-label hover:text-accent flex items-center gap-1">
                       <span class="material-icons text-xs">done_all</span> Mark Read
                     </button>

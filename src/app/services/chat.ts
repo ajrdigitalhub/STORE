@@ -5,9 +5,8 @@ import { AuthService } from './auth';
 import { ApiService } from './api.service';
 
 export interface Message {
-  id?: string;
-  senderUid: string;
-  senderName: string;
+  sender_id: string | number;
+  sender_name: string;
   text: string;
   timestamp: string;
 }
@@ -39,8 +38,8 @@ export class ChatService {
     if (!profile) return;
 
     const message: Message = {
-      senderUid: profile.uid,
-      senderName: profile.displayName || 'User',
+      sender_id: profile.id,
+      sender_name: profile.name || 'User',
       text,
       timestamp: new Date().toISOString()
     };
@@ -78,8 +77,8 @@ export class ChatService {
   sendBotMessage(text: string) {
     setTimeout(() => {
       const botMessage: Message = {
-        senderUid: 'bot',
-        senderName: 'IDEA Zone Bot',
+        sender_id: 'bot',
+        sender_name: 'IDEA Zone Bot',
         text,
         timestamp: new Date().toISOString()
       };

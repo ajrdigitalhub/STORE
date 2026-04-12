@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { auth } from '../firebase';
-import { onAuthStateChanged, User, signOut, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { ApiService } from './api.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -20,14 +20,20 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 export interface UserProfile {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
+  id: number;
+  name: string;
+  email: string;
   role: 'customer' | 'admin';
-  avatar_url?: string;
   phone?: string;
-  address?: string | null;
-  createdAt: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
+  created_at: string;
+  updated_at: string;
 }
 
 @Injectable({
@@ -51,39 +57,49 @@ export class AuthService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        this.fetchProfile();
+      } else {
+        this.isAuthReadySignal.set(true);
+      }
+      
       onAuthStateChanged(auth, async (user) => {
         this.userSignal.set(user);
-        if (user) {
-          await this.syncProfile(user);
-        } else {
-          this.profileSignal.set(null);
+        // If Google login via Firebase, we still might want to sync
+        if (user && !localStorage.getItem('auth_token')) {
+          await this.syncFirebaseUser(user);
         }
-        this.isAuthReadySignal.set(true);
       });
     } else {
       this.isAuthReadySignal.set(true);
     }
   }
 
-  private async syncProfile(user: User) {
+  private async fetchProfile() {
     try {
-      // Try to get profile from our DB
-      const profile = await firstValueFrom(this.api.get<UserProfile>(`/auth/profile/${user.uid}`));
-      this.profileSignal.set(profile);
-    } catch {
-      // If not found, register them
-      const newProfile = {
-        uid: user.uid,
+      const response = await firstValueFrom(this.api.get<{user: UserProfile}>('/auth/profile'));
+      this.profileSignal.set(response.user);
+    } catch (error) {
+      console.error('Failed to fetch profile', error);
+      this.logout();
+    } finally {
+      this.isAuthReadySignal.set(true);
+    }
+  }
+
+  private async syncFirebaseUser(user: User) {
+    // For Google login, we might need a special route on server
+    try {
+      const response = await firstValueFrom(this.api.post<{token: string, user: UserProfile}>('/auth/google-sync', {
         email: user.email,
-        displayName: user.displayName,
-        role: user.email === 'ajrgroupconnect@gmail.com' ? 'admin' : 'customer'
-      };
-      try {
-        const profile = await firstValueFrom(this.api.post<UserProfile>('/auth/register', newProfile));
-        this.profileSignal.set(profile);
-      } catch (regError) {
-        console.error('Failed to sync profile', regError);
-      }
+        name: user.displayName,
+        uid: user.uid
+      }));
+      localStorage.setItem('auth_token', response.token);
+      this.profileSignal.set(response.user);
+    } catch (error) {
+      console.error('Firebase sync failed', error);
     }
   }
 
@@ -93,36 +109,27 @@ export class AuthService {
   }
 
   async loginWithEmail(email: string, pass: string) {
-    if (email === 'admin@ideazone.com' && pass === 'admin123') {
-      try {
-        return await signInWithEmailAndPassword(auth, email, pass);
-      } catch (error: unknown) {
-        // If user doesn't exist, try to register them automatically for this static account
-        const authError = error as { code?: string };
-        if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-credential' || authError.code === 'auth/invalid-login-credentials') {
-          try {
-            return await this.registerWithEmail(email, pass, 'IDEA Admin');
-          } catch {
-            // If registration fails (e.g. already exists but wrong pass), throw original error
-            throw error;
-          }
-        }
-        throw error;
-      }
-    }
-    return signInWithEmailAndPassword(auth, email, pass);
+    const response = await firstValueFrom(this.api.post<{token: string, user: UserProfile}>('/auth/login', { email, password: pass }));
+    localStorage.setItem('auth_token', response.token);
+    this.profileSignal.set(response.user);
+    return response;
   }
 
   async registerWithEmail(email: string, pass: string, name: string) {
-    const credential = await createUserWithEmailAndPassword(auth, email, pass);
-    if (credential.user) {
-      await updateProfile(credential.user, { displayName: name });
-      await this.syncProfile(credential.user);
-    }
-    return credential;
+    const response = await firstValueFrom(this.api.post<{token: string, user: UserProfile}>('/auth/register', { 
+      email, 
+      password: pass,
+      name
+    }));
+    localStorage.setItem('auth_token', response.token);
+    this.profileSignal.set(response.user);
+    return response;
   }
 
   async logout() {
+    localStorage.removeItem('auth_token');
+    this.profileSignal.set(null);
+    this.userSignal.set(null);
     return signOut(auth);
   }
 }

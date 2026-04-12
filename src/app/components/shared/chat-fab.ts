@@ -81,7 +81,7 @@ interface QuickAction {
                     {{ msg.text }}
                   </div>
                   <span class="text-[8px] text-accent-muted mt-1 px-1 uppercase tracking-tighter">
-                    {{ msg.senderName }} • {{ msg.timestamp | date:'shortTime' }}
+                    {{ msg.sender_name }} • {{ msg.timestamp | date:'shortTime' }}
                   </span>
                 </div>
               }
@@ -171,7 +171,7 @@ export class ChatFabComponent implements AfterViewChecked {
   }
 
   isMe(msg: Message) {
-    return msg.senderUid === this.authService.profile()?.uid;
+    return msg.sender_id === this.authService.profile()?.id;
   }
 
   sendMessage() {

@@ -25,6 +25,9 @@ export class ProductDetailComponent {
   specifications = computed(() => {
     const p = this.product();
     if (!p) return [];
+    if (p.specification && Object.keys(p.specification).length > 0) {
+      return Object.entries(p.specification).map(([label, value]) => ({ label, value }));
+    }
     return [
       { label: 'Material', value: p.category_name || 'Standard Polymer' },
       { label: 'Precision', value: '±0.1mm' },
@@ -36,7 +39,7 @@ export class ProductDetailComponent {
   relatedProducts = computed(() => {
     const p = this.product();
     if (!p) return [];
-    return this.productService.products().filter(prod => prod.category_id === p.category_id && prod.id !== p.id).slice(0, 4);
+    return this.productService.products().filter(prod => prod.categoryid === p.categoryid && prod.id !== p.id).slice(0, 4);
   });
 
   constructor() {

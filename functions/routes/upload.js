@@ -1,23 +1,40 @@
 const express = require('express');
 const Busboy = require('busboy');
 const path = require('path');
-const { bucket } = require('../firebaseAdmin');
+const { bucket } = require('../firebase');
 const router = express.Router();
 
-router.post('/', (req, res) => {
+// Middleware to capture raw body for busboy.end(req.rawBody)
+const rawBodyMiddleware = (req, res, next) => {
+  let data = Buffer.alloc(0);
+  req.on('data', (chunk) => {
+    data = Buffer.concat([data, chunk]);
+  });
+  req.on('end', () => {
+    req.rawBody = data;
+    next();
+  });
+  req.on('error', (err) => {
+    next(err);
+  });
+};
+
+router.post('/', rawBodyMiddleware, (req, res) => {
+  if (!req.rawBody || req.rawBody.length === 0) {
+    return res.status(400).json({ error: 'No request body found.' });
+  }
+
   const busboy = Busboy({ headers: req.headers });
-  let fileUploaded = false;
+  let fileProcessed = false;
 
   busboy.on('file', (name, file, info) => {
-    const { filename, encoding, mimeType } = info;
+    const { filename, mimeType } = info;
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const newFileName = uniqueSuffix + path.extname(filename);
 
     const blob = bucket.file(`uploads/${newFileName}`);
     const blobStream = blob.createWriteStream({
-      metadata: {
-        contentType: mimeType
-      },
+      metadata: { contentType: mimeType },
       resumable: false
     });
 
@@ -29,20 +46,20 @@ router.post('/', (req, res) => {
     });
 
     blobStream.on('finish', async () => {
-      fileUploaded = true;
+      fileProcessed = true;
       try {
-        // FIX: Removed blob.makePublic() as it crashes on Uniform Access buckets.
-        // Instead, we generate a Signed URL.
         const [url] = await blob.getSignedUrl({
           action: 'read',
-          expires: '03-01-2500' // Far future date
+          expires: '03-01-2500'
         });
 
-        res.json({
-          success: true,
-          url: url,
-          fileName: newFileName
-        });
+        if (!res.headersSent) {
+          res.json({
+            success: true,
+            url: url,
+            fileName: newFileName
+          });
+        }
       } catch (err) {
         console.error('Error generating URL:', err);
         if (!res.headersSent) {
@@ -57,16 +74,17 @@ router.post('/', (req, res) => {
   busboy.on('error', (err) => {
     console.error('Busboy error:', err);
     if (!res.headersSent) {
-      res.status(500).json({ error: 'Parsing failed' });
+      res.status(500).json({ error: `Parsing failed: ${err.message}` });
     }
   });
 
   busboy.on('finish', () => {
-    // Note: If multiple files are uploaded, you might need a different 
-    // counter logic, but for a single file, this works.
+    if (!fileProcessed && !res.headersSent) {
+      res.status(400).json({ error: 'No file found in request' });
+    }
   });
 
-  req.pipe(busboy);
+  busboy.end(req.rawBody);
 });
 
 module.exports = router;

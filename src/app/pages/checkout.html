@@ -17,17 +17,25 @@
             <label for="phone" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Phone Number</label>
             <input id="phone" type="text" [(ngModel)]="address.phone" placeholder="+91 9876543210" class="input-field">
           </div>
+          <div class="space-y-2">
+            <label for="email" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Email Address</label>
+            <input id="email" type="email" [(ngModel)]="address.email" placeholder="john@example.com" class="input-field">
+          </div>
           <div class="md:col-span-2 space-y-2">
             <label for="street" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Street Address</label>
-            <input id="street" type="text" [(ngModel)]="address.street" placeholder="123, Tech Park" class="input-field">
+            <input id="street" type="text" [(ngModel)]="address.address" placeholder="123, Tech Park" class="input-field">
           </div>
           <div class="space-y-2">
             <label for="city" class="text-xs font-bold uppercase tracking-widest text-accent-muted">City</label>
             <input id="city" type="text" [(ngModel)]="address.city" placeholder="Mumbai" class="input-field">
           </div>
           <div class="space-y-2">
-            <label for="pincode" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Pincode</label>
-            <input id="pincode" type="text" [(ngModel)]="address.pincode" placeholder="400001" class="input-field">
+            <label for="state" class="text-xs font-bold uppercase tracking-widest text-accent-muted">State</label>
+            <input id="state" type="text" [(ngModel)]="address.state" placeholder="Maharashtra" class="input-field">
+          </div>
+          <div class="space-y-2">
+            <label for="zip" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Pincode</label>
+            <input id="zip" type="text" [(ngModel)]="address.zip" placeholder="400001" class="input-field">
           </div>
         </div>
       </div>

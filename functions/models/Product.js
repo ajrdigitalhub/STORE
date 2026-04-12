@@ -11,6 +11,10 @@ class Product {
     this.images = data.images || [];
     this.stock = parseInt(data.stock) || 0;
     this.variants = data.variants || [];
+    this.specification = data.specification || {};
+    this.tags = data.tags || [];
+    this.rating = parseFloat(data.rating) || 0;
+    this.reviews_count = parseInt(data.reviews_count) || 0;
     this.featured = data.featured || false;
     this.active = data.active !== false;
     this.created_at = data.created_at;
@@ -19,14 +23,25 @@ class Product {
 
   // Create new product
   static async create(productData) {
-    const { name, description, price, compare_price, id, images = [], stock = 0, variants = [], featured = false, active = true } = productData;
+    const { 
+      name, description, price, compare_price, images = [], 
+      stock = 0, variants = [], featured = false, active = true,
+      specification = {}, tags = [], categoryid
+    } = productData;
 
     const query = `
-      INSERT INTO products (name, description, price, compare_price, id, images, stock, variants, featured, active)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      INSERT INTO products (
+        name, description, price, compare_price, images, 
+        stock, variants, featured, active, specification, tags, categoryid
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
     `;
-    const values = [name, description, price, compare_price, 123, JSON.stringify(images), stock, JSON.stringify(variants), featured, active];
+    const values = [
+      name, description, price, compare_price, JSON.stringify(images), 
+      stock, JSON.stringify(variants), featured, active, 
+      JSON.stringify(specification), JSON.stringify(tags), categoryid
+    ];
 
     const result = await pool.query(query, values);
     return new Product(result.rows[0]);
@@ -37,7 +52,7 @@ class Product {
     const query = `
       SELECT p.*, c.name as category_name, c.description as category_description
       FROM products p
-      LEFT JOIN categories c ON p.id = c.id
+      LEFT JOIN categories c ON p.categoryid = c.id
       WHERE p.id = $1 AND p.active = true
     `;
     const result = await pool.query(query, [id]);
@@ -51,11 +66,13 @@ class Product {
     let query = `
       SELECT p.*, c.name as category_name
       FROM products p
-      LEFT JOIN categories c ON p.id = c.id
+      LEFT JOIN categories c ON p.categoryid = c.id
       WHERE p.active = true
     `;
     let countQuery = `
-      SELECT COUNT(*) FROM products p WHERE p.active = true
+      SELECT COUNT(*) FROM products p 
+      LEFT JOIN categories c ON p.categoryid = c.id
+      WHERE p.active = true
     `;
     const values = [];
     let paramIndex = 1;
@@ -121,7 +138,7 @@ class Product {
     let paramIndex = 1;
 
     Object.keys(updateData).forEach(key => {
-      if (key === 'images' || key === 'variants') {
+      if (['images', 'variants', 'specification', 'tags'].includes(key)) {
         fields.push(`${key} = $${paramIndex}`);
         values.push(JSON.stringify(updateData[key]));
         paramIndex++;
@@ -171,7 +188,7 @@ class Product {
     const query = `
       SELECT p.*, c.name as category_name
       FROM products p
-      LEFT JOIN categories c ON p.id = c.id
+      LEFT JOIN categories c ON p.categoryid = c.id
       WHERE p.active = true AND p.featured = true
       ORDER BY p.created_at DESC
       LIMIT $1

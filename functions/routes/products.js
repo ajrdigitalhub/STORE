@@ -1,31 +1,8 @@
 const express = require('express');
-// const multer = require('multer');
-const path = require('path');
 const Product = require('../models/Product');
-const { auth, adminAuth } = require('../middleware/auth');
+const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
-
-// Multer config for product images
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
-//   filename: (req, file, cb) => {
-//     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-//     cb(null, uniqueName);
-//   }
-// });
-const upload =[];
-//  multer({
-//   storage,
-//   limits: { fileSize: 5 * 1024 * 1024 },
-//   fileFilter: (req, file, cb) => {
-//     const allowed = /jpeg|jpg|png|webp|gif/;
-//     const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-//     const mimeOk = allowed.test(file.mimetype);
-//     if (extOk && mimeOk) cb(null, true);
-//     else cb(new Error('Only image files are allowed'));
-//   }
-// });
 
 // GET /api/products — list with search, filter, pagination
 router.get('/', async (req, res, next) => {
@@ -71,18 +48,14 @@ router.get('/:id', async (req, res, next) => {
 // POST /api/products — admin only
 router.post('/', adminAuth, async (req, res, next) => {
   try {
-    const { name, description, price, comparePrice, category, stock, variants, featured } = req.body;
-    const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
-
-    let parsedVariants = [];
-    if (variants) {
-      try { parsedVariants = JSON.parse(variants); } catch (e) { parsedVariants = []; }
-    }
+    const { name, description, price, comparePrice, category, stock, variants, featured, images, specification, tags } = req.body;
 
     const product = await Product.create({
       name, description, price: Number(price), compare_price: Number(comparePrice || 0),
-      categoryid: category, stock: Number(stock || 0), images, variants: parsedVariants,
-      featured: featured === 'true'
+      categoryid: category, stock: Number(stock || 0), images: images || [], variants: variants || [],
+      featured: featured === true || featured === 'true',
+      specification: specification || {},
+      tags: tags || []
     });
     res.status(201).json(product);
   } catch (error) {
@@ -93,23 +66,14 @@ router.post('/', adminAuth, async (req, res, next) => {
 // PUT /api/products/:id — admin only
 router.put('/:id', adminAuth, async (req, res, next) => {
   try {
-    const { name, description, price, comparePrice, category, stock, variants, featured, existingImages } = req.body;
-    const newImages = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
-
-    let parsedExisting = [];
-    if (existingImages) {
-      try { parsedExisting = JSON.parse(existingImages); } catch (e) { parsedExisting = []; }
-    }
-
-    let parsedVariants = [];
-    if (variants) {
-      try { parsedVariants = JSON.parse(variants); } catch (e) { parsedVariants = []; }
-    }
+    const { name, description, price, comparePrice, category, stock, variants, featured, images, specification, tags } = req.body;
 
     const updateData = {
       name, description, price: Number(price), compare_price: Number(comparePrice || 0),
-      categoryid: category, stock: Number(stock || 0), images: [...parsedExisting, ...newImages],
-      variants: parsedVariants, featured: featured === 'true'
+      categoryid: category, stock: Number(stock || 0), images: images || [],
+      variants: variants || [], featured: featured === true || featured === 'true',
+      specification: specification || {},
+      tags: tags || []
     };
 
     const product = await Product.update(req.params.id, updateData);

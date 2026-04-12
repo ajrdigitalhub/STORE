@@ -13,13 +13,11 @@ import { animate, stagger } from 'motion';
 
 interface Customer {
   id: number;
-  uid: string;
+  name: string;
   email: string;
-  display_name: string | null;
   role: string;
-  avatar_url: string | null;
   phone: string | null;
-  address: string | null;
+  address: unknown;
   created_at: string;
 }
 
@@ -29,7 +27,7 @@ interface Message {
   email: string;
   subject: string;
   message: string;
-  is_read: boolean;
+  status: string;
   created_at: string;
 }
 
@@ -63,8 +61,8 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Thank you for reaching out to IDEA Zone 3D!'
   ];
 
-  newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
-  newCategory = { name: '', slug: '', description: '', image_url: '' };
+  newProduct = { name: '', price: 0, categoryid: 0, stock: 0, description: '', imageUrl: '' };
+  newCategory = { name: '', description: '', image: '' };
   
   customers = signal<Customer[]>([]);
   messages = signal<Message[]>([]);
@@ -202,20 +200,26 @@ export class AdminDashboardComponent implements AfterViewInit {
     await this.productService.addProduct({
       name: this.newProduct.name,
       price: this.newProduct.price,
-      category_id: this.newProduct.category_id,
+      categoryid: this.newProduct.categoryid,
       stock: this.newProduct.stock,
       description: this.newProduct.description,
       images: [this.newProduct.imageUrl],
-      is_featured: true
+      featured: true,
+      active: true
     });
     this.showProductForm.set(false);
-    this.newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrl: '' };
+    this.newProduct = { name: '', price: 0, categoryid: 0, stock: 0, description: '', imageUrl: '' };
   }
 
   async saveCategory() {
-    await this.productService.addCategory(this.newCategory);
+    await this.productService.addCategory({
+      name: this.newCategory.name,
+      description: this.newCategory.description,
+      image: this.newCategory.image,
+      active: true
+    });
     this.showCategoryForm.set(false);
-    this.newCategory = { name: '', slug: '', description: '', image_url: '' };
+    this.newCategory = { name: '', description: '', image: '' };
   }
 
   async deleteCategory(id: number) {
@@ -435,7 +439,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       this.isUploading.set(true);
       try {
         const url = await this.uploadService.uploadImage(file);
-        this.newCategory.image_url = url;
+        this.newCategory.image = url;
       } catch (error) {
         console.error('Upload failed', error);
         alert('Image upload failed');
@@ -466,12 +470,12 @@ export class AdminDashboardComponent implements AfterViewInit {
     }
   }
 
-  totalRevenue = computed(() => this.orderService.orders().reduce((acc, order) => acc + order.total, 0));
-  pendingOrders = computed(() => this.orderService.orders().filter(order => order.status === 'pending'));
+  totalRevenue = computed(() => this.orderService.orders().reduce((acc, order) => acc + order.total_amount, 0));
+  pendingOrders = computed(() => this.orderService.orders().filter(order => order.order_status === 'pending'));
   totalCustomers = signal(2); // Mocked for now to match screenshot
   recentOrders = computed(() => this.orderService.orders().slice(0, 5));
 
-  async updateOrderStatus(id: string, status: Order['status']) {
+  async updateOrderStatus(id: number, status: Order['order_status']) {
     await this.orderService.updateOrderStatus(id, status);
   }
 

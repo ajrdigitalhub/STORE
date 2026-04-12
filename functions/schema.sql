@@ -1,9 +1,3 @@
--- Create database (run this separately if needed)
--- CREATE DATABASE ecommerce;
-
--- Use the database
--- \c ecommerce;
-
 -- Create tables
 
 -- Users table
@@ -41,6 +35,10 @@ CREATE TABLE products (
     images JSONB DEFAULT '[]'::jsonb,
     stock INTEGER DEFAULT 0,
     variants JSONB DEFAULT '[]'::jsonb,
+    specification JSONB DEFAULT '{}'::jsonb,
+    tags JSONB DEFAULT '[]'::jsonb,
+    rating DECIMAL(3,2) DEFAULT 0,
+    reviews_count INTEGER DEFAULT 0,
     featured BOOLEAN DEFAULT false,
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -120,6 +118,13 @@ CREATE TABLE contact_configs (
     phone VARCHAR(20),
     email VARCHAR(255),
     working_hours TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Config table for general app settings
+CREATE TABLE config (
+    key VARCHAR(255) PRIMARY KEY,
+    value JSONB NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

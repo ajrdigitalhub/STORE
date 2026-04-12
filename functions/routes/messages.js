@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/', async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;
-    const newMessage = await Message.create({ name, email, subject, message });
+    await Message.create({ name, email, subject, message });
     res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
     next(error);
@@ -26,33 +26,6 @@ router.get('/', adminAuth, async (req, res, next) => {
       page: result.page,
       pages: Math.ceil(result.total / Number(limit))
     });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// PATCH /api/messages/:id - Admin: Update message status
-router.patch('/:id', adminAuth, async (req, res, next) => {
-  try {
-    const { status } = req.body;
-    const message = await Message.updateStatus(req.params.id, status);
-    if (!message) {
-      return res.status(404).json({ message: 'Message not found' });
-    }
-    res.json(message);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// DELETE /api/messages/:id - Admin: Delete a message
-router.delete('/:id', adminAuth, async (req, res, next) => {
-  try {
-    const deleted = await Message.delete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ message: 'Message not found' });
-    }
-    res.json({ message: 'Message deleted successfully' });
   } catch (error) {
     next(error);
   }

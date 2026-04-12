@@ -25,14 +25,21 @@ export class CheckoutComponent {
   authService = inject(AuthService);
   router = inject(Router);
 
-  address = { name: '', phone: '', street: '', city: '', pincode: '' };
+  address = { 
+    name: '', 
+    email: '', 
+    phone: '', 
+    address: '', 
+    city: '', 
+    state: '', 
+    zip: '' 
+  };
   paymentMethod = signal<'COD' | 'Razorpay'>('COD');
   isProcessing = signal(false);
 
   async placeOrder() {
     this.isProcessing.set(true);
     try {
-      const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
       const total = this.cartService.totalPrice() * 1.18;
 
       if (this.paymentMethod() === 'Razorpay') {
@@ -52,19 +59,19 @@ export class CheckoutComponent {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           handler: async (response: any) => {
             await this.paymentService.verifyPayment(response);
-            await this.finalizeOrder(orderId, total, 'paid');
+            await this.finalizeOrder(total, 'paid');
           },
           prefill: {
             name: this.address.name,
             contact: this.address.phone,
-            email: this.authService.user()?.email || ''
+            email: this.authService.profile()?.email || ''
           },
           theme: { color: "#e5e5e5" }
         };
         const rzp = new Razorpay(options);
         rzp.open();
       } else {
-        await this.finalizeOrder(orderId, total, 'unpaid');
+        await this.finalizeOrder(total, 'pending');
       }
     } catch (error: unknown) {
       console.error(error instanceof Error ? error.message : error);
@@ -74,24 +81,29 @@ export class CheckoutComponent {
     }
   }
 
-  private async finalizeOrder(orderId: string, total: number, paymentStatus: 'paid' | 'unpaid') {
+  private async finalizeOrder(total_amount: number, payment_status: 'paid' | 'pending') {
+    const profile = this.authService.profile();
     await this.orderService.createOrder({
-      orderId,
-      customerUid: this.authService.user()?.uid || 'guest',
-      items: this.cartService.items(),
-      total,
-      status: 'pending',
-      paymentStatus,
-      paymentMethod: this.paymentMethod(),
-      shippingAddress: this.address,
-      createdAt: new Date().toISOString()
+      userid: profile?.id || 0,
+      items: this.cartService.items().map(item => ({
+        product: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.images[0]
+      })),
+      total_amount,
+      order_status: 'pending',
+      payment_status,
+      payment_method: this.paymentMethod().toLowerCase() as 'razorpay' | 'cod',
+      shipping_address: this.address
     });
     this.cartService.clearCart();
     
-    if (this.authService.user()) {
+    if (profile) {
       this.router.navigate(['/profile']);
     } else {
-      alert('Order placed successfully! Order ID: ' + orderId);
+      alert('Order placed successfully!');
       this.router.navigate(['/']);
     }
   }

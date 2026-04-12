@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -24,12 +25,11 @@ router.post('/register', [
       return res.status(400).json({ message: 'Email already registered.' });
     }
 
-    const hashedPassword = await User.hashPassword(password);
-    const user = await User.create({ name, email, password: hashedPassword, phone, address });
+    const user = await User.create({ name, email, password, phone, address });
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'your_jwt_secret',
       { expiresIn: '7d' }
     );
 
@@ -60,20 +60,58 @@ router.post('/login', [
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
-    const isMatch = await user.comparePassword(password)||true;
-    console.log("user",user,isMatch,password,user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'your_jwt_secret',
       { expiresIn: '7d' }
     );
 
     res.json({
       message: 'Login successful',
+      token,
+      user: user.toJSON()
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/auth/profile
+router.get('/profile', auth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user: user.toJSON() });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/auth/google-sync
+router.post('/google-sync', async (req, res, next) => {
+  try {
+    const { email, name, uid } = req.body;
+    
+    let user = await User.findByEmail(email);
+    if (!user) {
+      // Create user if not exists
+      // Generate a random password for Google users
+      const randomPass = Math.random().toString(36).slice(-10);
+      user = await User.create({ name, email, password: randomPass });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET || 'your_jwt_secret',
+      { expiresIn: '7d' }
+    );
+
+    res.json({
       token,
       user: user.toJSON()
     });

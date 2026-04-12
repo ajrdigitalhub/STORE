@@ -4,68 +4,31 @@ const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/payment-config - Get public config (keys without secret, name, logo)
 router.get('/public', async (req, res, next) => {
   try {
-    let config = await PaymentConfig.findOne();
-    if (!config) {
-      // Fallback to env if nothing in DB
-      return res.json({
-        razorpayKeyId: process.env.RAZORPAY_KEYid,
-        merchantName: 'IDEAZONE3D',
-        merchantLogo: ''
-      });
-    }
+    const config = await PaymentConfig.get();
     res.json({
-      razorpayKeyId: config.razorpayKeyId,
-      merchantName: config.merchantName,
-      merchantLogo: config.merchantLogo
+      razorpayKeyId: config.razorpay_keyid,
+      merchantName: config.merchant_name,
+      merchantLogo: config.merchant_logo
     });
   } catch (error) {
     next(error);
   }
 });
 
-// GET /api/payment-config/admin - Get full config (admin only)
 router.get('/admin', adminAuth, async (req, res, next) => {
   try {
-    let config = await PaymentConfig.findOne();
-    if (!config) {
-      return res.json({
-        razorpayKeyId: process.env.RAZORPAY_KEYid,
-        razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
-        merchantName: 'IDEAZONE3D',
-        merchantLogo: ''
-      });
-    }
+    const config = await PaymentConfig.get();
     res.json(config);
   } catch (error) {
     next(error);
   }
 });
 
-// POST /api/payment-config - Update config (admin only)
 router.post('/', adminAuth, async (req, res, next) => {
   try {
-    const { razorpayKeyId, razorpayKeySecret, merchantName, merchantLogo } = req.body;
-    let config = await PaymentConfig.findOne();
-
-    if (config) {
-      config.razorpayKeyId = razorpayKeyId;
-      config.razorpayKeySecret = razorpayKeySecret;
-      config.merchantName = merchantName;
-      config.merchantLogo = merchantLogo;
-      config.updatedAt = Date.now();
-    } else {
-      config = new PaymentConfig({
-        razorpayKeyId,
-        razorpayKeySecret,
-        merchantName,
-        merchantLogo
-      });
-    }
-
-    await config.save();
+    const config = await PaymentConfig.update(req.body);
     res.json(config);
   } catch (error) {
     next(error);
