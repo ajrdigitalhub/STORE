@@ -25,6 +25,7 @@
               "__dirname": "''"
             },
             "browser": "src/main.ts",
+            "index": "src/index.html",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -40,6 +41,7 @@
             "ssr": {
               "entry": "server/main.js"
             },
+            "prerender": false,
             "externalDependencies": [
               "@grpc/grpc-js",
               "@grpc/proto-loader",
@@ -61,12 +63,12 @@
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "5MB"
+                  "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "8kB",
-                  "maximumError": "12kB"
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
