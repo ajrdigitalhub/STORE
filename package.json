@@ -46,7 +46,8 @@
     "tslib": "^2.3.0"
   },
   "optionalDependencies": {
-    "lightningcss-linux-x64-gnu": "1.32.0"
+    "lightningcss-linux-x64-gnu": "1.32.0",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.2.2"
   },
   "overrides": {
     "lightningcss": "1.32.0"
