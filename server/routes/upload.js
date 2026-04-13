@@ -1,37 +1,43 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const { auth } = require('../middleware/auth');
+import { Router } from 'express';
+import multer from 'multer';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 
-const router = express.Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Multer config for custom item images
+const uploadDir = join(__dirname, '../../public/uploads');
+
+// Ensure upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-    cb(null, uniqueName);
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = file.originalname.split('.').pop();
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + ext);
   }
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif/;
-    const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = allowed.test(file.mimetype);
-    if (extOk && mimeOk) cb(null, true);
-    else cb(new Error('Only image files are allowed'));
-  }
-});
+const upload = multer({ storage: storage });
 
-// POST /api/upload — authenticated users can upload custom images
-router.post('/', auth, upload.single('image'), (req, res) => {
+const router = Router();
+
+router.post('/', upload.single('image'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
+    res.status(400).json({ error: 'No file uploaded' });
+    return;
   }
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+  
+  // Return the public URL for the uploaded file
+  const fileUrl = `/uploads/${req.file.filename}`;
+  res.json({ url: fileUrl });
 });
 
-module.exports = router;
+export const uploadRoutes = router;

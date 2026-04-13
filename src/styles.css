@@ -1,0 +1,96 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-serif: "Playfair Display", serif;
+
+  --color-metallic-black: #0a0a0a;
+  --color-metallic-gray: #1a1a1a;
+  --color-metallic-light: #2a2a2a;
+  --color-accent: #e5e5e5;
+  --color-accent-muted: #a3a3a3;
+
+  --shadow-metallic: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes reverse-spin-slow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+.animate-reverse-spin-slow {
+  animation: reverse-spin-slow 15s linear infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-metallic-black text-accent font-sans antialiased;
+    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-metallic-gray/50 backdrop-blur-md border border-white/10 rounded-2xl shadow-glass;
+  }
+
+  .metallic-button {
+    @apply px-6 py-3 bg-accent text-metallic-black font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .metallic-button-outline {
+    @apply px-6 py-3 bg-transparent text-accent border border-accent/30 font-semibold rounded-xl transition-all duration-300 hover:bg-accent/10 hover:border-accent;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-metallic-light/50 border border-white/10 rounded-xl text-accent focus:outline-none focus:border-accent/50 transition-all;
+  }
+
+  .tech-label {
+    @apply text-[11px] font-sans font-semibold uppercase tracking-wider text-accent-muted;
+  }
+
+  .tech-value {
+    @apply font-mono tracking-tighter;
+  }
+
+  .tech-card {
+    @apply bg-metallic-gray/30 border border-white/5 rounded-lg overflow-hidden;
+  }
+
+  .tech-header {
+    @apply bg-white/5 border-b border-white/5 px-4 py-2 flex items-center justify-between;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-metallic-black;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-metallic-light rounded-full border-2 border-metallic-black;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent-muted;
+}

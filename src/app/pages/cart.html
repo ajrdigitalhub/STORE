@@ -1,0 +1,90 @@
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <h1 class="text-4xl font-bold mb-12">Your Shopping Cart</h1>
+
+  @if (cartService.items().length > 0) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div class="lg:col-span-2 space-y-6">
+        @for (item of cartService.items(); track item.id) {
+          <div class="glass-card p-6 flex flex-col sm:flex-row items-center gap-6">
+            <div class="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+              <img [src]="item.images && item.images.length > 0 ? item.images[0] : 'https://picsum.photos/seed/' + item.id + '/200/200'" [alt]="item.name" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+            </div>
+            <div class="flex-grow text-center sm:text-left">
+              <h3 class="text-xl font-bold mb-1">{{ item.name }}</h3>
+              <p class="text-accent-muted text-sm mb-4">{{ item.category_name || 'Uncategorized' }}</p>
+              <div class="flex items-center justify-center sm:justify-start gap-4">
+                <div class="flex items-center bg-metallic-light/50 rounded-lg p-1">
+                  <button (click)="cartService.updateQuantity(item.id, item.quantity - 1)" class="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-md">
+                    <span class="material-icons text-sm">remove</span>
+                  </button>
+                  <span class="w-10 text-center font-bold text-sm">{{ item.quantity }}</span>
+                  <button (click)="cartService.updateQuantity(item.id, item.quantity + 1)" class="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-md">
+                    <span class="material-icons text-sm">add</span>
+                  </button>
+                </div>
+                <button (click)="cartService.removeFromCart(item.id)" class="text-red-500 hover:text-red-400 text-sm font-medium flex items-center gap-1">
+                  <span class="material-icons text-sm">delete</span>
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-xl font-bold text-accent">{{ item.price * item.quantity | currency:'INR' }}</p>
+              <p class="text-xs text-accent-muted">{{ item.price | currency:'INR' }} each</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="space-y-6">
+        <div class="glass-card p-8">
+          <h2 class="text-2xl font-bold mb-8">Order Summary</h2>
+          <div class="space-y-4 mb-8">
+            <div class="flex justify-between text-accent-muted">
+              <span>Subtotal ({{ cartService.totalItems() }} items)</span>
+              <span>{{ cartService.totalPrice() | currency:'INR' }}</span>
+            </div>
+            <div class="flex justify-between text-accent-muted">
+              <span>Shipping</span>
+              <span class="text-green-500">Free</span>
+            </div>
+            <div class="flex justify-between text-accent-muted">
+              <span>Tax (GST 18%)</span>
+              <span>{{ cartService.totalPrice() * 0.18 | currency:'INR' }}</span>
+            </div>
+            <div class="border-t border-white/5 pt-4 flex justify-between text-xl font-bold text-white">
+              <span>Total</span>
+              <span>{{ cartService.totalPrice() * 1.18 | currency:'INR' }}</span>
+            </div>
+          </div>
+          <a routerLink="/checkout" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
+            Proceed to Checkout
+            <span class="material-icons">arrow_forward</span>
+          </a>
+          <p class="text-[10px] text-accent-muted text-center mt-6 uppercase tracking-widest">
+            Secure payment powered by Razorpay
+          </p>
+        </div>
+
+        <div class="glass-card p-6 flex items-center gap-4">
+          <span class="material-icons text-accent">local_offer</span>
+          <div class="flex-grow">
+            <h4 class="text-sm font-bold">Have a promo code?</h4>
+            <p class="text-xs text-accent-muted">Apply it at the next step</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="min-h-[50vh] flex flex-col items-center justify-center text-center">
+      <div class="w-24 h-24 bg-metallic-gray rounded-full flex items-center justify-center mb-8">
+        <span class="material-icons text-5xl text-accent-muted">shopping_cart</span>
+      </div>
+      <h2 class="text-3xl font-bold mb-4">Your cart is empty</h2>
+      <p class="text-accent-muted mb-10 max-w-md">
+        Looks like you haven't added anything to your cart yet. Explore our products and find something special.
+      </p>
+      <a routerLink="/products" class="metallic-button px-10">Start Shopping</a>
+    </div>
+  }
+</div>

@@ -1,85 +1,33 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
-const User = require('../models/User');
+import { Router } from 'express';
+import { query } from '../db.js';
 
-const router = express.Router();
+const router = Router();
 
-// POST /api/auth/register
-router.post('/register', [
-  body('name').trim().notEmpty().withMessage('Name is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], async (req, res, next) => {
+router.post('/register', async (req, res) => {
+  const { email, displayName, uid } = req.body;
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
-    }
-
-    const { name, email, password, phone } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered.' });
-    }
-
-    const user = new User({ name, email, password, phone });
-    await user.save();
-
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+    const result = await query(
+      'INSERT INTO users (email, display_name, uid) VALUES ($1, $2, $3) ON CONFLICT (uid) DO UPDATE SET email = $1, display_name = $2 RETURNING id, email, display_name, uid, role',
+      [email, displayName, uid]
     );
-
-    res.status(201).json({
-      message: 'Registration successful',
-      token,
-      user: user.toJSON()
-    });
+    res.status(201).json(result.rows[0]);
   } catch (error) {
-    next(error);
+    res.status(500).json({ error: 'Failed to register user', details: error });
   }
 });
 
-// POST /api/auth/login
-router.post('/login', [
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').notEmpty().withMessage('Password is required')
-], async (req, res, next) => {
+router.get('/profile/:uid', async (req, res) => {
+  const { uid } = req.params;
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
+    const result = await query('SELECT id, email, display_name, uid, role, created_at FROM users WHERE uid = $1', [uid]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
-
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
-    }
-
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.json({
-      message: 'Login successful',
-      token,
-      user: user.toJSON()
-    });
+    res.json(result.rows[0]);
   } catch (error) {
-    next(error);
+    res.status(500).json({ error: 'Failed to fetch profile', details: error });
   }
 });
 
-module.exports = router;
+export const authRoutes = router;

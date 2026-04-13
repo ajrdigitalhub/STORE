@@ -1,67 +1,69 @@
-const express = require('express');
-const Category = require('../models/Category');
-const { adminAuth } = require('../middleware/auth');
+import { Router } from 'express';
+import { pool } from '../db.js';
+import { authenticate, isAdmin } from '../auth.js';
 
-const router = express.Router();
+const router = Router();
 
-// GET /api/categories
-router.get('/', async (req, res, next) => {
+// Get all categories
+router.get('/', async (req, res) => {
   try {
-    const categories = await Category.find({ active: true }).sort('name');
-    res.json(categories);
+    const result = await pool.query('SELECT * FROM categories ORDER BY name ASC');
+    res.json(result.rows);
   } catch (error) {
-    next(error);
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// GET /api/categories/:id
-router.get('/:id', async (req, res, next) => {
+// Create a category (Admin only)
+router.post('/', authenticate, isAdmin, async (req, res) => {
+  const { name, slug, description, image_url } = req.body;
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) return res.status(404).json({ message: 'Category not found' });
-    res.json(category);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// POST /api/categories — admin only
-router.post('/', adminAuth, async (req, res, next) => {
-  try {
-    const { name, description, image } = req.body;
-    const category = new Category({ name, description, image });
-    await category.save();
-    res.status(201).json(category);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// PUT /api/categories/:id — admin only
-router.put('/:id', adminAuth, async (req, res, next) => {
-  try {
-    const { name, description, image, active } = req.body;
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
-      { name, description, image, active },
-      { new: true, runValidators: true }
+    const result = await pool.query(
+      'INSERT INTO categories (name, slug, description, image_url) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, slug, description, image_url]
     );
-    if (!category) return res.status(404).json({ message: 'Category not found' });
-    res.json(category);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
-    next(error);
+    console.error('Error creating category:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// DELETE /api/categories/:id — admin only
-router.delete('/:id', adminAuth, async (req, res, next) => {
+// Update a category (Admin only)
+router.put('/:id', authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, slug, description, image_url } = req.body;
   try {
-    const category = await Category.findByIdAndDelete(req.params.id);
-    if (!category) return res.status(404).json({ message: 'Category not found' });
+    const result = await pool.query(
+      'UPDATE categories SET name = $1, slug = $2, description = $3, image_url = $4 WHERE id = $5 RETURNING *',
+      [name, slug, description, image_url, id]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating category:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete a category (Admin only)
+router.delete('/:id', authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM categories WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
-    next(error);
+    console.error('Error deleting category:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-module.exports = router;
+export default router;
