@@ -108,8 +108,12 @@
 
               <div class="flex items-end gap-4 mb-8">
                 <span class="text-4xl font-bold text-accent">{{ p.price | currency:'INR' }}</span>
-                <span class="text-lg text-accent-muted line-through mb-1">{{ p.price * 1.2 | currency:'INR' }}</span>
-                <span class="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded mb-1 border border-accent/20">20% OFF</span>
+                @if (p.compare_price && p.compare_price > p.price) {
+                  <span class="text-lg text-accent-muted line-through mb-1">{{ p.compare_price | currency:'INR' }}</span>
+                  <span class="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded mb-1 border border-accent/20">
+                    {{ ((p.compare_price - p.price) / p.compare_price * 100) | number:'1.0-0' }}% OFF
+                  </span>
+                }
               </div>
               <p class="text-accent-muted leading-relaxed text-lg font-light">
                 {{ p.description }}

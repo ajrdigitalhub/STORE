@@ -10,31 +10,24 @@ export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  private getHeaders() {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    return {
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-  }
-
   get<T>(path: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${path}`, { headers: this.getHeaders() });
+    return this.http.get<T>(`${this.baseUrl}${path}`);
   }
 
   post<T>(path: string, body: unknown): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}${path}`, body, { headers: this.getHeaders() });
+    return this.http.post<T>(`${this.baseUrl}${path}`, body);
   }
 
   put<T>(path: string, body: unknown): Observable<T> {
-    return this.http.put<T>(`${this.baseUrl}${path}`, body, { headers: this.getHeaders() });
+    return this.http.put<T>(`${this.baseUrl}${path}`, body);
   }
 
   patch<T>(path: string, body: unknown): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}${path}`, body, { headers: this.getHeaders() });
+    return this.http.patch<T>(`${this.baseUrl}${path}`, body);
   }
 
   delete<T>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}${path}`, { headers: this.getHeaders() });
+    return this.http.delete<T>(`${this.baseUrl}${path}`);
   }
 
   getBaseUrl(): string {

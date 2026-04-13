@@ -1,10 +1,11 @@
 import { Component, inject, signal, computed, effect, untracked, AfterViewInit, ElementRef } from '@angular/core';
-import { ProductService } from '../../services/product';
+import { Product, ProductService } from '../../services/product';
 import { OrderService, Order } from '../../services/order';
 import { AuthService } from '../../services/auth';
 import { ChatService } from '../../services/chat';
 import { ConfigService, AppConfig } from '../../services/config';
 import { UploadService } from '../../services/upload';
+import { ToastService } from '../../services/toast.service';
 import { SkeletonComponent } from '../../components/shared/skeleton';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -46,11 +47,13 @@ export class AdminDashboardComponent implements AfterViewInit {
   chatService = inject(ChatService);
   configService = inject(ConfigService);
   uploadService = inject(UploadService);
+  toastService = inject(ToastService);
   http = inject(HttpClient);
   private el = inject(ElementRef);
 
   activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'hero' | 'footer'>('dashboard');
   showProductForm = signal(false);
+  editingProduct = signal<Product | null>(null);
   showCategoryForm = signal(false);
   chatMessage = '';
   quickReplies = [
@@ -61,9 +64,9 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Thank you for reaching out to IDEA Zone 3D!'
   ];
 
-  newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
+  newProduct = { name: '', price: 0, compare_price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
   newCategory = { name: '', description: '', image: '' };
-  
+
   customers = signal<Customer[]>([]);
   messages = signal<Message[]>([]);
 
@@ -129,17 +132,17 @@ export class AdminDashboardComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       const config = this.configService.config();
-      
+
       untracked(() => {
         const currentHero = config.hero;
         // Only sync if form is currently empty (initial load)
         if (this.heroForm().slides.length === 0 && currentHero?.slides) {
-          this.heroForm.set({ 
+          this.heroForm.set({
             slides: JSON.parse(JSON.stringify(currentHero.slides))
           });
         }
         if (!this.aboutForm().title && config.about?.title) {
-          this.aboutForm.set({ 
+          this.aboutForm.set({
             ...config.about,
             values: JSON.parse(JSON.stringify(config.about.values || []))
           });
@@ -152,7 +155,7 @@ export class AdminDashboardComponent implements AfterViewInit {
           this.loadRazorpaySecret();
         }
         if (!this.footerForm().description && config.footer?.description) {
-          this.footerForm.set({ 
+          this.footerForm.set({
             description: config.footer.description,
             socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
             copyrightText: config.footer.copyrightText
@@ -192,7 +195,7 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async loadRazorpaySecret() {
     try {
-      const res = await this.http.get<{ keySecret: string }>('/api/app-config/razorpay_secret').toPromise();
+      const res = await this.configService.getRazorpaySecret();
       if (res) {
         this.razorpayForm.update(f => ({ ...f, keySecret: res.keySecret }));
       }
@@ -202,18 +205,48 @@ export class AdminDashboardComponent implements AfterViewInit {
   }
 
   async saveProduct() {
-    await this.productService.addProduct({
+    const productData = {
       name: this.newProduct.name,
       price: this.newProduct.price,
+      compare_price: this.newProduct.compare_price || undefined,
       category_id: this.newProduct.category_id,
       stock: this.newProduct.stock,
       description: this.newProduct.description,
       images: this.newProduct.imageUrls,
       featured: true,
       active: true
-    });
+    };
+
+    if (this.editingProduct()) {
+      await this.productService.updateProduct(this.editingProduct()!.id, productData);
+      this.toastService.show('Product updated successfully', 'success');
+    } else {
+      await this.productService.addProduct(productData);
+      this.toastService.show('Product added successfully', 'success');
+    }
+
+    this.cancelProductEdit();
+  }
+
+  editProduct(product: Product) {
+    this.editingProduct.set(product);
+    this.newProduct = {
+      name: product.name,
+      price: product.price,
+      compare_price: product.compare_price || 0,
+      category_id: product.category_id,
+      stock: product.stock,
+      description: product.description,
+      imageUrls: [...(product.images || [])]
+    };
+    this.showProductForm.set(true);
+    setTimeout(() => this.animateContent(), 0);
+  }
+
+  cancelProductEdit() {
     this.showProductForm.set(false);
-    this.newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] };
+    this.editingProduct.set(null);
+    this.newProduct = { name: '', price: 0, compare_price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] };
   }
 
   async saveCategory() {
@@ -223,6 +256,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       image: this.newCategory.image,
       active: true
     });
+    this.toastService.show('Category added successfully', 'success');
     this.showCategoryForm.set(false);
     this.newCategory = { name: '', description: '', image: '' };
   }
@@ -230,6 +264,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   async deleteCategory(id: number) {
     if (confirm('Are you sure you want to delete this category?')) {
       await this.productService.deleteCategory(id);
+      this.toastService.show('Category deleted successfully', 'success');
     }
   }
 
@@ -293,13 +328,17 @@ export class AdminDashboardComponent implements AfterViewInit {
     const target = event.target as HTMLInputElement;
     const files = target.files;
     if (files && files.length > 0) {
+      if (this.newProduct.imageUrls.length + files.length > 3) {
+        this.toastService.show('Maximum 3 images allowed per product', 'error');
+        return;
+      }
       this.isUploading.set(true);
       try {
         const urls = await this.uploadService.uploadImages(files);
         this.newProduct.imageUrls = [...this.newProduct.imageUrls, ...urls];
       } catch (error) {
         console.error('Upload failed', error);
-        alert('Image upload failed');
+        this.toastService.show('Image upload failed', 'error');
       } finally {
         this.isUploading.set(false);
       }
@@ -353,6 +392,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       hero: { ...this.heroForm() }
     };
     await this.configService.updateConfig(newConfig);
+    this.toastService.show('Hero section updated', 'success');
   }
 
   async saveAboutConfig() {
@@ -362,7 +402,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       about: { ...this.aboutForm() }
     };
     await this.configService.updateConfig(newConfig);
-    alert('About configuration saved successfully');
+    this.toastService.show('About section updated', 'success');
   }
 
   addAboutValue() {
@@ -387,12 +427,13 @@ export class AdminDashboardComponent implements AfterViewInit {
       contact: { ...this.contactForm() }
     };
     await this.configService.updateConfig(newConfig);
+    this.toastService.show('Contact info updated', 'success');
   }
 
   async saveRazorpayConfig() {
     const currentConfig = this.configService.config();
     const form = this.razorpayForm();
-    
+
     const newConfig: AppConfig = {
       ...currentConfig,
       razorpay: {
@@ -400,12 +441,12 @@ export class AdminDashboardComponent implements AfterViewInit {
         enabled: form.enabled
       }
     };
-    
+
     await this.configService.updateConfig(newConfig);
-    
-    // Save secret separately
-    await this.http.post('/api/app-config/razorpay_secret', { keySecret: form.keySecret }).toPromise();
-    alert('Razorpay configuration saved successfully');
+
+    // Save secret separately using ConfigService
+    await this.configService.setRazorpaySecret(form.keySecret);
+    this.toastService.show('Payment settings updated', 'success');
   }
 
   async saveFooterConfig() {
@@ -415,7 +456,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       footer: { ...this.footerForm() }
     };
     await this.configService.updateConfig(newConfig);
-    alert('Footer configuration saved successfully');
+    this.toastService.show('Footer updated', 'success');
   }
 
   addSocialLink() {

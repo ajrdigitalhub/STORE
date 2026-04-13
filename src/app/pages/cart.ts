@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../services/cart';
+import { AuthService } from '../services/auth';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
 @Component({
@@ -13,4 +14,5 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 })
 export class CartComponent {
   cartService = inject(CartService);
+  authService = inject(AuthService);
 }

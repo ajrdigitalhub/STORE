@@ -1,13 +1,13 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Product } from '../../services/product';
 import { CartService } from '../../services/cart';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, CurrencyPipe, DecimalPipe],
   template: `
     <div class="glass-card group overflow-hidden h-full flex flex-col">
       <div class="relative aspect-square overflow-hidden">
@@ -19,7 +19,13 @@ import { CartService } from '../../services/cart';
           @if (product && product.stock < 5) {
             <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">Low Stock</span>
           }
-          <span class="bg-accent text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">New</span>
+          @if (product && product.compare_price && product.compare_price > product.price) {
+            <span class="bg-accent text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">
+              {{ ((product.compare_price - product.price) / product.compare_price * 100) | number:'1.0-0' }}% OFF
+            </span>
+          } @else {
+            <span class="bg-accent text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">New</span>
+          }
         </div>
         
         <!-- Hover Overlay -->

@@ -66,17 +66,35 @@ router.post('/', adminAuth, async (req, res, next) => {
 // PUT /api/products/:id — admin only
 router.put('/:id', adminAuth, async (req, res, next) => {
   try {
-    const { name, description, price, comparePrice, category, stock, variants, featured, images, specification, tags } = req.body;
+    const { name, description, price, comparePrice, compare_price, category, category_id, stock, variants, featured, images, specification, tags, active } = req.body;
 
     const updateData = {
-      name, description, price: Number(price), compare_price: Number(comparePrice || 0),
-      category_id: category, stock: Number(stock || 0), images: images || [],
-      variants: variants || [], featured: featured === true || featured === 'true',
+      name,
+      description,
+      price: Number(price),
+      compare_price: Number(comparePrice || compare_price || 0),
+      category_id: category_id || category,
+      stock: Number(stock || 0),
+      images: images || [],
+      variants: variants || [],
+      featured: featured === true || featured === 'true',
       specification: specification || {},
-      tags: tags || []
+      tags: tags || [],
+      active: active !== false
     };
 
     const product = await Product.update(req.params.id, updateData);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH /api/products/:id — admin only
+router.patch('/:id', adminAuth, async (req, res, next) => {
+  try {
+    const product = await Product.update(req.params.id, req.body);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {

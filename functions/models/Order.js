@@ -40,14 +40,26 @@ class Order {
     try {
       await client.query('BEGIN');
 
-      const { user_id, userid, items, total_amount, shipping_address, payment_method = 'cod' } = orderData;
+      const { user_id, userid, items, total_amount, shipping_address, payment_method } = orderData;
       const finalUserId = user_id || userid;
+
+      console.log('Order.create - items:', JSON.stringify(items, null, 2));
+
+      if (!payment_method) {
+        throw new Error('Payment method is required');
+      }
 
       // Validate stock for all items
       for (const item of items) {
+        if (!item.product) {
+          console.error('Order.create - Item missing product ID:', JSON.stringify(item, null, 2));
+          throw new Error(`Order item is missing a valid product ID. Item: ${JSON.stringify(item)}`);
+        }
+
+        console.log('Validating item:', JSON.stringify(item, null, 2));
         const productResult = await client.query('SELECT stock FROM products WHERE id = $1 AND active = true', [item.product]);
         if (productResult.rows.length === 0) {
-          throw new Error(`Product ${item.product} not found`);
+          throw new Error(`Product with ID ${item.product} not found or is inactive`);
         }
         if (productResult.rows[0].stock < item.quantity) {
           throw new Error(`Insufficient stock for product ${item.product}`);

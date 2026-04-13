@@ -7,7 +7,7 @@ export const routes: Routes = [
   { path: 'products', loadComponent: () => import('./pages/product-list').then(m => m.ProductListComponent) },
   { path: 'products/:id', loadComponent: () => import('./pages/product-detail').then(m => m.ProductDetailComponent) },
   { path: 'cart', loadComponent: () => import('./pages/cart').then(m => m.CartComponent) },
-  { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent) },
+  { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent), canActivate: [authGuard] },
   { path: 'login', loadComponent: () => import('./pages/login').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register').then(m => m.RegisterComponent) },
   { path: 'profile', loadComponent: () => import('./pages/profile').then(m => m.ProfileComponent), canActivate: [authGuard] },

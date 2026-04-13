@@ -7,14 +7,17 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div 
-      [class]="'animate-pulse bg-white/5 rounded-lg ' + className()"
+      [class]="'relative overflow-hidden bg-white/5 rounded-lg ' + className()"
       [style.width]="width()"
       [style.height]="height()"
     >
-      <div class="w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+      <div class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
     </div>
   `,
   styles: [`
+    .animate-shimmer {
+      animation: shimmer 2s infinite;
+    }
     @keyframes shimmer {
       100% {
         transform: translateX(100%);

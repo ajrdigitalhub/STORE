@@ -12,17 +12,20 @@ export class UploadService {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await firstValueFrom(this.api.post<{ success: boolean; url: string; fileName: string }>('/upload', formData));
-    return response.url || (response as any).urls?.[0];
+    const response = await firstValueFrom(this.api.post<{ success: boolean; url: string; fileName: string; urls?: string[] }>('/upload', formData));
+    return response.url || response.urls?.[0] || '';
   }
 
   async uploadImages(files: FileList | File[]): Promise<string[]> {
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('images', files[i]);
+    const fileArray = Array.from(files);
+    for (const file of fileArray) {
+      formData.append('images', file);
     }
 
-    const response = await firstValueFrom(this.api.post<{ success: boolean; urls: string[]; files: any[] }>('/upload', formData));
-    return response.urls;
+    const response = await firstValueFrom(this.api.post<{ success: boolean; url?: string; urls?: string[]; files: unknown[] }>('/upload', formData));
+    if (response.urls) return response.urls;
+    if (response.url) return [response.url];
+    return [];
   }
 }

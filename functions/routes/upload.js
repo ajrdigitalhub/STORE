@@ -5,26 +5,33 @@ const { bucket } = require('../firebase');
 const router = express.Router();
 
 router.post('/', (req, res) => {
+  // 1. Check if rawBody exists (standard for Firebase Functions)
   if (!req.rawBody) {
     return res.status(400).json({ error: 'No request body found.' });
   }
 
   const busboy = Busboy({ headers: req.headers });
   const uploadPromises = [];
-  const uploadedFiles = [];
 
   busboy.on('file', (name, file, info) => {
     const { filename, mimeType } = info;
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const newFileName = uniqueSuffix + path.extname(filename);
 
-    const blob = bucket.file(`uploads/${newFileName}`);
-    const blobStream = blob.createWriteStream({
-      metadata: { contentType: mimeType },
-      resumable: false
-    });
+    if (!bucket) {
+      console.error('Upload attempted but bucket is not initialized');
+      file.resume();
+      return;
+    }
 
-    const uploadPromise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const newFileName = uniqueSuffix + path.extname(filename);
+
+      const blob = bucket.file(`uploads/${newFileName}`);
+      const blobStream = blob.createWriteStream({
+        metadata: { contentType: mimeType },
+        resumable: false
+      });
+
       blobStream.on('error', (err) => {
         console.error('Blob stream error:', err);
         reject(err);
@@ -36,30 +43,36 @@ router.post('/', (req, res) => {
             action: 'read',
             expires: '03-01-2500'
           });
-          uploadedFiles.push({ url, fileName: newFileName });
-          resolve();
+          resolve({ url, fileName: newFileName });
         } catch (err) {
-          console.error('Error generating URL:', err);
           reject(err);
         }
       });
+
+      file.pipe(blobStream);
     });
 
-    uploadPromises.push(uploadPromise);
-    file.pipe(blobStream);
+    uploadPromises.push(promise);
   });
 
   busboy.on('finish', async () => {
     try {
-      await Promise.all(uploadPromises);
-      if (!res.headersSent) {
+      const results = await Promise.all(uploadPromises);
+      if (results.length === 1) {
         res.json({
           success: true,
-          urls: uploadedFiles.map(f => f.url),
-          files: uploadedFiles
+          url: results[0].url,
+          fileName: results[0].fileName
+        });
+      } else {
+        res.json({
+          success: true,
+          urls: results.map(r => r.url),
+          files: results
         });
       }
     } catch (err) {
+      console.error('Upload processing error:', err);
       if (!res.headersSent) {
         res.status(500).json({ error: 'Upload failed', message: err.message });
       }

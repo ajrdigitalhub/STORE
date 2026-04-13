@@ -28,6 +28,7 @@
     "@angular/router": "^21.0.0",
     "@angular/ssr": "^21.0.0",
     "@google/genai": "^1.27.0",
+    "@grpc/grpc-js": "^1.14.3",
     "bcryptjs": "^3.0.3",
     "busboy": "^1.6.0",
     "concurrently": "^9.2.1",
@@ -35,7 +36,7 @@
     "express-validator": "^7.3.2",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.8.0",
-    "@grpc/grpc-js": "^1.14.3",
+    "firebase-functions": "^7.2.5",
     "jsonwebtoken": "^9.0.3",
     "lightningcss": "1.32.0",
     "motion": "^12.23.24",
@@ -47,8 +48,8 @@
     "tslib": "^2.3.0"
   },
   "optionalDependencies": {
-    "lightningcss-linux-x64-gnu": "1.32.0",
-    "@tailwindcss/oxide-linux-x64-gnu": "4.2.2"
+    "@tailwindcss/oxide-linux-x64-gnu": "4.2.2",
+    "lightningcss-linux-x64-gnu": "1.32.0"
   },
   "overrides": {
     "lightningcss": "1.32.0"

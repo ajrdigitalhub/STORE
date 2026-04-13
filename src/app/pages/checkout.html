@@ -45,28 +45,15 @@
           <span class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">2</span>
           Payment Method
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button (click)="paymentMethod.set('COD')" class="glass-card p-6 text-left border-2 transition-all" [class.border-accent]="paymentMethod() === 'COD'" [class.border-transparent]="paymentMethod() !== 'COD'">
-            <div class="flex items-center justify-between mb-4">
-              <span class="material-icons text-accent">local_shipping</span>
-              @if (paymentMethod() === 'COD') {
-                <span class="material-icons text-accent text-sm">check_circle</span>
-              }
-            </div>
-            <h4 class="font-bold mb-1">Cash on Delivery</h4>
-            <p class="text-xs text-accent-muted">Pay when you receive your order.</p>
-          </button>
-
-          <button (click)="paymentMethod.set('Razorpay')" class="glass-card p-6 text-left border-2 transition-all" [class.border-accent]="paymentMethod() === 'Razorpay'" [class.border-transparent]="paymentMethod() !== 'Razorpay'">
+        <div class="grid grid-cols-1 gap-4">
+          <div class="glass-card p-6 text-left border-2 border-accent bg-accent/5">
             <div class="flex items-center justify-between mb-4">
               <span class="material-icons text-accent">payment</span>
-              @if (paymentMethod() === 'Razorpay') {
-                <span class="material-icons text-accent text-sm">check_circle</span>
-              }
+              <span class="material-icons text-accent text-sm">check_circle</span>
             </div>
             <h4 class="font-bold mb-1">Razorpay Secure</h4>
-            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking.</p>
-          </button>
+            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking. (COD is currently disabled)</p>
+          </div>
         </div>
       </div>
     </div>

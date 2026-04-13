@@ -27,6 +27,10 @@ export class CartService {
   }
 
   addToCart(product: Product) {
+    if (!product || !product.id) {
+      console.error('CartService - Attempted to add product without ID:', product);
+      return;
+    }
     this.itemsSignal.update(items => {
       const existingItem = items.find(i => i.id === product.id);
       if (existingItem) {

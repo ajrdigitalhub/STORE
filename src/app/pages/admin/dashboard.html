@@ -248,17 +248,17 @@
       <div class="space-y-8">
         <div class="flex justify-between items-center">
           <div class="tech-label">Product Management</div>
-          <button (click)="showProductForm.set(!showProductForm())"
+          <button (click)="editingProduct() ? cancelProductEdit() : showProductForm.set(!showProductForm())"
             class="metallic-button py-2 px-6 text-xs flex items-center gap-2">
             <span class="material-icons text-sm">{{ showProductForm() ? 'close' : 'add' }}</span>
-            {{ showProductForm() ? 'Cancel' : 'Add New Product' }}
+            {{ showProductForm() ? 'Cancel' : (editingProduct() ? 'Cancel Edit' : 'Add New Product') }}
           </button>
         </div>
 
         @if (showProductForm()) {
         <div class="tech-card border-accent/20 animate-in fade-in slide-in-from-top-4 duration-500">
           <div class="tech-header">
-            <span class="tech-label">Add New Product</span>
+            <span class="tech-label">{{ editingProduct() ? 'Edit Product' : 'Add New Product' }}</span>
           </div>
           <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-4 md:col-span-2">
@@ -271,6 +271,11 @@
                 <div class="space-y-2">
                   <label for="p-price" class="tech-label">Price</label>
                   <input id="p-price" type="number" [(ngModel)]="newProduct.price" placeholder="0.00"
+                    class="input-field font-mono text-sm">
+                </div>
+                <div class="space-y-2">
+                  <label for="p-compare-price" class="tech-label">Compare Price (Discount)</label>
+                  <input id="p-compare-price" type="number" [(ngModel)]="newProduct.compare_price" placeholder="0.00"
                     class="input-field font-mono text-sm">
                 </div>
                 <div class="space-y-2">
@@ -308,9 +313,15 @@
                 }
                 @if (newProduct.imageUrls.length > 0) {
                 <div class="w-full h-full grid grid-cols-2 gap-2 overflow-y-auto p-1">
-                  @for (url of newProduct.imageUrls; track url) {
-                  <img [src]="url" class="w-full h-24 object-cover rounded border border-white/10"
-                    referrerpolicy="no-referrer" alt="Product Preview">
+                  @for (url of newProduct.imageUrls; track url; let i = $index) {
+                  <div class="relative group/img">
+                    <img [src]="url" class="w-full h-24 object-cover rounded border border-white/10"
+                      referrerpolicy="no-referrer" alt="Product Preview">
+                    <button (click)="newProduct.imageUrls.splice(i, 1)"
+                      class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                      <span class="material-icons text-[10px]">close</span>
+                    </button>
+                  </div>
                   }
                 </div>
                 <div
@@ -329,17 +340,16 @@
                   #productImageInput>
               </div>
               <div class="space-y-2">
-                <label class="tech-label">Image URLs</label>
+                <span class="tech-label block">Image URLs</span>
                 <div class="text-[10px] text-accent-muted">{{ newProduct.imageUrls.length }} images uploaded</div>
               </div>
             </div>
 
             <div class="md:col-span-3 pt-6 border-t border-white/5 flex gap-4">
               <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs" [disabled]="isUploading()">
-                {{ isUploading() ? 'Saving...' : 'Save Product' }}
+                {{ isUploading() ? 'Saving...' : (editingProduct() ? 'Update Product' : 'Save Product') }}
               </button>
-              <button (click)="showProductForm.set(false)"
-                class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
+              <button (click)="cancelProductEdit()" class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
             </div>
           </div>
         </div>
@@ -406,10 +416,16 @@
                     </div>
                   </td>
                   <td class="py-4 px-6">
-                    <button (click)="productService.deleteProduct(product.id)"
-                      class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
-                      <span class="material-icons text-sm">delete_outline</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                      <button (click)="editProduct(product)"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-accent hover:bg-accent/10 transition-colors">
+                        <span class="material-icons text-sm">edit</span>
+                      </button>
+                      <button (click)="productService.deleteProduct(product.id)"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors">
+                        <span class="material-icons text-sm">delete_outline</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 }

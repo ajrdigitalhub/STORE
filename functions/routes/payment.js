@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const pool = require('../db');
 const Order = require('../models/Order');
 const PaymentConfig = require('../models/PaymentConfig');
 const { auth } = require('../middleware/auth');
@@ -9,16 +10,57 @@ const router = express.Router();
 
 // Initialize Razorpay helper
 const getRazorpayInstance = async () => {
-  const config = await PaymentConfig.get();
-  return {
-    instance: new Razorpay({
-      key_id: config.razorpay_keyid || process.env.RAZORPAY_KEY_ID,
-      key_secret: config.razorpay_key_secret || process.env.RAZORPAY_KEY_SECRET
-    }),
-    key_id: config.razorpay_keyid || process.env.RAZORPAY_KEY_ID,
-    key_secret: config.razorpay_key_secret || process.env.RAZORPAY_KEY_SECRET
-  };
+  try {
+    // Read from 'config' table like the Admin Dashboard does
+    const appConfigResult = await pool.query('SELECT value FROM config WHERE key = $1', ['app']);
+    const secretConfigResult = await pool.query('SELECT value FROM config WHERE key = $1', ['razorpay_secret']);
+
+    const appConfig = appConfigResult.rows.length > 0 ? appConfigResult.rows[0].value : {};
+    const secretConfig = secretConfigResult.rows.length > 0 ? secretConfigResult.rows[0].value : {};
+
+    const key_id_source = appConfig.razorpay?.keyId ? 'DB (app)' : (process.env.RAZORPAY_KEY_ID ? 'Env' : 'None');
+    const key_secret_source = secretConfig.keySecret ? 'DB (razorpay_secret)' : (process.env.RAZORPAY_KEY_SECRET ? 'Env' : 'None');
+
+    const key_id = (appConfig.razorpay?.keyId || process.env.RAZORPAY_KEY_ID || '').trim();
+    const key_secret = (secretConfig.keySecret || process.env.RAZORPAY_KEY_SECRET || '').trim();
+
+    console.log('Razorpay Initialization Attempt:', {
+      has_key_id: !!key_id,
+      key_id_source,
+      key_id_length: key_id.length,
+      has_key_secret: !!key_secret,
+      key_secret_source
+    });
+
+    if (!key_id || !key_secret) {
+      throw new Error('Razorpay credentials are missing or empty. Please configure them in the Admin Panel (Payment Settings) or environment variables.');
+    }
+
+    const instance = new Razorpay({
+      key_id: key_id,
+      key_secret: key_secret
+    });
+
+    return {
+      instance,
+      key_id,
+      key_secret
+    };
+  } catch (err) {
+    console.error('Razorpay Initialization Error:', err);
+    throw err;
+  }
 };
+
+// GET /api/payment/get-key
+router.get('/get-key', auth, async (req, res, next) => {
+  try {
+    const { key_id } = await getRazorpayInstance();
+    res.json({ key: key_id });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // POST /api/payment/create-order
 router.post('/create-order', auth, async (req, res, next) => {

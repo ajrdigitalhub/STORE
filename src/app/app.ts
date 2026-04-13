@@ -3,6 +3,7 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './components/layout/header';
 import { FooterComponent } from './components/layout/footer';
 import { ChatFabComponent } from './components/shared/chat-fab';
+import { ToastComponent } from './components/toast/toast';
 import { AuthService } from './services/auth';
 import { SkeletonComponent } from './components/shared/skeleton';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -11,7 +12,7 @@ import { filter, map } from 'rxjs';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, SkeletonComponent, ChatFabComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, SkeletonComponent, ChatFabComponent, ToastComponent],
   templateUrl: './app.html',
   styles: [`
     :host {

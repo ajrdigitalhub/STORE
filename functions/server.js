@@ -1,13 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const http = require('http');
-const dotenv = require('dotenv');
 const path = require('path');
-const functions = require('firebase-functions');
-dotenv.config();
-
-const { initializeSocket } = require('./socket/chat');
-const errorHandler = require('./middleware/errorHandler');
+const http = require('http');
+const { Server } = require('socket.io');
+require('dotenv').config();
+const pool = require('./db');
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -19,15 +16,9 @@ const contactConfigRoutes = require('./routes/contact-config');
 const paymentConfigRoutes = require('./routes/paymentConfig');
 const appConfigRoutes = require('./routes/app-config');
 const userRoutes = require('./routes/users');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
-const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "POST"]
-//   }
-// });
 
 // Middleware
 app.use(cors());
@@ -50,34 +41,10 @@ app.use('/api/contact-config', contactConfigRoutes);
 app.use('/api/payment-config', paymentConfigRoutes);
 app.use('/api/app-config', appConfigRoutes);
 app.use('/api/users', userRoutes);
-
-// Socket.io
-// io.on('connection', (socket) => {
-//   console.log('A user connected:', socket.id);
-
-//   socket.on('join-admin', () => {
-//     socket.join('admin-room');
-//   });
-
-//   socket.on('join-customer', (userId) => {
-//     socket.join(userId.toString());
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected:', socket.id);
-//   });
-// });
-
-// Error Handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err : {}
-  });
-});
-
-const port = process.env.PORT || 3000;
+app.use('/api/upload', express.raw({ type: 'multipart/form-data', limit: '10mb' }), (req, res, next) => {
+  req.rawBody = req.body;
+  next();
+}, uploadRoutes);
 
 // Serve static files
 const browserDistPath = path.join(__dirname, '../dist/app/browser');
@@ -92,16 +59,42 @@ app.get(/^(?!\/api).*/, (req, res) => {
   } else if (require('fs').existsSync(csrIndexPath)) {
     res.sendFile(csrIndexPath);
   } else {
-    res.status(404).send('Frontend not found. Please run npm run build.');
+    res.status(404).send('Frontend not found.');
   }
 });
 
-// if (require.main === module) {
-//   server.listen(port, () => {
-//     console.log(`Server running on port ${port}`);
-//   });
-// }
-exports.api = functions.https.onRequest(app);
+// Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err : {}
+  });
+});
 
+/**
+ * LOGIC SEPARATION:
+ * Only initialize Socket.io and start listening if we are running locally.
+ * Firebase Functions provide their own server environment.
+ */
+if (require.main === module) {
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: { origin: "*", methods: ["GET", "POST"] }
+  });
 
-// module.exports = { app, io };
+  io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+    socket.on('join-admin', () => socket.join('admin-room'));
+    socket.on('join-customer', (userId) => socket.join(userId.toString()));
+    socket.on('disconnect', () => console.log('User disconnected:', socket.id));
+  });
+
+  const port = process.env.PORT || 3000;
+  server.listen(port, () => {
+    console.log(`Local server running on port ${port}`);
+  });
+}
+
+// Export the app for Firebase
+module.exports = { app };

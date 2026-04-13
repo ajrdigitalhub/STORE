@@ -16,9 +16,9 @@ export class PaymentService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createRazorpayOrder(amount: number): Promise<any> {
+  async createRazorpayOrder(amount: number, orderId: number): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return firstValueFrom(this.api.post<any>('/payment/create-order', { amount }));
+    return firstValueFrom(this.api.post<any>('/payment/create-order', { amount, orderId }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

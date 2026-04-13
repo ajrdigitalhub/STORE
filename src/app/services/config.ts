@@ -63,7 +63,7 @@ export interface AppConfig {
 export class ConfigService {
   private platformId = inject(PLATFORM_ID);
   private api = inject(ApiService);
-  
+
   private configSignal = signal<AppConfig>({
     hero: {
       slides: [
@@ -123,7 +123,7 @@ export class ConfigService {
       enabled: false
     }
   });
-  
+
   config = this.configSignal.asReadonly();
 
   constructor() {
@@ -146,6 +146,16 @@ export class ConfigService {
   }
 
   async updateConfig(config: AppConfig) {
-    return firstValueFrom(this.api.post<AppConfig>('/app-config/app', config));
+    const res = await firstValueFrom(this.api.post<AppConfig>('/app-config/app', config));
+    this.configSignal.set(res);
+    return res;
+  }
+
+  async getRazorpaySecret() {
+    return firstValueFrom(this.api.get<{ keySecret: string }>('/app-config/razorpay_secret'));
+  }
+
+  async setRazorpaySecret(keySecret: string) {
+    return firstValueFrom(this.api.post<{ keySecret: string }>('/app-config/razorpay_secret', { keySecret }));
   }
 }

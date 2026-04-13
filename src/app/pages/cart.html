@@ -57,10 +57,22 @@
               <span>{{ cartService.totalPrice() * 1.18 | currency:'INR' }}</span>
             </div>
           </div>
-          <a routerLink="/checkout" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
-            Proceed to Checkout
-            <span class="material-icons">arrow_forward</span>
-          </a>
+          @if (authService.profile() || authService.user()) {
+            <a routerLink="/checkout" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
+              Proceed to Checkout
+              <span class="material-icons">arrow_forward</span>
+            </a>
+          } @else {
+            <div class="space-y-4">
+              <p class="text-xs text-yellow-500 text-center font-mono uppercase tracking-tighter">
+                Authentication required to proceed
+              </p>
+              <a routerLink="/login" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
+                Login to Checkout
+                <span class="material-icons">login</span>
+              </a>
+            </div>
+          }
           <p class="text-[10px] text-accent-muted text-center mt-6 uppercase tracking-widest">
             Secure payment powered by Razorpay
           </p>
