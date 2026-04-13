@@ -40,7 +40,6 @@
             "ssr": {
               "entry": "server/main.js"
             },
-            "prerender": false,
             "externalDependencies": [
               "@grpc/grpc-js",
               "@grpc/proto-loader",

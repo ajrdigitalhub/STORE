@@ -44,6 +44,9 @@
     "socket.io-client": "^4.8.3",
     "tslib": "^2.3.0"
   },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "1.32.0"
+  },
   "devDependencies": {
     "@angular/build": "^21.0.0",
     "@angular/cli": "^21.0.0",
