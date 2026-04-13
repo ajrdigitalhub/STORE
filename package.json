@@ -36,6 +36,7 @@
     "firebase-admin": "^13.8.0",
     "@grpc/grpc-js": "^1.14.3",
     "jsonwebtoken": "^9.0.3",
+    "lightningcss": "1.32.0",
     "motion": "^12.23.24",
     "pg": "^8.20.0",
     "razorpay": "^2.9.6",
@@ -43,6 +44,12 @@
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
     "tslib": "^2.3.0"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "1.32.0"
+  },
+  "overrides": {
+    "lightningcss": "1.32.0"
   },
   "devDependencies": {
     "@angular/build": "^21.0.0",
