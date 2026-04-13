@@ -75,7 +75,7 @@ import { animate, stagger } from "motion";
       </div>
 
       <!-- Carousel Progress Indicators -->
-      @if ((configService.config().hero.slides.length ?? 0) > 1) {
+      @if (configService.config().hero.slides.length > 1) {
         <div class="absolute bottom-16 left-1/2 -translate-x-1/2 z-20 flex gap-4">
           @for (slide of configService.config().hero.slides; track $index) {
             <button 
