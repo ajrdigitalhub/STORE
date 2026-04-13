@@ -9,6 +9,7 @@
     "start": "node server/main.js",
     "dev": "concurrently \"cross-env PORT=3001 node server/server.js\" \"ng serve --port=3000 --host=0.0.0.0 --proxy-config proxy.conf.json\"",
     "build": "ng build",
+    "postinstall": "npm run build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
