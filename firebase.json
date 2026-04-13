@@ -24,6 +24,11 @@
       {
         "source": "**",
         "destination": "/index.csr.html"
+      },
+      {
+        "source": "/**",
+        "destination": "https://ideazone3d.com",
+        "type": 301
       }
     ],
     "predeploy": [
