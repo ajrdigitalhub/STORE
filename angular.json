@@ -20,10 +20,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "define": {
-              "GEMINI_API_KEY": "'YOUR_GEMINI_API_KEY'",
-              "__dirname": "''"
-            },
+            "outputPath": "dist/browser",
             "browser": "src/main.ts",
             "index": "src/index.html",
             "tsConfig": "tsconfig.app.json",
@@ -36,6 +33,7 @@
             "styles": [
               "src/styles.css"
             ],
+              "scripts": ["npm run build"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
