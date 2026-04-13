@@ -18,11 +18,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/browser",
-            "browser": "src/main.ts",
             "index": "src/index.html",
+            "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -33,25 +33,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "server/main.js"
-            },
-            "externalDependencies": [
-              "@grpc/grpc-js",
-              "@grpc/proto-loader",
-              "firebase-admin",
-              "firebase-admin/app",
-              "firebase-admin/firestore",
-              "razorpay",
-              "bcryptjs",
-              "jsonwebtoken",
-              "multer",
-              "express",
-              "cors",
-              "socket.io"
-            ]
+            "serverTarget": "app:server"
           },
           "configurations": {
             "production": {
@@ -76,6 +58,14 @@
             }
           },
           "defaultConfiguration": "production"
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/browser/server",
+            "main": "src/main.server.ts",
+            "tsConfig": "tsconfig.app.json"
+          }
         },
         "serve": {
           "builder": "@angular/build:dev-server",
