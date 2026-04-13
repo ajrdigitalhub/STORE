@@ -63,7 +63,7 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   newProduct = { name: '', price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
   newCategory = { name: '', description: '', image: '' };
-
+  
   customers = signal<Customer[]>([]);
   messages = signal<Message[]>([]);
 
@@ -129,17 +129,17 @@ export class AdminDashboardComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       const config = this.configService.config();
-
+      
       untracked(() => {
         const currentHero = config.hero;
         // Only sync if form is currently empty (initial load)
         if (this.heroForm().slides.length === 0 && currentHero?.slides) {
-          this.heroForm.set({
+          this.heroForm.set({ 
             slides: JSON.parse(JSON.stringify(currentHero.slides))
           });
         }
         if (!this.aboutForm().title && config.about?.title) {
-          this.aboutForm.set({
+          this.aboutForm.set({ 
             ...config.about,
             values: JSON.parse(JSON.stringify(config.about.values || []))
           });
@@ -152,7 +152,7 @@ export class AdminDashboardComponent implements AfterViewInit {
           this.loadRazorpaySecret();
         }
         if (!this.footerForm().description && config.footer?.description) {
-          this.footerForm.set({
+          this.footerForm.set({ 
             description: config.footer.description,
             socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
             copyrightText: config.footer.copyrightText
@@ -392,7 +392,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   async saveRazorpayConfig() {
     const currentConfig = this.configService.config();
     const form = this.razorpayForm();
-
+    
     const newConfig: AppConfig = {
       ...currentConfig,
       razorpay: {
@@ -400,9 +400,9 @@ export class AdminDashboardComponent implements AfterViewInit {
         enabled: form.enabled
       }
     };
-
+    
     await this.configService.updateConfig(newConfig);
-
+    
     // Save secret separately
     await this.http.post('/api/app-config/razorpay_secret', { keySecret: form.keySecret }).toPromise();
     alert('Razorpay configuration saved successfully');

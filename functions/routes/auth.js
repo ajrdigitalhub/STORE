@@ -57,7 +57,7 @@ router.post('/login', [
     const { email, password } = req.body;
 
     let user = await User.findByEmail(email);
-
+    
     // Auto-seed admin user if trying to login with admin@ideazone.com and it doesn't exist
     if (!user && email === 'admin@ideazone.com') {
       user = await User.create({
@@ -110,7 +110,7 @@ router.get('/profile', auth, async (req, res, next) => {
 router.post('/google-sync', async (req, res, next) => {
   try {
     const { email, name, uid } = req.body;
-
+    
     let user = await User.findByEmail(email);
     if (!user) {
       // Create user if not exists

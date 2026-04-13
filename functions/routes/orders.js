@@ -39,11 +39,11 @@ router.get('/', auth, async (req, res, next) => {
       result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
     }
 
-    res.json({
-      orders: result.orders,
-      total: result.total,
-      page: Number(page),
-      pages: Math.ceil(result.total / Number(limit))
+    res.json({ 
+      orders: result.orders, 
+      total: result.total, 
+      page: Number(page), 
+      pages: Math.ceil(result.total / Number(limit)) 
     });
   } catch (error) {
     next(error);
