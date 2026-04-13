@@ -1,0 +1,66 @@
+<footer class="bg-metallic-gray border-t border-white/5 pt-16 pb-8 px-6 mt-20">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+    <div class="space-y-6">
+      <a routerLink="/" class="text-2xl font-display font-bold tracking-tighter text-white">
+        IDEA Zone 3D
+      </a>
+      <p class="text-accent-muted text-sm leading-relaxed">
+        {{ configService.config().footer.description }}
+      </p>
+      <div class="flex gap-4">
+        @for (link of configService.config().footer.socialLinks; track link.platform) {
+          <a [href]="link.url" target="_blank" class="w-10 h-10 rounded-full bg-metallic-light flex items-center justify-center text-accent hover:bg-accent hover:text-metallic-black transition-all">
+            <span class="material-icons text-sm">{{ link.icon }}</span>
+          </a>
+        }
+      </div>
+    </div>
+
+    <div>
+      <h4 class="text-white font-bold mb-6">Quick Links</h4>
+      <ul class="space-y-4 text-sm text-accent-muted">
+        <li><a routerLink="/" class="hover:text-white transition-colors">Home</a></li>
+        <li><a routerLink="/products" class="hover:text-white transition-colors">Shop</a></li>
+        <li><a routerLink="/about" class="hover:text-white transition-colors">About Us</a></li>
+        <li><a routerLink="/contact" class="hover:text-white transition-colors">Contact</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="text-white font-bold mb-6">Customer Service</h4>
+      <ul class="space-y-4 text-sm text-accent-muted">
+        <li><a routerLink="/profile" class="hover:text-white transition-colors">My Account</a></li>
+        <li><a routerLink="/orders" class="hover:text-white transition-colors">Order History</a></li>
+        <li><a routerLink="/cart" class="hover:text-white transition-colors">Shopping Cart</a></li>
+        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="text-white font-bold mb-6">Contact Us</h4>
+      <ul class="space-y-4 text-sm text-accent-muted">
+        <li class="flex items-start gap-3">
+          <span class="material-icons text-accent text-sm mt-1">location_on</span>
+          <span>{{ configService.config().contact.address }}</span>
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="material-icons text-accent text-sm">phone</span>
+          <span>{{ configService.config().contact.phone }}</span>
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="material-icons text-accent text-sm">email</span>
+          <span>{{ configService.config().contact.email }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest">
+    <p>{{ configService.config().footer.copyrightText }}</p>
+    <div class="flex gap-8">
+      <span>Terms of Service</span>
+      <span>Privacy Policy</span>
+      <span>Cookie Policy</span>
+    </div>
+  </div>
+</footer>

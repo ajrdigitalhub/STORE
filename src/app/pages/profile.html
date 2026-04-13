@@ -1,0 +1,90 @@
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+    <div class="lg:col-span-1 space-y-6">
+      <div class="glass-card p-8 text-center">
+        <div class="w-24 h-24 bg-metallic-light rounded-full flex items-center justify-center mx-auto mb-6 text-4xl font-bold border-2 border-accent/20">
+          {{ authService.profile()?.name?.charAt(0) }}
+        </div>
+        <h2 class="text-2xl font-bold mb-1">{{ authService.profile()?.name }}</h2>
+        <p class="text-accent-muted text-sm mb-8">{{ authService.profile()?.email }}</p>
+        
+        <div class="flex flex-col gap-2">
+          <button class="metallic-button py-2 text-sm">Edit Profile</button>
+          <button (click)="logout()" class="metallic-button-outline py-2 text-sm">Logout</button>
+        </div>
+      </div>
+
+      <div class="glass-card p-6">
+        <h4 class="text-xs font-bold uppercase tracking-widest text-accent-muted mb-4">Account Type</h4>
+        <div class="flex items-center gap-3">
+          <span class="material-icons text-accent">verified</span>
+          <span class="font-bold capitalize">{{ authService.profile()?.role }} Account</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-3 space-y-12">
+      <div>
+        <h2 class="text-3xl font-bold mb-8">Order History</h2>
+        @if (orderService.isLoading()) {
+          <div class="space-y-6">
+            @for (i of [1, 2]; track i) {
+              <div class="glass-card p-6 flex flex-col md:flex-row justify-between gap-6">
+                <div class="space-y-4 flex-grow">
+                  <div class="flex items-center gap-4">
+                    <app-skeleton width="120px" height="1.5rem"></app-skeleton>
+                    <app-skeleton width="80px" height="1.25rem"></app-skeleton>
+                    <app-skeleton width="60px" height="1.25rem"></app-skeleton>
+                  </div>
+                  <div class="flex gap-4">
+                    <app-skeleton width="48px" height="48px" className="rounded-lg"></app-skeleton>
+                    <app-skeleton width="48px" height="48px" className="rounded-lg"></app-skeleton>
+                  </div>
+                  <app-skeleton width="150px" height="0.75rem"></app-skeleton>
+                </div>
+                <div class="text-right flex flex-col justify-between items-end">
+                  <app-skeleton width="100px" height="2rem" className="mb-4"></app-skeleton>
+                  <app-skeleton width="120px" height="2.5rem" className="rounded-full"></app-skeleton>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (orderService.orders().length > 0) {
+          <div class="space-y-6">
+            @for (order of orderService.orders(); track order.id) {
+              <div class="glass-card p-6 flex flex-col md:flex-row justify-between gap-6">
+                <div class="space-y-4">
+                  <div class="flex items-center gap-4">
+                    <span class="text-lg font-bold">{{ order.order_number }}</span>
+                    <span class="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">
+                      {{ order.order_status }}
+                    </span>
+                    <span class="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">
+                      {{ order.payment_status }}
+                    </span>
+                  </div>
+                  <div class="flex gap-4">
+                    @for (item of order.items; track item.product) {
+                      <img [src]="item.image" [alt]="item.name" class="w-12 h-12 rounded-lg object-cover border border-white/10" referrerpolicy="no-referrer">
+                    }
+                  </div>
+                  <p class="text-xs text-accent-muted">Placed on {{ order.created_at | date:'mediumDate' }}</p>
+                </div>
+                <div class="text-right flex flex-col justify-between items-end">
+                  <p class="text-2xl font-bold">{{ order.total_amount | currency:'INR' }}</p>
+                  <button class="metallic-button-outline py-2 px-4 text-xs">View Details</button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="glass-card p-12 text-center">
+            <span class="material-icons text-4xl text-accent-muted mb-4">shopping_bag</span>
+            <p class="text-accent-muted">You haven't placed any orders yet.</p>
+            <a routerLink="/products" class="metallic-button mt-6 inline-block">Start Shopping</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
