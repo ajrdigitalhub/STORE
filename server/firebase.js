@@ -1,11 +1,30 @@
-import admin from 'firebase-admin';
-import firebaseConfig from '../firebase-applet-config.json' with { type: 'json' };
+const admin = require('firebase-admin');
+require('dotenv').config();
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    projectId: firebaseConfig.projectId,
-  });
+// Decode base64 service account from environment variable
+const serviceAccountBase64 = process.env.APP_FIREBASE_SERVICE_ACCOUNT_BASE64;
+if (!serviceAccountBase64 || serviceAccountBase64 === "YOUR_BASE64_ENCODED_SERVICE_ACCOUNT_JSON") {
+  throw new Error('APP_FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is not set. Please encode your service account JSON file to base64 and add it to your .env file.');
 }
 
-export const firebaseAdmin = admin;
-export const authAdmin = admin.auth();
+const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('ascii');
+const serviceAccount = JSON.parse(serviceAccountJson);
+const bucketName = process.env.APP_FIREBASE_STORAGE_BUCKET;
+
+if (!bucketName || bucketName === "YOUR_FIREBASE_STORAGE_BUCKET") {
+  throw new Error('APP_FIREBASE_STORAGE_BUCKET environment variable is not set.');
+}
+
+// Force re-initialization if already initialized
+if (admin.apps.length > 0) {
+  admin.app().delete();
+}
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: bucketName
+});
+
+const bucket = admin.storage().bucket();
+
+module.exports = { bucket };
