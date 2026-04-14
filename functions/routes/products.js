@@ -69,14 +69,14 @@ router.put('/:id', adminAuth, async (req, res, next) => {
     const { name, description, price, comparePrice, compare_price, category, category_id, stock, variants, featured, images, specification, tags, active } = req.body;
 
     const updateData = {
-      name,
-      description,
-      price: Number(price),
+      name, 
+      description, 
+      price: Number(price), 
       compare_price: Number(comparePrice || compare_price || 0),
-      category_id: category_id || category,
-      stock: Number(stock || 0),
+      category_id: category_id || category, 
+      stock: Number(stock || 0), 
       images: images || [],
-      variants: variants || [],
+      variants: variants || [], 
       featured: featured === true || featured === 'true',
       specification: specification || {},
       tags: tags || [],

@@ -15,7 +15,7 @@ router.post('/', (req, res) => {
 
   busboy.on('file', (name, file, info) => {
     const { filename, mimeType } = info;
-
+    
     if (!bucket) {
       console.error('Upload attempted but bucket is not initialized');
       file.resume();

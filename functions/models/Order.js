@@ -40,7 +40,19 @@ class Order {
     try {
       await client.query('BEGIN');
 
-      const { user_id, userid, items, total_amount, shipping_address, payment_method } = orderData;
+      const { 
+        user_id, 
+        userid, 
+        items, 
+        total_amount, 
+        shipping_address, 
+        payment_method,
+        payment_status = 'pending',
+        order_status = 'pending',
+        razorpay_orderid,
+        razorpay_paymentid,
+        razorpay_signature
+      } = orderData;
       const finalUserId = user_id || userid;
 
       console.log('Order.create - items:', JSON.stringify(items, null, 2));
@@ -55,7 +67,7 @@ class Order {
           console.error('Order.create - Item missing product ID:', JSON.stringify(item, null, 2));
           throw new Error(`Order item is missing a valid product ID. Item: ${JSON.stringify(item)}`);
         }
-
+        
         console.log('Validating item:', JSON.stringify(item, null, 2));
         const productResult = await client.query('SELECT stock FROM products WHERE id = $1 AND active = true', [item.product]);
         if (productResult.rows.length === 0) {
@@ -76,11 +88,27 @@ class Order {
 
       // Create order
       const query = `
-        INSERT INTO orders (user_id, items, total_amount, shipping_address, payment_method, order_number)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO orders (
+          user_id, items, total_amount, shipping_address, payment_method, 
+          order_number, payment_status, order_status, 
+          razorpay_orderid, razorpay_paymentid, razorpay_signature
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING *
       `;
-      const values = [finalUserId, JSON.stringify(items), total_amount, JSON.stringify(shipping_address), payment_method, orderNumber];
+      const values = [
+        finalUserId, 
+        JSON.stringify(items), 
+        total_amount, 
+        JSON.stringify(shipping_address), 
+        payment_method, 
+        orderNumber,
+        payment_status,
+        order_status,
+        razorpay_orderid,
+        razorpay_paymentid,
+        razorpay_signature
+      ];
 
       const result = await client.query(query, values);
 

@@ -124,10 +124,10 @@
           <div class="tech-label mb-2">Subsystem / {{ activeTab() | uppercase }}</div>
           <h1 class="text-5xl font-bold tracking-tighter italic font-serif">{{ getTabDisplayName(activeTab()) }}</h1>
         </div>
-        <div class="text-right">
+        <!-- <div class="text-right">
           <div class="tech-label mb-1">System Clock</div>
           <div class="tech-value text-xl">{{ '2026-04-09T12:33:41-07:00' | date:'HH:mm:ss' }}</div>
-        </div>
+        </div> -->
       </header>
 
       <!-- Dashboard View -->
@@ -151,10 +151,10 @@
             <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
           </div>
           <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
-          <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
+          <!-- <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
             <span class="material-icons text-[10px]">trending_up</span>
             +12.5% VS PREVIOUS PERIOD
-          </div>
+          </div> -->
         </div>
 
         <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
@@ -204,6 +204,7 @@
                 <th class="py-3 px-6 tech-label">Amount</th>
                 <th class="py-3 px-6 tech-label">Status</th>
                 <th class="py-3 px-6 tech-label">Date</th>
+                <th class="py-3 px-6 tech-label">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -215,6 +216,7 @@
                 <td class="py-4 px-6"><app-skeleton width="60px"></app-skeleton></td>
                 <td class="py-4 px-6"><app-skeleton width="70px" height="1.25rem"></app-skeleton></td>
                 <td class="py-4 px-6"><app-skeleton width="120px"></app-skeleton></td>
+                <td class="py-4 px-6"><app-skeleton width="40px"></app-skeleton></td>
               </tr>
               }
               } @else {
@@ -230,6 +232,11 @@
                 </td>
                 <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">{{ order.created_at | date:'yyyy-MM-dd
                   HH:mm' }}</td>
+                <td class="py-4 px-6">
+                  <a [routerLink]="['/orders', order.id]" class="text-accent hover:text-white transition-colors">
+                    <span class="material-icons text-sm">visibility</span>
+                  </a>
+                </td>
               </tr>
               } @empty {
               <tr>
@@ -349,7 +356,8 @@
               <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs" [disabled]="isUploading()">
                 {{ isUploading() ? 'Saving...' : (editingProduct() ? 'Update Product' : 'Save Product') }}
               </button>
-              <button (click)="cancelProductEdit()" class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
+              <button (click)="cancelProductEdit()"
+                class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
             </div>
           </div>
         </div>
@@ -452,6 +460,7 @@
                 <th class="py-3 px-6 tech-label">Total Amount</th>
                 <th class="py-3 px-6 tech-label">Status</th>
                 <th class="py-3 px-6 tech-label">Update Status</th>
+                <th class="py-3 px-6 tech-label">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -480,6 +489,11 @@
                     <option value="delivered" [selected]="order.order_status === 'delivered'">DELIVERED</option>
                   </select>
                 </td>
+                <td class="py-4 px-6">
+                  <a [routerLink]="['/orders', order.id]" class="text-accent hover:text-white transition-colors">
+                    <span class="material-icons text-sm">visibility</span>
+                  </a>
+                </td>
               </tr>
               }
             </tbody>
@@ -490,51 +504,95 @@
 
       <!-- Chat View -->
       @if (activeTab() === 'chat') {
-      <div class="tech-card h-[700px] flex flex-col">
-        <div class="tech-header">
-          <div class="flex items-center gap-3">
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="tech-label">Live Chat</span>
+      <div class="tech-card h-[700px] flex overflow-hidden">
+        <!-- Chat List -->
+        <div class="w-80 border-r border-white/5 flex flex-col bg-white/[0.02]">
+          <div class="p-4 border-b border-white/5 bg-white/[0.02]">
+            <h3 class="tech-label">Active Sessions</h3>
           </div>
-          <span class="tech-label opacity-50">Online</span>
-        </div>
-
-        <div class="flex-grow overflow-y-auto p-8 space-y-6 bg-black/20">
-          @for (msg of chatService.messages(); track msg.timestamp) {
-          <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
-            <div class="flex items-center gap-2 mb-2 px-1">
-              <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
-              <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
-            </div>
-            <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border"
-              [class.bg-accent]="msg.sender_id === authService.profile()?.id"
-              [class.text-metallic-black]="msg.sender_id === authService.profile()?.id"
-              [class.border-accent]="msg.sender_id === authService.profile()?.id"
-              [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
-              [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
-              {{ msg.text }}
-            </div>
-          </div>
-          }
-        </div>
-
-        <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
-          <div class="flex flex-wrap gap-2">
-            @for (reply of quickReplies; track reply) {
-            <button (click)="chatMessage = reply; sendMessage()"
-              class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded">
-              {{ reply }}
+          <div class="flex-grow overflow-y-auto">
+            @for (chat of chatService.activeChats(); track chat.id) {
+            <button (click)="chatService.selectChat(chat)"
+              class="w-full p-4 text-left border-b border-white/5 hover:bg-white/5 transition-all group relative"
+              [class.bg-accent/10]="chatService.selectedChat()?.id === chat.id">
+              <div class="flex justify-between items-start mb-1">
+                <span class="text-xs font-bold truncate pr-2" [class.text-accent]="chatService.selectedChat()?.id === chat.id">
+                  {{ chat.customer_name }}
+                </span>
+                <span class="text-[8px] font-mono opacity-40">{{ chat.last_message_at | date:'HH:mm' }}</span>
+              </div>
+              <p class="text-[10px] text-accent-muted truncate opacity-70 group-hover:opacity-100 transition-opacity">
+                {{ chat.last_message }}
+              </p>
+              @if (chatService.selectedChat()?.id === chat.id) {
+              <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-accent"></div>
+              }
             </button>
+            } @empty {
+            <div class="p-8 text-center opacity-30 italic tech-label text-[10px]">
+              No active chat sessions
+            </div>
             }
           </div>
-          <div class="flex gap-4">
-            <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()"
-              placeholder="Type your message..." class="input-field font-mono text-sm">
-            <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
-              <span class="material-icons text-sm">send</span>
-              Send Message
-            </button>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="flex-grow flex flex-col bg-black/20">
+          @if (chatService.selectedChat()) {
+          <div class="tech-header border-b border-white/5">
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span class="tech-label">Chatting with {{ chatService.selectedChat()?.customer_name }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="tech-label text-[10px] opacity-50">UID: {{ chatService.selectedChat()?.customer_id }}</span>
+              <button (click)="closeChat()" class="text-red-500 hover:text-red-400 tech-label text-[10px]">Close Session</button>
+            </div>
           </div>
+
+          <div class="flex-grow overflow-y-auto p-8 space-y-6">
+            @for (msg of chatService.messages(); track msg.timestamp) {
+            <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
+              <div class="flex items-center gap-2 mb-2 px-1">
+                <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
+                <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
+              </div>
+              <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border"
+                [class.bg-accent]="msg.sender_id === authService.profile()?.id"
+                [class.text-metallic-black]="msg.sender_id === authService.profile()?.id"
+                [class.border-accent]="msg.sender_id === authService.profile()?.id"
+                [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
+                [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
+                {{ msg.text }}
+              </div>
+            </div>
+            }
+          </div>
+
+          <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
+            <div class="flex flex-wrap gap-2">
+              @for (reply of quickReplies; track reply) {
+              <button (click)="chatMessage = reply; sendMessage()"
+                class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded">
+                {{ reply }}
+              </button>
+              }
+            </div>
+            <div class="flex gap-4">
+              <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()"
+                placeholder="Type your message..." class="input-field font-mono text-sm">
+              <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
+                <span class="material-icons text-sm">send</span>
+                Send
+              </button>
+            </div>
+          </div>
+          } @else {
+          <div class="flex-grow flex flex-col items-center justify-center opacity-20">
+            <span class="material-icons text-6xl mb-4">chat_bubble_outline</span>
+            <p class="tech-label">Select a session to start chatting</p>
+          </div>
+          }
         </div>
       </div>
       }

@@ -33,9 +33,10 @@ export class RegisterComponent {
     try {
       await this.authService.loginWithGoogle();
       this.showWelcomePopup.set(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      if (error?.code !== 'auth/popup-closed-by-user') {
+      const err = error as { code?: string };
+      if (err?.code !== 'auth/popup-closed-by-user') {
         this.errorMessage.set('Registration failed. Please try again.');
       }
     } finally {
@@ -51,7 +52,7 @@ export class RegisterComponent {
     try {
       await this.authService.registerWithEmail(this.email, this.password, this.displayName);
       this.showWelcomePopup.set(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       this.errorMessage.set('Registration failed. Please check your details.');
     } finally {

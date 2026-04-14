@@ -96,6 +96,11 @@ export class OrderService {
   }
 
   async updateOrderStatus(id: number, orderStatus: Order['order_status'], paymentStatus?: Order['payment_status']) {
-    return firstValueFrom(this.api.put<Order>(`/orders/${id}/status`, { orderStatus, paymentStatus }));
+    await firstValueFrom(this.api.put<Order>(`/orders/${id}/status`, { orderStatus, paymentStatus }));
+    this.loadUserOrders(); // Refresh the list
+  }
+
+  async getOrder(id: number): Promise<Order> {
+    return firstValueFrom(this.api.get<Order>(`/orders/${id}`));
   }
 }

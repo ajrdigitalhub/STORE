@@ -29,9 +29,10 @@ export class LoginComponent {
     try {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/']);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      if (error?.code !== 'auth/popup-closed-by-user') {
+      const err = error as { code?: string };
+      if (err?.code !== 'auth/popup-closed-by-user') {
         this.errorMessage.set('Login failed. Please try again.');
       }
     } finally {
@@ -47,7 +48,7 @@ export class LoginComponent {
     try {
       await this.authService.loginWithEmail(this.email, this.password);
       this.router.navigate(['/']);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       this.errorMessage.set('Login failed. Check your credentials.');
     } finally {

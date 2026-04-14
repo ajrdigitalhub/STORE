@@ -36,13 +36,13 @@ export interface Product {
 export class ProductService {
   private api = inject(ApiService);
   private platformId = inject(PLATFORM_ID);
-
+  
   private productsSignal = signal<Product[]>([]);
   products = this.productsSignal.asReadonly();
-
+  
   private categoriesSignal = signal<Category[]>([]);
   categories = this.categoriesSignal.asReadonly();
-
+  
   isLoading = signal(false);
   useMockData = signal(true);
 
@@ -80,7 +80,7 @@ export class ProductService {
 
   private loadProducts() {
     this.isLoading.set(true);
-    this.api.get<{ products: Product[], total: number }>('/products').subscribe({
+    this.api.get<{products: Product[], total: number}>('/products').subscribe({
       next: (response) => {
         console.log('ProductService - Loaded products:', response.products.map(p => ({ id: p.id, name: p.name })));
         this.productsSignal.set(response.products);

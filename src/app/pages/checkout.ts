@@ -28,14 +28,14 @@ export class CheckoutComponent {
   toastService = inject(ToastService);
   router = inject(Router);
 
-  address = {
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zip: ''
+  address = { 
+    name: '', 
+    email: '', 
+    phone: '', 
+    address: '', 
+    city: '', 
+    state: '', 
+    zip: '' 
   };
   paymentMethod = signal<'Razorpay'>('Razorpay');
   isProcessing = signal(false);
@@ -46,8 +46,6 @@ export class CheckoutComponent {
     this.isProcessing.set(true);
     try {
       const total = this.cartService.totalPrice() * 1.18;
-
-      // 1. Create local order first
       const profile = this.authService.profile();
       if (!profile) {
         throw new Error('User profile not loaded. Please login again.');
@@ -61,63 +59,78 @@ export class CheckoutComponent {
         image: item.images && item.images.length > 0 ? item.images[0] : ''
       }));
 
-      console.log('CheckoutComponent - orderItems:', orderItems);
+      if (this.paymentMethod() === 'Razorpay') {
+        // 1. Initiate Razorpay
+        const success = await this.paymentService.loadRazorpayScript();
+        if (!success) throw new Error('Razorpay SDK failed to load');
 
-      const order = await this.orderService.createOrder({
-        userid: profile.id,
-        items: orderItems,
-        total_amount: total,
-        order_status: 'pending',
-        payment_status: 'pending',
-        payment_method: 'razorpay',
-        shipping_address: this.address
-      });
+        const rzpOrder = await this.paymentService.createRazorpayOrder(total);
+        const rzpKey = await this.paymentService.getRazorpayKey();
+        
+        const options = {
+          key: rzpKey,
+          amount: rzpOrder.amount,
+          currency: rzpOrder.currency,
+          name: "IDEA Zone 3D",
+          description: "Order Payment",
+          order_id: rzpOrder.id,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          handler: async (response: any) => {
+            try {
+              // 2. Create order ONLY after successful payment
+              const order = await this.orderService.createOrder({
+                userid: profile.id,
+                items: orderItems,
+                total_amount: total,
+                payment_method: 'razorpay',
+                shipping_address: this.address,
+                // Pass Razorpay details for verification on backend
+                razorpay_orderid: response.razorpay_orderid,
+                razorpay_paymentid: response.razorpay_paymentid,
+                razorpay_signature: response.razorpay_signature
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
 
-      // 2. Initiate Razorpay
-      const success = await this.paymentService.loadRazorpayScript();
-      if (!success) throw new Error('Razorpay SDK failed to load');
-
-      const rzpOrder = await this.paymentService.createRazorpayOrder(total, order.id);
-      const rzpKey = await this.paymentService.getRazorpayKey();
-
-      const options = {
-        key: rzpKey,
-        amount: rzpOrder.amount,
-        currency: rzpOrder.currency,
-        name: "IDEA Zone 3D",
-        description: "Order Payment",
-        order_id: rzpOrder.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        handler: async (response: any) => {
-          try {
-            await this.paymentService.verifyPayment({
-              ...response,
-              orderId: order.id
-            });
-            this.toastService.show('Order placed successfully!', 'success');
-            this.cartService.clearCart();
-            this.router.navigate(['/profile']);
-          } catch (err) {
-            console.error('Payment verification failed', err);
-            this.toastService.show('Payment verification failed. Please contact support.', 'error');
-          } finally {
-            this.isProcessing.set(false);
+              this.toastService.show('Order placed successfully!', 'success');
+              this.cartService.clearCart();
+              this.router.navigate(['/orders', order.id]);
+            } catch (err) {
+              console.error('Order creation failed', err);
+              this.toastService.show('Order creation failed. Please contact support.', 'error');
+            } finally {
+              this.isProcessing.set(false);
+            }
+          },
+          prefill: {
+            name: this.address.name,
+            contact: this.address.phone,
+            email: this.authService.profile()?.email || ''
+          },
+          theme: { color: "#e5e5e5" },
+          modal: {
+            ondismiss: () => {
+              this.isProcessing.set(false);
+            }
           }
-        },
-        prefill: {
-          name: this.address.name,
-          contact: this.address.phone,
-          email: this.authService.profile()?.email || ''
-        },
-        theme: { color: "#e5e5e5" },
-        modal: {
-          ondismiss: () => {
-            this.isProcessing.set(false);
-          }
-        }
-      };
-      const rzp = new Razorpay(options);
-      rzp.open();
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } else {
+        // COD Flow (if implemented later)
+        const order = await this.orderService.createOrder({
+          userid: profile.id,
+          items: orderItems,
+          total_amount: total,
+          order_status: 'pending',
+          payment_status: 'pending',
+          payment_method: 'cod',
+          shipping_address: this.address
+        });
+        this.toastService.show('Order placed successfully!', 'success');
+        this.cartService.clearCart();
+        this.router.navigate(['/orders', order.id]);
+        this.isProcessing.set(false);
+      }
     } catch (error: unknown) {
       console.error(error instanceof Error ? error.message : error);
       this.toastService.show('Order failed. Please try again.', 'error');
@@ -131,7 +144,7 @@ export class CheckoutComponent {
       this.toastService.show('Please fill in all shipping details.', 'error');
       return false;
     }
-
+    
     const items = this.cartService.items();
     if (items.length === 0) {
       this.toastService.show('Your cart is empty.', 'error');

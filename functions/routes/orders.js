@@ -1,4 +1,6 @@
 const express = require('express');
+const crypto = require('crypto');
+const pool = require('../db');
 const Order = require('../models/Order');
 const { auth, adminAuth } = require('../middleware/auth');
 
@@ -7,10 +9,50 @@ const router = express.Router();
 // POST /api/orders — create order (customer)
 router.post('/', auth, async (req, res, next) => {
   try {
-    const { items, shippingAddress, paymentMethod, totalAmount } = req.body;
+    const { 
+      items, 
+      shippingAddress, 
+      paymentMethod, 
+      totalAmount,
+      razorpay_orderid,
+      razorpay_paymentid,
+      razorpay_signature
+    } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'Order must have at least one item' });
+    }
+
+    let paymentStatus = 'pending';
+    let orderStatus = 'pending';
+
+    // If Razorpay, verify payment before creating order
+    if (paymentMethod === 'razorpay') {
+      if (!razorpay_orderid || !razorpay_paymentid || !razorpay_signature) {
+        return res.status(400).json({ message: 'Razorpay payment details are required' });
+      }
+
+      // Get Razorpay secret from DB
+      const secretConfigResult = await pool.query('SELECT value FROM config WHERE key = $1', ['razorpay_secret']);
+      const secretConfig = secretConfigResult.rows.length > 0 ? secretConfigResult.rows[0].value : {};
+      const key_secret = (secretConfig.keySecret || process.env.RAZORPAY_KEY_SECRET || '').trim();
+
+      if (!key_secret) {
+        return res.status(500).json({ message: 'Razorpay secret not configured' });
+      }
+
+      const body = razorpay_orderid + '|' + razorpay_paymentid;
+      const expectedSignature = crypto
+        .createHmac('sha256', key_secret)
+        .update(body.toString())
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({ message: 'Payment verification failed' });
+      }
+
+      paymentStatus = 'paid';
+      orderStatus = 'processing';
     }
 
     const order = await Order.create({
@@ -18,7 +60,12 @@ router.post('/', auth, async (req, res, next) => {
       items,
       total_amount: totalAmount,
       shipping_address: shippingAddress,
-      payment_method: paymentMethod
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
+      order_status: orderStatus,
+      razorpay_orderid,
+      razorpay_paymentid,
+      razorpay_signature
     });
 
     res.status(201).json(order);

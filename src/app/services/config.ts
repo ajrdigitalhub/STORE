@@ -63,7 +63,7 @@ export interface AppConfig {
 export class ConfigService {
   private platformId = inject(PLATFORM_ID);
   private api = inject(ApiService);
-
+  
   private configSignal = signal<AppConfig>({
     hero: {
       slides: [
@@ -123,7 +123,7 @@ export class ConfigService {
       enabled: false
     }
   });
-
+  
   config = this.configSignal.asReadonly();
 
   constructor() {

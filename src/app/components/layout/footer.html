@@ -1,4 +1,4 @@
-<footer class="bg-metallic-gray border-t border-white/5 pt-16 pb-8 px-6 mt-20">
+<footer class="bg-metallic-gray border-t border-white/5 pt-16 pb-8 px-4 mt-20">
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
     <div class="space-y-6">
       <a routerLink="/" class="text-2xl font-display font-bold tracking-tighter text-white">
@@ -30,9 +30,9 @@
       <h4 class="text-white font-bold mb-6">Customer Service</h4>
       <ul class="space-y-4 text-sm text-accent-muted">
         <li><a routerLink="/profile" class="hover:text-white transition-colors">My Account</a></li>
-        <li><a routerLink="/orders" class="hover:text-white transition-colors">Order History</a></li>
-        <li><a routerLink="/cart" class="hover:text-white transition-colors">Shopping Cart</a></li>
-        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+        <li><a routerLink="/terms" class="hover:text-white transition-colors">Terms & Conditions</a></li>
+        <li><a routerLink="/returns" class="hover:text-white transition-colors">Return Policy</a></li>
+        <li><a routerLink="/contact" class="hover:text-white transition-colors">Support</a></li>
       </ul>
     </div>
 
@@ -58,9 +58,9 @@
   <div class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest">
     <p>{{ configService.config().footer.copyrightText }}</p>
     <div class="flex gap-8">
-      <span>Terms of Service</span>
-      <span>Privacy Policy</span>
-      <span>Cookie Policy</span>
+      <a routerLink="/terms" class="hover:text-white transition-colors">Terms of Service</a>
+      <a routerLink="/returns" class="hover:text-white transition-colors">Return Policy</a>
+      <a routerLink="/contact" class="hover:text-white transition-colors">Contact Us</a>
     </div>
   </div>
 </footer>

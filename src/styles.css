@@ -1,12 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Ubuntu", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Ubuntu", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --font-serif: "Playfair Display", serif;
+  --font-serif: "Ubuntu", serif;
 
   --color-metallic-black: #0a0a0a;
   --color-metallic-gray: #1a1a1a;
@@ -75,6 +75,14 @@
 
   .tech-header {
     @apply bg-white/5 border-b border-white/5 px-4 py-2 flex items-center justify-between;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

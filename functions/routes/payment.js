@@ -14,7 +14,7 @@ const getRazorpayInstance = async () => {
     // Read from 'config' table like the Admin Dashboard does
     const appConfigResult = await pool.query('SELECT value FROM config WHERE key = $1', ['app']);
     const secretConfigResult = await pool.query('SELECT value FROM config WHERE key = $1', ['razorpay_secret']);
-
+    
     const appConfig = appConfigResult.rows.length > 0 ? appConfigResult.rows[0].value : {};
     const secretConfig = secretConfigResult.rows.length > 0 ? secretConfigResult.rows[0].value : {};
 
@@ -24,8 +24,8 @@ const getRazorpayInstance = async () => {
     const key_id = (appConfig.razorpay?.keyId || process.env.RAZORPAY_KEY_ID || '').trim();
     const key_secret = (secretConfig.keySecret || process.env.RAZORPAY_KEY_SECRET || '').trim();
 
-    console.log('Razorpay Initialization Attempt:', {
-      has_key_id: !!key_id,
+    console.log('Razorpay Initialization Attempt:', { 
+      has_key_id: !!key_id, 
       key_id_source,
       key_id_length: key_id.length,
       has_key_secret: !!key_secret,
@@ -40,7 +40,7 @@ const getRazorpayInstance = async () => {
       key_id: key_id,
       key_secret: key_secret
     });
-
+    
     return {
       instance,
       key_id,
@@ -65,17 +65,16 @@ router.get('/get-key', auth, async (req, res, next) => {
 // POST /api/payment/create-order
 router.post('/create-order', auth, async (req, res, next) => {
   try {
-    const { amount, orderId } = req.body;
+    const { amount } = req.body;
 
     const { instance: razorpay, key_id } = await getRazorpayInstance();
     const options = {
       amount: Math.round(amount * 100),
       currency: 'INR',
-      receipt: orderId.toString()
+      receipt: `rcpt_${Date.now()}`
     };
 
     const razorpayOrder = await razorpay.orders.create(options);
-    await Order.updatePayment(orderId, { razorpayOrderId: razorpayOrder.id });
 
     res.json({
       orderId: razorpayOrder.id,

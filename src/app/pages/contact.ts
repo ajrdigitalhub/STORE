@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <div class="min-h-screen pt-32 pb-20 px-6">
+    <div class="min-h-screen pt-32 pb-20 px-4">
       <div class="max-w-6xl mx-auto">
         <h1 class="text-5xl font-black uppercase tracking-tighter mb-12 text-center">Contact Us</h1>
         

@@ -86,6 +86,16 @@ interface QuickAction {
                 </div>
               }
 
+              @if (chatService.isTyping() || isTyping()) {
+                <div class="flex items-start gap-2 animate-pulse">
+                  <div class="bg-white/5 p-3 rounded-2xl rounded-tl-none flex gap-1">
+                    <div class="w-1 h-1 bg-accent rounded-full"></div>
+                    <div class="w-1 h-1 bg-accent rounded-full"></div>
+                    <div class="w-1 h-1 bg-accent rounded-full"></div>
+                  </div>
+                </div>
+              }
+
               <!-- Quick Actions -->
               @if (!userHasSentMessage()) {
                 <div class="space-y-2 pt-4">
@@ -138,6 +148,7 @@ export class ChatFabComponent implements AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   isOpen = signal(false);
+  isTyping = signal(false);
   unreadCount = signal(0);
   userHasSentMessage = signal(false);
   messageText = '';
@@ -163,8 +174,12 @@ export class ChatFabComponent implements AfterViewChecked {
     if (this.isOpen()) {
       this.unreadCount.set(0);
       if (!this.hasSentWelcome && this.chatService.messages().length === 0) {
-        this.chatService.sendBotMessage('Welcome to IDEA Zone 3D! How can we help you today?');
-        this.hasSentWelcome = true;
+        this.isTyping.set(true);
+        setTimeout(() => {
+          this.chatService.sendBotMessage('Welcome to IDEA Zone 3D! How can we help you today?');
+          this.isTyping.set(false);
+          this.hasSentWelcome = true;
+        }, 1500);
       }
       setTimeout(() => this.scrollToBottom(), 100);
     }

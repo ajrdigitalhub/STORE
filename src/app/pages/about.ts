@@ -18,7 +18,7 @@ import { ConfigService } from '../services/config';
           <div class="absolute inset-0 bg-gradient-to-b from-metallic-black/20 via-metallic-black/60 to-metallic-black"></div>
         </div>
         
-        <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
           <div class="tech-label mb-6 inline-block px-4 py-1 border border-accent/30 rounded-full bg-accent/5">Established 2020</div>
           <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 italic font-serif leading-none">
             {{ configService.config().about.title }}
@@ -30,7 +30,7 @@ import { ConfigService } from '../services/config';
       </section>
 
       <!-- Main Content -->
-      <section class="py-24 px-6">
+      <section class="py-24 px-4">
         <div class="max-w-6xl mx-auto">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
             <div class="space-y-8">
@@ -101,7 +101,7 @@ import { ConfigService } from '../services/config';
       </section>
 
       <!-- CTA Section -->
-      <section class="py-32 px-6 bg-accent/5 border-y border-white/5">
+      <section class="py-32 px-4 bg-accent/5 border-y border-white/5">
         <div class="max-w-4xl mx-auto text-center">
           <h2 class="text-4xl md:text-5xl font-bold mb-8 italic font-serif">Ready to bring your ideas to life?</h2>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">

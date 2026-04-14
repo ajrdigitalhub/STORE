@@ -36,7 +36,7 @@ import { animate, stagger } from "motion";
       </div>
 
       <!-- Content -->
-      <div class="relative z-10 flex flex-col items-center text-center max-w-7xl px-6">
+      <div class="relative z-10 flex flex-col items-center text-center max-w-7xl px-4">
         <div class="mb-10 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl animate-fade-in hero-badge">
           <span class="flex h-2 w-2 rounded-full bg-accent animate-ping"></span>
           <span class="text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-white/80">

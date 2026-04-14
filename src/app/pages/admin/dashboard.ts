@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, effect, untracked, AfterViewInit, ElementRef } from '@angular/core';
-import { Product, ProductService } from '../../services/product';
+import { RouterLink } from '@angular/router';
+import { ProductService, Product } from '../../services/product';
 import { OrderService, Order } from '../../services/order';
 import { AuthService } from '../../services/auth';
 import { ChatService } from '../../services/chat';
@@ -34,7 +35,7 @@ interface Message {
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [CommonModule, FormsModule, CurrencyPipe, SkeletonComponent],
+  imports: [CommonModule, FormsModule, CurrencyPipe, SkeletonComponent, RouterLink],
   templateUrl: './dashboard.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
@@ -66,7 +67,7 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   newProduct = { name: '', price: 0, compare_price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
   newCategory = { name: '', description: '', image: '' };
-
+  
   customers = signal<Customer[]>([]);
   messages = signal<Message[]>([]);
 
@@ -132,17 +133,17 @@ export class AdminDashboardComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       const config = this.configService.config();
-
+      
       untracked(() => {
         const currentHero = config.hero;
         // Only sync if form is currently empty (initial load)
         if (this.heroForm().slides.length === 0 && currentHero?.slides) {
-          this.heroForm.set({
+          this.heroForm.set({ 
             slides: JSON.parse(JSON.stringify(currentHero.slides))
           });
         }
         if (!this.aboutForm().title && config.about?.title) {
-          this.aboutForm.set({
+          this.aboutForm.set({ 
             ...config.about,
             values: JSON.parse(JSON.stringify(config.about.values || []))
           });
@@ -155,7 +156,7 @@ export class AdminDashboardComponent implements AfterViewInit {
           this.loadRazorpaySecret();
         }
         if (!this.footerForm().description && config.footer?.description) {
-          this.footerForm.set({
+          this.footerForm.set({ 
             description: config.footer.description,
             socialLinks: JSON.parse(JSON.stringify(config.footer.socialLinks || [])),
             copyrightText: config.footer.copyrightText
@@ -224,7 +225,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       await this.productService.addProduct(productData);
       this.toastService.show('Product added successfully', 'success');
     }
-
+    
     this.cancelProductEdit();
   }
 
@@ -433,7 +434,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   async saveRazorpayConfig() {
     const currentConfig = this.configService.config();
     const form = this.razorpayForm();
-
+    
     const newConfig: AppConfig = {
       ...currentConfig,
       razorpay: {
@@ -441,9 +442,9 @@ export class AdminDashboardComponent implements AfterViewInit {
         enabled: form.enabled
       }
     };
-
+    
     await this.configService.updateConfig(newConfig);
-
+    
     // Save secret separately using ConfigService
     await this.configService.setRazorpaySecret(form.keySecret);
     this.toastService.show('Payment settings updated', 'success');
@@ -529,6 +530,19 @@ export class AdminDashboardComponent implements AfterViewInit {
     if (this.chatMessage.trim()) {
       this.chatService.sendMessage(this.chatMessage);
       this.chatMessage = '';
+    }
+  }
+
+  async closeChat() {
+    const selected = this.chatService.selectedChat();
+    if (selected && confirm('Are you sure you want to close this chat session?')) {
+      try {
+        await this.http.post(`/api/chats/${selected.id}/status`, { isActive: false }).toPromise();
+        this.toastService.show('Chat session closed', 'success');
+        this.chatService.loadActiveChats();
+      } catch (error) {
+        console.error('Failed to close chat', error);
+      }
     }
   }
 }

@@ -24,8 +24,8 @@ class Product {
 
   // Create new product
   static async create(productData) {
-    const {
-      name, description, price, compare_price, images = [],
+    const { 
+      name, description, price, compare_price, images = [], 
       stock = 0, variants = [], featured = false, active = true,
       specification = {}, tags = [], category_id
     } = productData;
@@ -39,8 +39,8 @@ class Product {
       RETURNING *
     `;
     const values = [
-      name, description, price, compare_price, JSON.stringify(images),
-      stock, JSON.stringify(variants), featured, active,
+      name, description, price, compare_price, JSON.stringify(images), 
+      stock, JSON.stringify(variants), featured, active, 
       JSON.stringify(specification), JSON.stringify(tags), category_id
     ];
 

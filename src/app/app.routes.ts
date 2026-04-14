@@ -6,6 +6,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'products', loadComponent: () => import('./pages/product-list').then(m => m.ProductListComponent) },
   { path: 'products/:id', loadComponent: () => import('./pages/product-detail').then(m => m.ProductDetailComponent) },
+  { path: 'orders/:id', loadComponent: () => import('./pages/order-detail').then(m => m.OrderDetailComponent), canActivate: [authGuard] },
   { path: 'cart', loadComponent: () => import('./pages/cart').then(m => m.CartComponent) },
   { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent), canActivate: [authGuard] },
   { path: 'login', loadComponent: () => import('./pages/login').then(m => m.LoginComponent) },
@@ -14,5 +15,7 @@ export const routes: Routes = [
   { path: 'admin', loadComponent: () => import('./pages/admin/dashboard').then(m => m.AdminDashboardComponent), canActivate: [adminGuard] },
   { path: 'about', loadComponent: () => import('./pages/about').then(m => m.AboutComponent) },
   { path: 'contact', loadComponent: () => import('./pages/contact').then(m => m.ContactComponent) },
+  { path: 'terms', loadComponent: () => import('./pages/terms').then(m => m.TermsComponent) },
+  { path: 'returns', loadComponent: () => import('./pages/returns').then(m => m.ReturnsComponent) },
   { path: '**', redirectTo: '' }
 ];
