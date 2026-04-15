@@ -49,12 +49,24 @@ export interface RazorpayConfig {
   enabled: boolean;
 }
 
+export interface WhatsAppConfig {
+  apiEnabled: boolean;
+  apiUrl: string;
+  apiKey: string;
+  adminPhoneNumber: string;
+  welcomeMessageTemplateName: string;
+  orderConfirmationClientTemplateName: string;
+  orderConfirmationAdminTemplateName: string;
+  orderStatusUpdateTemplateName: string;
+}
+
 export interface AppConfig {
   hero: HeroConfig;
   about: AboutConfig;
   contact: ContactConfig;
   footer: FooterConfig;
   razorpay: RazorpayConfig;
+  whatsapp: WhatsAppConfig;
 }
 
 @Injectable({
@@ -121,6 +133,16 @@ export class ConfigService {
     razorpay: {
       keyId: '',
       enabled: false
+    },
+    whatsapp: {
+      apiEnabled: false,
+      apiUrl: '',
+      apiKey: '',
+      adminPhoneNumber: '',
+      welcomeMessageTemplateName: '',
+      orderConfirmationClientTemplateName: '',
+      orderConfirmationAdminTemplateName: '',
+      orderStatusUpdateTemplateName: ''
     }
   });
   

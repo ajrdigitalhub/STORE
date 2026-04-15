@@ -46,7 +46,7 @@ import { animate, stagger } from "motion";
         
         @if (configService.config().hero.slides[currentImageIndex()]; as currentSlide) {
           <div class="overflow-hidden mb-6">
-            <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-tighter leading-[0.85] text-white hero-title">
+            <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.9] text-white hero-title">
               @let titleParts = currentSlide.title.split(' ');
               @for (part of titleParts; track $index) {
                 <span class="block overflow-hidden">
@@ -57,7 +57,7 @@ import { animate, stagger } from "motion";
           </div>
           
           <div class="max-w-2xl mx-auto overflow-hidden mb-12">
-            <p class="text-lg md:text-xl text-white/60 font-light leading-relaxed subtitle text-balance">
+            <p class="text-base md:text-lg text-white/60 font-light leading-relaxed subtitle text-balance">
               {{ currentSlide.subtitle }}
             </p>
           </div>
@@ -171,8 +171,13 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
     if (titleParts && titleParts.length > 0) {
       animate(
         titleParts,
-        { y: [100, 0], opacity: [0, 1] },
-        { delay: stagger(0.1), duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+        { 
+          y: [100, 0], 
+          opacity: [0, 1],
+          filter: ["blur(10px)", "blur(0px)"],
+          scale: [0.9, 1]
+        },
+        { delay: stagger(0.1), duration: 1, ease: [0.22, 1, 0.36, 1] }
       );
     }
     
@@ -180,8 +185,8 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
     if (subtitle) {
       animate(
         subtitle,
-        { opacity: [0, 0.8], y: [20, 0] },
-        { delay: 0.5, duration: 0.8 }
+        { opacity: [0, 0.8], y: [20, 0], filter: ["blur(5px)", "blur(0px)"] },
+        { delay: 0.6, duration: 0.8 }
       );
     }
     
@@ -190,7 +195,7 @@ export class HeroComponent implements OnDestroy, AfterViewInit {
       animate(
         ctaButtons,
         { opacity: [0, 1], y: [20, 0] },
-        { delay: 0.7, duration: 0.8 }
+        { delay: 0.8, duration: 0.8 }
       );
     }
   }

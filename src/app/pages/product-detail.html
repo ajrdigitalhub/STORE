@@ -21,7 +21,7 @@
               @for (img of p.images; track img) {
                 <button 
                   (click)="selectedImage.set(img)" 
-                  class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden glass-card p-1 border-2 transition-all hover:scale-105 active:scale-70"
+                  class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden glass-card p-1 border-2 transition-all hover:scale-105 active:scale-95"
                   [class.border-accent]="selectedImage() === img"
                   [class.border-transparent]="selectedImage() !== img"
                 >
@@ -119,6 +119,67 @@
                 {{ p.description }}
               </p>
             </div>
+
+            <!-- Customization Options -->
+            @if (p.customizable) {
+              <div class="tech-card border-accent/20 p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="flex items-center gap-2 text-accent">
+                  <span class="material-icons text-sm">auto_awesome</span>
+                  <span class="tech-label text-xs uppercase tracking-widest">Custom Options</span>
+                </div>
+
+                @if (p.customization_type === 'text') {
+                  <div class="space-y-2">
+                    <label for="custom-text-input" class="tech-label text-[10px] text-accent-muted">Enter Name / Text</label>
+                    <input 
+                      id="custom-text-input"
+                      type="text" 
+                      [ngModel]="customText()" 
+                      (ngModelChange)="customText.set($event)"
+                      placeholder="Ex: Your Name or Brand"
+                      class="input-field text-sm font-mono"
+                    >
+                  </div>
+                }
+
+                @if (p.customization_type === 'image_file') {
+                  <div class="space-y-2">
+                    <span class="tech-label text-[10px] text-accent-muted block">Upload Design / Image</span>
+                    <div class="flex items-center gap-4">
+                      <button 
+                        (click)="customImageInput.click()"
+                        class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2"
+                        [disabled]="isUploading()"
+                      >
+                        <span class="material-icons text-xs">{{ isUploading() ? 'refresh' : 'upload' }}</span>
+                        {{ isUploading() ? 'Uploading...' : 'Choose file' }}
+                      </button>
+                      <span class="text-[10px] text-accent-muted font-mono truncate max-w-[200px]">
+                        {{ customImageUrl() ? 'File uploaded successfully' : 'No file chosen' }}
+                      </span>
+                    </div>
+                    @if (customImageUrl()) {
+                      <div class="mt-2 relative w-20 h-20 group">
+                        <img [src]="customImageUrl()" alt="Custom Design Preview" class="w-full h-full object-cover rounded border border-accent/20" referrerpolicy="no-referrer">
+                        <button 
+                          (click)="customImageUrl.set(null)"
+                          class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <span class="material-icons text-[10px]">close</span>
+                        </button>
+                      </div>
+                    }
+                    <input 
+                      type="file" 
+                      #customImageInput 
+                      class="hidden" 
+                      (change)="onCustomImageSelected($event)"
+                      accept="image/*"
+                    >
+                  </div>
+                }
+              </div>
+            }
 
             <div class="space-y-6">
               <div class="flex items-center gap-4">

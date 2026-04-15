@@ -1,6 +1,6 @@
-import { Injectable, signal, inject, PLATFORM_ID, effect } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import { AuthService } from './auth';
 import { ApiService } from './api.service';
 
@@ -42,6 +42,8 @@ export class ChatService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
+      // Socket.IO disabled as per user request
+      /*
       const baseUrl = this.api.getBaseUrl().replace(/\/api$/, '');
       this.socket = io(baseUrl || undefined);
       
@@ -73,14 +75,25 @@ export class ChatService {
       });
 
       // Initial join
-      effect(() => {
-        const profile = this.authService.profile();
-        if (profile) {
-          if (profile.role === 'admin') {
+      this.authService.user$.subscribe(user => {
+        if (user) {
+          if (user.role === 'admin') {
             this.socket?.emit('join-admin');
             this.loadActiveChats();
           } else {
-            this.socket?.emit('join-customer', profile.id);
+            this.socket?.emit('join-customer', user.id);
+            this.loadChatHistory();
+          }
+        }
+      });
+      */
+
+      // Initial join (HTTP only)
+      this.authService.user$.subscribe((user: any) => {
+        if (user) {
+          if (user.role === 'admin') {
+            this.loadActiveChats();
+          } else {
             this.loadChatHistory();
           }
         }

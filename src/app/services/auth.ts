@@ -1,4 +1,5 @@
 import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { auth } from '../firebase';
 import { onAuthStateChanged, User, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -47,6 +48,7 @@ export class AuthService {
   private isAuthReadySignal = signal<boolean>(false);
 
   user = computed(() => this.userSignal());
+  user$ = toObservable(this.userSignal);
   profile = computed(() => this.profileSignal());
   isAuthReady = computed(() => this.isAuthReadySignal());
   isAdmin = computed(() => 

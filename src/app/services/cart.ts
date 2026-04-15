@@ -4,6 +4,10 @@ import { Product } from './product';
 
 export interface CartItem extends Product {
   quantity: number;
+  customization?: {
+    text?: string;
+    image?: string;
+  };
 }
 
 @Injectable({
@@ -26,32 +30,47 @@ export class CartService {
     }
   }
 
-  addToCart(product: Product) {
+  addToCart(product: Product, customization?: CartItem['customization']) {
     if (!product || !product.id) {
       console.error('CartService - Attempted to add product without ID:', product);
       return;
     }
     this.itemsSignal.update(items => {
-      const existingItem = items.find(i => i.id === product.id);
+      // Find item with same ID AND same customization
+      const existingItem = items.find(i => 
+        i.id === product.id && 
+        JSON.stringify(i.customization) === JSON.stringify(customization)
+      );
+      
       if (existingItem) {
-        return items.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return items.map(i => 
+          (i.id === product.id && JSON.stringify(i.customization) === JSON.stringify(customization)) 
+          ? { ...i, quantity: i.quantity + 1 } 
+          : i
+        );
       }
-      return [...items, { ...product, quantity: 1 }];
+      return [...items, { ...product, quantity: 1, customization }];
     });
     this.saveCart();
   }
 
-  removeFromCart(productId: number) {
-    this.itemsSignal.update(items => items.filter(i => i.id !== productId));
+  removeFromCart(productId: number, customization?: CartItem['customization']) {
+    this.itemsSignal.update(items => items.filter(i => 
+      !(i.id === productId && JSON.stringify(i.customization) === JSON.stringify(customization))
+    ));
     this.saveCart();
   }
 
-  updateQuantity(productId: number, quantity: number) {
+  updateQuantity(productId: number, quantity: number, customization?: CartItem['customization']) {
     if (quantity <= 0) {
-      this.removeFromCart(productId);
+      this.removeFromCart(productId, customization);
       return;
     }
-    this.itemsSignal.update(items => items.map(i => i.id === productId ? { ...i, quantity } : i));
+    this.itemsSignal.update(items => items.map(i => 
+      (i.id === productId && JSON.stringify(i.customization) === JSON.stringify(customization)) 
+      ? { ...i, quantity } 
+      : i
+    ));
     this.saveCart();
   }
 

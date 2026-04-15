@@ -6,6 +6,51 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 const pool = require('./db');
 
+async function initDB() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS config (
+          key VARCHAR(255) PRIMARY KEY,
+          value JSONB NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Add customization fields to products if they don't exist
+    await pool.query(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='customizable') THEN
+          ALTER TABLE products ADD COLUMN customizable BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='customization_type') THEN
+          ALTER TABLE products ADD COLUMN customization_type VARCHAR(50) DEFAULT 'none';
+        END IF;
+      END $$;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS whatsapp_logs (
+          id SERIAL PRIMARY KEY,
+          recipient_number VARCHAR(50),
+          message_content TEXT,
+          status VARCHAR(20),
+          reason TEXT,
+          order_id INTEGER,
+          user_id INTEGER,
+          message_type VARCHAR(50),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log('Database initialized: config table, product customization fields, and whatsapp_logs table checked');
+  } catch (error) {
+    console.error('Error initializing database:', error);
+  }
+}
+
+initDB();
+
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
@@ -57,6 +102,8 @@ app.use('/api/upload', express.raw({ type: 'multipart/form-data', limit: '10mb' 
 }, uploadRoutes);
 
 // Socket.io
+// Socket.io disabled as per user request
+/*
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
@@ -114,6 +161,7 @@ io.on('connection', (socket) => {
     console.log('User disconnected:', socket.id);
   });
 });
+*/
 
 // Error Handler
 app.use((err, req, res, next) => {
@@ -149,5 +197,4 @@ if (require.main === module) {
   });
 }
 
-// Export the app for Firebase
-module.exports = { app };
+module.exports = { app, io };

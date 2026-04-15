@@ -49,6 +49,9 @@
       <a routerLink="/products" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Products</a>
       <a routerLink="/about" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">About</a>
       <a routerLink="/contact" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Contact</a>
+      @if (authService.isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent hover:text-white transition-all">Admin Panel</a>
+      }
       @if (authService.profile()) {
         <a routerLink="/profile" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">My Account</a>
         <button (click)="logout(); toggleMenu()" class="px-4 py-3 text-left text-sm font-bold text-red-500 hover:text-white transition-all">Logout</button>

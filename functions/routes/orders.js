@@ -68,6 +68,23 @@ router.post('/', auth, async (req, res, next) => {
       razorpay_signature
     });
 
+    // Send WhatsApp confirmation
+    const { sendOrderConfirmation } = require('../whatsapp');
+    // Fetch order with user details for notification
+    const orderWithDetails = await Order.findById(order.id);
+    sendOrderConfirmation({
+      ...orderWithDetails,
+      customerName: orderWithDetails.user_name,
+      orderNumber: orderWithDetails.order_number,
+      totalAmount: orderWithDetails.total_amount,
+      paymentMethod: orderWithDetails.payment_method,
+      status: orderWithDetails.order_status,
+      paymentId: orderWithDetails.razorpay_paymentid,
+      orderDate: orderWithDetails.created_at,
+      shippingAddress: orderWithDetails.shipping_address,
+      userId: orderWithDetails.user_id
+    }).catch(err => console.error('WhatsApp notification failed:', err));
+
     res.status(201).json(order);
   } catch (error) {
     next(error);

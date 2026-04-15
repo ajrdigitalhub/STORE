@@ -22,6 +22,8 @@ export interface Product {
   images: string[];
   stock: number;
   featured: boolean;
+  customizable: boolean;
+  customization_type: 'none' | 'text' | 'image_file';
   active: boolean;
   created_at: string;
   specification?: Record<string, string>;

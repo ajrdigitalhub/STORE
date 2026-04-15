@@ -101,6 +101,13 @@
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">account_balance_wallet</span>
         <span class="font-medium text-xs uppercase tracking-widest">Payments</span>
       </button>
+      <button (click)="activeTab.set('whatsapp')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'whatsapp'" [class.text-accent]="activeTab() === 'whatsapp'"
+        [class.text-accent-muted]="activeTab() !== 'whatsapp'">
+        <span class="material-icons text-lg group-hover:scale-110 transition-transform">chat_bubble</span>
+        <span class="font-medium text-xs uppercase tracking-widest">WhatsApp</span>
+      </button>
     </nav>
 
     <div class="p-6 border-t border-white/5">
@@ -124,10 +131,10 @@
           <div class="tech-label mb-2">Subsystem / {{ activeTab() | uppercase }}</div>
           <h1 class="text-5xl font-bold tracking-tighter italic font-serif">{{ getTabDisplayName(activeTab()) }}</h1>
         </div>
-        <!-- <div class="text-right">
+        <div class="text-right">
           <div class="tech-label mb-1">System Clock</div>
           <div class="tech-value text-xl">{{ '2026-04-09T12:33:41-07:00' | date:'HH:mm:ss' }}</div>
-        </div> -->
+        </div>
       </header>
 
       <!-- Dashboard View -->
@@ -301,6 +308,33 @@
                     class="input-field font-mono text-sm">
                 </div>
               </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                <div class="flex flex-col gap-4">
+                  <div class="flex items-center gap-3">
+                    <input id="p-featured" type="checkbox" [(ngModel)]="newProduct.featured"
+                      class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent">
+                    <label for="p-featured" class="tech-label cursor-pointer">Featured Product</label>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <input id="p-customizable" type="checkbox" [(ngModel)]="newProduct.customizable"
+                      class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent">
+                    <label for="p-customizable" class="tech-label cursor-pointer">Customizable Product</label>
+                  </div>
+                </div>
+                @if (newProduct.customizable) {
+                <div class="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                  <label for="p-custom-type" class="tech-label">Customization Input Type</label>
+                  <select id="p-custom-type" [(ngModel)]="newProduct.customization_type"
+                    class="input-field font-mono text-sm bg-metallic-black">
+                    <option value="none">None</option>
+                    <option value="text">Text Input (Name/Brand)</option>
+                    <option value="image_file">Image File Upload</option>
+                  </select>
+                </div>
+                }
+              </div>
+
               <div class="space-y-2">
                 <label for="p-desc" class="tech-label">Description</label>
                 <textarea id="p-desc" [(ngModel)]="newProduct.description" placeholder="Enter product description..."
@@ -535,7 +569,6 @@
             }
           </div>
         </div>
-
         <!-- Chat Window -->
         <div class="flex-grow flex flex-col bg-black/20">
           @if (chatService.selectedChat()) {
@@ -593,6 +626,60 @@
             <p class="tech-label">Select a session to start chatting</p>
           </div>
           }
+        </div>
+      </div>
+      }
+      
+      <!-- WhatsApp Settings View -->
+      @if (activeTab() === 'whatsapp') {
+      <div class="tech-card max-w-2xl mx-auto">
+        <div class="tech-header">
+          <span class="tech-label">WhatsApp Configuration</span>
+        </div>
+        <div class="p-8 space-y-6">
+          <div class="flex items-center gap-3">
+            <input id="w-enabled" type="checkbox" [(ngModel)]="whatsappSettings.apiEnabled"
+              class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent">
+            <label for="w-enabled" class="tech-label cursor-pointer">Enable WhatsApp API</label>
+          </div>
+          <div class="space-y-2">
+            <label for="w-api-url" class="tech-label">API URL</label>
+            <input id="w-api-url" type="text" [(ngModel)]="whatsappSettings.apiUrl"
+              class="input-field font-mono text-sm" placeholder="https://graph.facebook.com/v18.0/...">
+          </div>
+          <div class="space-y-2">
+            <label for="w-api-key" class="tech-label">API Key (Bearer Token)</label>
+            <input id="w-api-key" type="password" [(ngModel)]="whatsappSettings.apiKey"
+              class="input-field font-mono text-sm" placeholder="Enter API Key">
+          </div>
+          <div class="space-y-2">
+            <label for="w-admin-phone" class="tech-label">Admin Phone Number (with country code)</label>
+            <input id="w-admin-phone" type="text" [(ngModel)]="whatsappSettings.adminPhoneNumber"
+              class="input-field font-mono text-sm" placeholder="+91XXXXXXXXXX">
+          </div>
+          <div class="space-y-2">
+            <label for="w-welcome-template" class="tech-label">Welcome Message Template Name</label>
+            <input id="w-welcome-template" type="text" [(ngModel)]="whatsappSettings.welcomeMessageTemplateName"
+              class="input-field font-mono text-sm" placeholder="welcome_message">
+          </div>
+          <div class="space-y-2">
+            <label for="w-order-client-template" class="tech-label">Order Confirmation (Client) Template Name</label>
+            <input id="w-order-client-template" type="text" [(ngModel)]="whatsappSettings.orderConfirmationClientTemplateName"
+              class="input-field font-mono text-sm" placeholder="order_confirmation">
+          </div>
+          <div class="space-y-2">
+            <label for="w-order-admin-template" class="tech-label">Order Confirmation (Admin) Template Name</label>
+            <input id="w-order-admin-template" type="text" [(ngModel)]="whatsappSettings.orderConfirmationAdminTemplateName"
+              class="input-field font-mono text-sm" placeholder="order_confirmation_admin">
+          </div>
+          <div class="space-y-2">
+            <label for="w-status-template" class="tech-label">Order Status Update Template Name</label>
+            <input id="w-status-template" type="text" [(ngModel)]="whatsappSettings.orderStatusUpdateTemplateName"
+              class="input-field font-mono text-sm" placeholder="order_status_update">
+          </div>
+          <button (click)="saveWhatsappSettings()" class="metallic-button py-2 px-8 text-xs">
+            Save WhatsApp Settings
+          </button>
         </div>
       </div>
       }

@@ -10,6 +10,10 @@ export interface OrderItem {
   price: number;
   quantity: number;
   image?: string;
+  customization?: {
+    text?: string;
+    image?: string;
+  };
 }
 
 export interface ShippingAddress {

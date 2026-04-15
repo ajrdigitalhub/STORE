@@ -17,6 +17,8 @@ class Product {
     this.rating = parseFloat(data.rating) || 0;
     this.reviews_count = parseInt(data.reviews_count) || 0;
     this.featured = data.featured || false;
+    this.customizable = data.customizable || false;
+    this.customization_type = data.customization_type || 'none';
     this.active = data.active !== false;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
@@ -27,21 +29,24 @@ class Product {
     const { 
       name, description, price, compare_price, images = [], 
       stock = 0, variants = [], featured = false, active = true,
-      specification = {}, tags = [], category_id
+      specification = {}, tags = [], category_id,
+      customizable = false, customization_type = 'none'
     } = productData;
 
     const query = `
       INSERT INTO products (
         name, description, price, compare_price, images, 
-        stock, variants, featured, active, specification, tags, category_id
+        stock, variants, featured, active, specification, tags, category_id,
+        customizable, customization_type
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *
     `;
     const values = [
       name, description, price, compare_price, JSON.stringify(images), 
       stock, JSON.stringify(variants), featured, active, 
-      JSON.stringify(specification), JSON.stringify(tags), category_id
+      JSON.stringify(specification), JSON.stringify(tags), category_id,
+      customizable, customization_type
     ];
 
     const result = await pool.query(query, values);

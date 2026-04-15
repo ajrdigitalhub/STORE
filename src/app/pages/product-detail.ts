@@ -2,13 +2,16 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { ProductService, Product } from '../services/product';
 import { CartService } from '../services/cart';
+import { UploadService } from '../services/upload';
+import { ToastService } from '../services/toast.service';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ProductCardComponent } from '../components/shared/product-card';
 import { SkeletonComponent } from '../components/shared/skeleton';
 
 @Component({
   selector: 'app-product-detail',
-  imports: [RouterLink, CommonModule, CurrencyPipe, ProductCardComponent, SkeletonComponent],
+  imports: [RouterLink, CommonModule, FormsModule, CurrencyPipe, ProductCardComponent, SkeletonComponent],
   templateUrl: './product-detail.html',
   styles: [`
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
@@ -18,12 +21,18 @@ export class ProductDetailComponent {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
   private cartService = inject(CartService);
+  private uploadService = inject(UploadService);
+  private toastService = inject(ToastService);
 
   product = signal<Product | null>(null);
   selectedImage = signal<string | null>(null);
   quantity = signal<number>(1);
   isZoomed = signal<boolean>(false);
   zoomBackgroundPosition = signal<string>('0% 0%');
+
+  customText = signal<string>('');
+  customImageUrl = signal<string | null>(null);
+  isUploading = signal<boolean>(false);
 
   specifications = computed(() => {
     const p = this.product();
@@ -86,12 +95,49 @@ export class ProductDetailComponent {
     this.isZoomed.set(false);
   }
 
+  async onCustomImageSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.isUploading.set(true);
+      try {
+        const url = await this.uploadService.uploadImage(file);
+        this.customImageUrl.set(url);
+        this.toastService.show('Design uploaded successfully', 'success');
+      } catch (error) {
+        console.error('Upload failed', error);
+        this.toastService.show('Image upload failed', 'error');
+      } finally {
+        this.isUploading.set(false);
+      }
+    }
+  }
+
   addToCart() {
     const p = this.product();
     if (p) {
-      for (let i = 0; i < this.quantity(); i++) {
-        this.cartService.addToCart(p);
+      const customization: { text?: string; image?: string } = {};
+      if (p.customizable) {
+        if (p.customization_type === 'text') {
+          if (!this.customText().trim()) {
+            this.toastService.show('Please enter customization text', 'error');
+            return;
+          }
+          customization.text = this.customText();
+        } else if (p.customization_type === 'image_file') {
+          const imageUrl = this.customImageUrl();
+          if (!imageUrl) {
+            this.toastService.show('Please upload your design', 'error');
+            return;
+          }
+          customization.image = imageUrl;
+        }
       }
+
+      for (let i = 0; i < this.quantity(); i++) {
+        this.cartService.addToCart(p, Object.keys(customization).length > 0 ? customization : undefined);
+      }
+      this.toastService.show('Added to cart', 'success');
     }
   }
 }

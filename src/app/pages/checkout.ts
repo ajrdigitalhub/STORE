@@ -56,7 +56,8 @@ export class CheckoutComponent {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        image: item.images && item.images.length > 0 ? item.images[0] : ''
+        image: item.images && item.images.length > 0 ? item.images[0] : '',
+        customization: item.customization
       }));
 
       if (this.paymentMethod() === 'Razorpay') {

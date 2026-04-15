@@ -52,7 +52,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   http = inject(HttpClient);
   private el = inject(ElementRef);
 
-  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'hero' | 'footer'>('dashboard');
+  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'whatsapp' | 'hero' | 'footer'>('dashboard');
   showProductForm = signal(false);
   editingProduct = signal<Product | null>(null);
   showCategoryForm = signal(false);
@@ -65,7 +65,29 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Thank you for reaching out to IDEA Zone 3D!'
   ];
 
-  newProduct = { name: '', price: 0, compare_price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] as string[] };
+  whatsappSettings = {
+    apiEnabled: false,
+    apiUrl: '',
+    apiKey: '',
+    adminPhoneNumber: '',
+    welcomeMessageTemplateName: '',
+    orderConfirmationClientTemplateName: '',
+    orderConfirmationAdminTemplateName: '',
+    orderStatusUpdateTemplateName: ''
+  };
+
+  newProduct = { 
+    name: '', 
+    price: 0, 
+    compare_price: 0, 
+    category_id: 0, 
+    stock: 0, 
+    description: '', 
+    imageUrls: [] as string[],
+    featured: false,
+    customizable: false,
+    customization_type: 'none' as 'none' | 'text' | 'image_file'
+  };
   newCategory = { name: '', description: '', image: '' };
   
   customers = signal<Customer[]>([]);
@@ -124,6 +146,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       'about': 'About',
       'contact': 'Contact',
       'payments': 'Payment Settings',
+      'whatsapp': 'WhatsApp Configuration',
       'hero': 'Hero Section Editor',
       'footer': 'Footer Editor'
     };
@@ -154,6 +177,9 @@ export class AdminDashboardComponent implements AfterViewInit {
         if (!this.razorpayForm().keyId && config.razorpay?.keyId) {
           this.razorpayForm.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled }));
           this.loadRazorpaySecret();
+        }
+        if (config.whatsapp && !this.whatsappSettings.apiUrl && config.whatsapp.apiUrl) {
+          this.whatsappSettings = { ...config.whatsapp };
         }
         if (!this.footerForm().description && config.footer?.description) {
           this.footerForm.set({ 
@@ -214,7 +240,9 @@ export class AdminDashboardComponent implements AfterViewInit {
       stock: this.newProduct.stock,
       description: this.newProduct.description,
       images: this.newProduct.imageUrls,
-      featured: true,
+      featured: this.newProduct.featured,
+      customizable: this.newProduct.customizable,
+      customization_type: this.newProduct.customization_type,
       active: true
     };
 
@@ -238,7 +266,10 @@ export class AdminDashboardComponent implements AfterViewInit {
       category_id: product.category_id,
       stock: product.stock,
       description: product.description,
-      imageUrls: [...(product.images || [])]
+      imageUrls: [...(product.images || [])],
+      featured: product.featured || false,
+      customizable: product.customizable || false,
+      customization_type: product.customization_type || 'none'
     };
     this.showProductForm.set(true);
     setTimeout(() => this.animateContent(), 0);
@@ -247,7 +278,18 @@ export class AdminDashboardComponent implements AfterViewInit {
   cancelProductEdit() {
     this.showProductForm.set(false);
     this.editingProduct.set(null);
-    this.newProduct = { name: '', price: 0, compare_price: 0, category_id: 0, stock: 0, description: '', imageUrls: [] };
+    this.newProduct = { 
+      name: '', 
+      price: 0, 
+      compare_price: 0, 
+      category_id: 0, 
+      stock: 0, 
+      description: '', 
+      imageUrls: [],
+      featured: false,
+      customizable: false,
+      customization_type: 'none'
+    };
   }
 
   async saveCategory() {
@@ -448,6 +490,16 @@ export class AdminDashboardComponent implements AfterViewInit {
     // Save secret separately using ConfigService
     await this.configService.setRazorpaySecret(form.keySecret);
     this.toastService.show('Payment settings updated', 'success');
+  }
+
+  async saveWhatsappSettings() {
+    const currentConfig = this.configService.config();
+    const newConfig: AppConfig = {
+      ...currentConfig,
+      whatsapp: { ...this.whatsappSettings }
+    };
+    await this.configService.updateConfig(newConfig);
+    this.toastService.show('WhatsApp settings updated', 'success');
   }
 
   async saveFooterConfig() {
