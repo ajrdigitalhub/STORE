@@ -155,7 +155,7 @@ export class ChatFabComponent implements AfterViewChecked {
 
   private hasSentWelcome = false;
 
-  whatsappNumber = '8903035099';
+  whatsappNumber = '+919989013142';
   whatsappMessage = 'I IDEAZONE3d, i need to explore more products, could you share more details on this';
   
   get whatsappUrl() {
