@@ -31,4 +31,26 @@ router.get('/', adminAuth, async (req, res, next) => {
   }
 });
 
+// PUT /api/messages/:id/read - Admin: Mark message as read
+router.put('/:id/read', adminAuth, async (req, res, next) => {
+  try {
+    const result = await Message.updateStatus(req.params.id, 'read');
+    if (!result) return res.status(404).json({ message: 'Message not found' });
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/messages/:id - Admin: Delete message
+router.delete('/:id', adminAuth, async (req, res, next) => {
+  try {
+    const success = await Message.delete(req.params.id);
+    if (!success) return res.status(404).json({ message: 'Message not found' });
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

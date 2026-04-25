@@ -1,15 +1,56 @@
-<div class="min-h-screen flex flex-col">
-  @if (!authService.isAuthReady()) {
-    <div class="flex-grow flex flex-col items-center justify-center p-12 space-y-8">
-      <div class="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center animate-pulse">
-        <div class="w-12 h-12 rounded-full bg-accent/20"></div>
+<div class="min-h-screen flex flex-col bg-metallic-black text-white selection:bg-accent selection:text-metallic-black">
+  <!-- Cinematic Loader -->
+  @if (!isAppLoaded() || !authService.isAuthReady()) {
+    <div class="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center transition-all duration-1000"
+         [class.opacity-0]="isAppLoaded() && authService.isAuthReady()"
+         [class.pointer-events-none]="isAppLoaded() && authService.isAuthReady()">
+      
+      <!-- Geometric Shape Animation -->
+      <div class="relative w-40 h-40 mb-8 animate-in fade-in zoom-in duration-1000">
+        <svg viewBox="0 0 100 100" class="w-full h-full fill-none stroke-current text-white overflow-visible">
+          <!-- Primary Icosahedron Geometry -->
+          <g class="animate-slow-spin origin-center">
+            <!-- Front Faces -->
+            <path d="M50 5 L90 35 L50 95 L10 35 Z" stroke-width="1.5" class="animate-dash" />
+            <path d="M50 5 L50 95" stroke-width="1" stroke-dasharray="4 4" class="opacity-30" />
+            <path d="M10 35 L90 35" stroke-width="1" stroke-dasharray="4 4" class="opacity-30" />
+            <circle cx="50" cy="5" r="1.5" fill="currentColor" class="animate-pulse" />
+            <circle cx="90" cy="35" r="1.5" fill="currentColor" />
+            <circle cx="50" cy="95" r="1.5" fill="currentColor" />
+            <circle cx="10" cy="35" r="1.5" fill="currentColor" />
+            
+            <!-- Secondary connections -->
+            <path d="M50 5 L70 50 L50 95" stroke-width="1" class="opacity-50" />
+            <path d="M50 5 L30 50 L50 95" stroke-width="1" class="opacity-50" />
+            <path d="M10 35 L30 50 L70 50 L90 35" stroke-width="1" class="opacity-50" />
+          </g>
+          
+          <!-- Outer Ring -->
+          <circle cx="50" cy="50" r="48" stroke-width="0.5" stroke-dasharray="2 10" class="opacity-20 animate-spin-slow" />
+        </svg>
       </div>
-      <div class="space-y-4 w-full max-w-md">
-        <app-skeleton width="100%" height="2rem"></app-skeleton>
-        <app-skeleton width="60%" height="1rem" className="mx-auto"></app-skeleton>
+
+      <!-- Branding -->
+      <div class="text-center space-y-2">
+        <h1 class="text-5xl font-black tracking-[0.2em] uppercase animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-300">
+          IDEAZONE<span class="text-accent">3D</span>
+        </h1>
+        <p class="text-[10px] text-accent-muted uppercase tracking-[0.5em] font-mono animate-in slide-in-from-bottom-4 fade-in duration-1000 delay-700">
+          Bring your ideas to reality
+        </p>
+      </div>
+
+      <!-- Progress Line -->
+      <div class="absolute bottom-20 w-32 h-[1px] bg-white/10 overflow-hidden">
+        <div class="h-full bg-accent animate-loading-bar origin-left"></div>
       </div>
     </div>
-  } @else {
+  }
+
+  <!-- Main Content -->
+  <div class="flex-grow flex flex-col transition-opacity duration-700"
+       [class.opacity-0]="!isAppLoaded() || !authService.isAuthReady()"
+       [class.opacity-100]="isAppLoaded() && authService.isAuthReady()">
     @if (!isAuthPage()) {
       <app-header />
     }
@@ -21,5 +62,5 @@
     }
     <app-chat-fab />
     <app-toast />
-  }
+  </div>
 </div>

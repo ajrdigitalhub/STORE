@@ -17,7 +17,7 @@ class ContactConfig {
     if (result.rows.length === 0) {
       // Create default
       return await this.create({
-        address: 'Ideazone3D Headquarters, HITEC City, Hyderabad, Telangana, India 500081',
+        address: 'IDEAZONE 3D Headquarters, HITEC City, Hyderabad, Telangana, India 500081',
         phone: '+91 99890 13142',
         email: 'ideazone3d@gmail.com',
         working_hours: 'Mon - Sat, 9am - 7pm'
@@ -28,7 +28,7 @@ class ContactConfig {
 
   // Create config
   static async create(configData) {
-    const { address = 'Ideazone3D Headquarters, HITEC City, Hyderabad, Telangana, India 500081', phone = '+91 99890 13142', email = 'ideazone3d@gmail.com', working_hours = 'Mon - Sat, 9am - 7pm' } = configData;
+    const { address = 'IDEAZONE 3D Headquarters, HITEC City, Hyderabad, Telangana, India 500081', phone = '+91 99890 13142', email = 'IDEAZONE 3D@gmail.com', working_hours = 'Mon - Sat, 9am - 7pm' } = configData;
 
     const query = `
       INSERT INTO contact_configs (address, phone, email, working_hours)

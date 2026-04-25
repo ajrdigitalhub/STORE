@@ -1,25 +1,40 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Socket } from 'socket.io-client';
 import { AuthService } from './auth';
-import { ApiService } from './api.service';
+import { 
+  collection, 
+  query, 
+  onSnapshot, 
+  addDoc, 
+  setDoc, 
+  doc, 
+  orderBy, 
+  serverTimestamp, 
+  Timestamp,
+  where
+} from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface Message {
-  sender_id: string | number;
+  id?: string;
+  sender_id: string; // Changed to string for UID
   sender_name: string;
   text: string;
-  timestamp: string;
-  customer_id?: string | number; // For admin to know which chat it belongs to
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  timestamp: any; // Using any for Firestore Timestamp/FieldValue compatibility
+  customer_id?: string;
 }
 
 export interface ChatSession {
-  id: number;
-  customer_id: number;
-  customer_name: string;
-  messages: Message[];
-  last_message: string;
-  last_message_at: string;
-  is_active: boolean;
+  id: string;
+  customerId: string;
+  customerName: string;
+  lastMessage: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lastMessageAt: any; // Using any for Firestore Timestamp/FieldValue compatibility
+  isActive: boolean;
+  unreadCount?: number;
+  messages?: Message[];
 }
 
 @Injectable({
@@ -27,8 +42,8 @@ export interface ChatSession {
 })
 export class ChatService {
   private platformId = inject(PLATFORM_ID);
-  private api = inject(ApiService);
-  private socket: Socket | null = null;
+  private authService = inject(AuthService);
+  
   private messagesSignal = signal<Message[]>([]);
   messages = this.messagesSignal.asReadonly();
   
@@ -38,138 +53,160 @@ export class ChatService {
   private selectedChatSignal = signal<ChatSession | null>(null);
   selectedChat = this.selectedChatSignal.asReadonly();
 
-  private authService = inject(AuthService);
+  private isTypingSignal = signal(false);
+  isTyping = this.isTypingSignal.asReadonly();
 
+  private unreadCountSignal = signal(0);
+  unreadCount = this.unreadCountSignal.asReadonly();
+
+  private isChatOpenSignal = signal(false);
+  
+  private guestId: string | null = null;
+  
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      // Socket.IO disabled as per user request
-      /*
-      const baseUrl = this.api.getBaseUrl().replace(/\/api$/, '');
-      this.socket = io(baseUrl || undefined);
-      
-      this.socket.on('message', (message: Message) => {
-        // If customer, just append
-        if (!this.authService.isAdmin()) {
-          this.messagesSignal.update(msgs => [...msgs, message]);
-        } else {
-          // If admin, check if it belongs to selected chat
-          const selected = this.selectedChatSignal();
-          if (selected && (message.sender_id === selected.customer_id || message.customer_id === selected.customer_id)) {
-            this.messagesSignal.update(msgs => [...msgs, message]);
-          }
-        }
-      });
+      this.guestId = localStorage.getItem('chat_guest_id');
+      if (!this.guestId) {
+        this.guestId = 'guest_' + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem('chat_guest_id', this.guestId);
+      }
 
-      this.socket.on('chat-update', (chat: ChatSession) => {
-        if (this.authService.isAdmin()) {
-          this.activeChatsSignal.update(chats => {
-            const index = chats.findIndex(c => c.id === chat.id);
-            if (index > -1) {
-              const newChats = [...chats];
-              newChats[index] = chat;
-              return newChats.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
-            }
-            return [chat, ...chats];
-          });
-        }
-      });
-
-      // Initial join
       this.authService.user$.subscribe(user => {
         if (user) {
-          if (user.role === 'admin') {
-            this.socket?.emit('join-admin');
-            this.loadActiveChats();
+          if (this.authService.isAdmin()) {
+            this.listenToAllChats();
           } else {
-            this.socket?.emit('join-customer', user.id);
-            this.loadChatHistory();
+            this.listenToCustomerChat(user.uid);
           }
-        }
-      });
-      */
-
-      // Initial join (HTTP only)
-      this.authService.user$.subscribe((user: any) => {
-        if (user) {
-          if (user.role === 'admin') {
-            this.loadActiveChats();
-          } else {
-            this.loadChatHistory();
+        } else {
+          // If guest, listen to guest chat
+          if (this.guestId) {
+            this.listenToCustomerChat(this.guestId);
           }
         }
       });
     }
   }
 
-  public loadActiveChats() {
-    this.api.get<ChatSession[]>('/chats/active').subscribe(chats => {
+  getEffectiveUserId(): string {
+    const user = this.authService.user();
+    if (user) return user.uid;
+    return this.guestId || 'anonymous';
+  }
+
+  setChatOpen(isOpen: boolean) {
+    this.isChatOpenSignal.set(isOpen);
+    if (isOpen) {
+      this.unreadCountSignal.set(0);
+    }
+  }
+
+  private listenToCustomerChat(userId: string) {
+    const messagesRef = collection(db, 'chats', userId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+    onSnapshot(q, (snapshot) => {
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: (doc.get('timestamp', { serverTimestamps: 'estimate' }) as Timestamp)?.toDate() || new Date()
+      })) as Message[];
+      
+      const prevMessages = this.messagesSignal();
+      if (messages.length > prevMessages.length && !this.isChatOpenSignal()) {
+        const lastMsg = messages[messages.length - 1];
+        if (lastMsg.sender_id !== userId) {
+          this.unreadCountSignal.update(c => c + 1);
+        }
+      }
+      
+      this.messagesSignal.set(messages);
+    });
+  }
+
+  private listenToAllChats() {
+    const chatsRef = collection(db, 'chats');
+    const q = query(chatsRef, where('isActive', '==', true), orderBy('lastMessageAt', 'desc'));
+
+    onSnapshot(q, (snapshot) => {
+      const chats = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        lastMessageAt: (doc.get('lastMessageAt', { serverTimestamps: 'estimate' }) as Timestamp)?.toDate() || new Date()
+      })) as ChatSession[];
       this.activeChatsSignal.set(chats);
     });
   }
 
-  private loadChatHistory() {
-    this.api.get<ChatSession>('/chats/history').subscribe(chat => {
-      if (chat) {
-        this.messagesSignal.set(chat.messages);
-      }
-    });
+  async closeChat(chatId: string) {
+    const chatRef = doc(db, 'chats', chatId);
+    await setDoc(chatRef, { isActive: false }, { merge: true });
+    this.selectedChatSignal.set(null);
+    this.messagesSignal.set([]);
   }
 
-  selectChat(chat: ChatSession) {
+  async selectChat(chat: ChatSession | null) {
     this.selectedChatSignal.set(chat);
-    this.messagesSignal.set(chat.messages);
+    if (chat) {
+      const messagesRef = collection(db, 'chats', chat.id, 'messages');
+      const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+      onSnapshot(q, (snapshot) => {
+        const messages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: (doc.get('timestamp', { serverTimestamps: 'estimate' }) as Timestamp)?.toDate() || new Date()
+        })) as Message[];
+        this.messagesSignal.set(messages);
+      });
+    } else {
+      this.messagesSignal.set([]);
+    }
   }
 
-  sendMessage(text: string) {
-    if (!this.socket) return;
+  async sendMessage(text: string) {
     const profile = this.authService.profile();
-    if (!profile) return;
-
+    
     const isAdmin = this.authService.isAdmin();
+    const userId = this.getEffectiveUserId();
     const selected = this.selectedChatSignal();
+    
+    const chatId = isAdmin ? selected?.id : userId;
+    if (!chatId) return;
 
-    interface SocketMessage {
-      sender_id: string | number;
-      sender_name: string;
-      text: string;
-      is_admin: boolean;
-      recipient_id?: string | number;
-    }
-
-    const message: SocketMessage = {
-      sender_id: profile.id,
-      sender_name: profile.name || 'User',
+    const messageData: Partial<Message> = {
+      sender_id: userId,
+      sender_name: profile?.name || (isAdmin ? 'Admin' : 'Guest User'),
       text,
-      is_admin: isAdmin
+      timestamp: serverTimestamp()
     };
 
-    if (isAdmin && selected) {
-      message.recipient_id = selected.customer_id;
-    }
+    // 1. Add message to subcollection
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    await addDoc(messagesRef, messageData);
 
-    this.socket.emit('message', message);
+    // 2. Update chat session metadata
+    const chatRef = doc(db, 'chats', chatId);
+    await setDoc(chatRef, {
+      customerId: isAdmin ? (selected?.customerId || chatId) : userId,
+      customerName: isAdmin ? (selected?.customerName || 'Guest User') : (profile?.name || 'Guest User'),
+      lastMessage: text,
+      lastMessageAt: serverTimestamp(),
+      isActive: true
+    }, { merge: true });
 
-    // Local sync for sender (Socket.IO will broadcast back but we can append immediately for better UX)
-    const localMsg: Message = {
-      sender_id: profile.id,
-      sender_name: profile.name || 'User',
-      text,
-      timestamp: new Date().toISOString()
-    };
-    this.messagesSignal.update(msgs => [...msgs, localMsg]);
-
-    // Auto-reply logic - only for customers
+    // Handle bot auto-reply for customers
     if (!isAdmin) {
-      this.handleAutoReply(text);
+      this.handleAutoReply(text, chatId);
     }
   }
 
-  private handleAutoReply(text: string) {
+  private handleAutoReply(text: string, chatId: string) {
     const lowerText = text.toLowerCase();
     let response = '';
 
     if (lowerText.includes('hi') || lowerText.includes('hello') || lowerText.includes('hey')) {
-      response = 'Hello! Welcome to IDEA Zone 3D. How can I assist you today?';
+      response = 'Hello! Welcome to IDEAZONE 3D. How can I assist you today?';
     } else if (lowerText.includes('order') || lowerText.includes('status')) {
       response = 'To check your order status, please provide your Order ID or check the "Orders" section in your profile.';
     } else if (lowerText.includes('price') || lowerText.includes('cost')) {
@@ -184,25 +221,34 @@ export class ChatService {
 
     if (response) {
       this.isTypingSignal.set(true);
-      setTimeout(() => {
-        this.sendBotMessage(response);
+      setTimeout(async () => {
+        await this.sendBotMessage(response, chatId);
         this.isTypingSignal.set(false);
       }, 1500);
     }
   }
 
-  private isTypingSignal = signal(false);
-  isTyping = this.isTypingSignal.asReadonly();
+  async sendBotMessage(text: string, chatId: string) {
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    const botMsg: Partial<Message> = {
+      sender_id: 'bot',
+      sender_name: 'IDEA Zone Bot',
+      text,
+      timestamp: serverTimestamp()
+    };
+    await addDoc(messagesRef, botMsg);
 
-  sendBotMessage(text: string) {
-    setTimeout(() => {
-      const botMessage: Message = {
-        sender_id: 'bot',
-        sender_name: 'IDEA Zone Bot',
-        text,
-        timestamp: new Date().toISOString()
-      };
-      this.messagesSignal.update(msgs => [...msgs, botMessage]);
-    }, 1000);
+    const chatRef = doc(db, 'chats', chatId);
+    await setDoc(chatRef, {
+      lastMessage: text,
+      lastMessageAt: serverTimestamp()
+    }, { merge: true });
+  }
+
+  // Legacy support for older components
+  loadActiveChats() {
+    // No-op for backward compatibility
   }
 }
+
+

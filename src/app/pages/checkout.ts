@@ -72,7 +72,7 @@ export class CheckoutComponent {
           key: rzpKey,
           amount: rzpOrder.amount,
           currency: rzpOrder.currency,
-          name: "IDEA Zone 3D",
+          name: "IDEAZONE 3D",
           description: "Order Payment",
           order_id: rzpOrder.id,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

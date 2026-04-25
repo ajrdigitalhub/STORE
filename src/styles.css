@@ -33,6 +33,34 @@
   animation: reverse-spin-slow 15s linear infinite;
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animate-dash {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: dash 3s ease-in-out forwards;
+}
+
+@keyframes loading-bar {
+  0% { transform: scaleX(0); }
+  50% { transform: scaleX(0.5); }
+  100% { transform: scaleX(1); }
+}
+.animate-loading-bar {
+  animation: loading-bar 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes slow-spin {
+  from { transform: rotate3d(1, 1, 1, 0deg); }
+  to { transform: rotate3d(1, 1, 1, 360deg); }
+}
+.animate-slow-spin {
+  animation: slow-spin 20s linear infinite;
+}
+
 @layer base {
   body {
     @apply bg-metallic-black text-accent font-sans antialiased;

@@ -58,11 +58,25 @@ import { FormsModule } from '@angular/forms';
                 </div>
                 <input type="text" [(ngModel)]="formData.subject" name="subject" placeholder="Subject" class="input-field" required>
                 <textarea [(ngModel)]="formData.message" name="message" placeholder="Your Message" class="input-field" rows="5" required></textarea>
-                <button type="submit" class="metallic-button w-full py-4 text-lg tracking-widest" [disabled]="isSubmitting()">
-                  {{ isSubmitting() ? 'SENDING...' : 'SEND MESSAGE' }}
+                <button type="submit" class="metallic-button w-full py-4 text-lg tracking-widest disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3" [disabled]="isSubmitting()">
+                  @if (isSubmitting()) {
+                    <div class="w-5 h-5 border-2 border-metallic-black/30 border-t-metallic-black rounded-full animate-spin"></div>
+                    SENDING...
+                  } @else {
+                    SEND MESSAGE
+                  }
                 </button>
                 @if (successMessage()) {
-                  <p class="text-green-500 text-center mt-4 font-mono text-sm">{{ successMessage() }}</p>
+                  <div class="mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-center animate-in fade-in slide-in-from-top-2">
+                    <span class="material-icons text-lg mb-1 block">check_circle</span>
+                    <p class="font-mono text-sm uppercase tracking-wider">{{ successMessage() }}</p>
+                  </div>
+                }
+                @if (errorMessage()) {
+                  <div class="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-center animate-in fade-in slide-in-from-top-2">
+                    <span class="material-icons text-lg mb-1 block">error_outline</span>
+                    <p class="font-mono text-sm uppercase tracking-wider">{{ errorMessage() }}</p>
+                  </div>
                 }
               </form>
             </div>
@@ -99,6 +113,7 @@ export class ContactComponent {
   formData = { name: '', email: '', subject: '', message: '' };
   isSubmitting = signal(false);
   successMessage = signal('');
+  errorMessage = signal('');
 
   safeMapUrl(): SafeResourceUrl | null {
     const url = this.configService.config().contact.mapUrl;
@@ -110,15 +125,20 @@ export class ContactComponent {
 
   async submitMessage(event: Event) {
     event.preventDefault();
+    if (this.isSubmitting()) return;
+
     this.isSubmitting.set(true);
     this.successMessage.set('');
+    this.errorMessage.set('');
+
     try {
       await this.http.post('/api/messages', this.formData).toPromise();
       this.successMessage.set('Message sent successfully! We will get back to you soon.');
       this.formData = { name: '', email: '', subject: '', message: '' };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to send message', error);
-      alert('Failed to send message. Please try again later.');
+      const err = error as { error?: { message?: string } };
+      this.errorMessage.set(err?.error?.message || 'Failed to send message. Please try again later.');
     } finally {
       this.isSubmitting.set(false);
     }

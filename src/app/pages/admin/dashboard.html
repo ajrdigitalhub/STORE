@@ -1,139 +1,216 @@
-<div class="flex min-h-screen bg-metallic-black font-sans selection:bg-accent selection:text-metallic-black">
+<div class="flex min-h-screen bg-metallic-black font-sans selection:bg-accent selection:text-metallic-black overflow-x-hidden">
+  <!-- Mobile Header -->
+  <div class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-metallic-black z-30 border-b border-white/5 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3">
+      <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+      <h2 class="text-sm font-bold tracking-tighter font-serif uppercase">IDEAZONE 3D</h2>
+    </div>
+    <button (click)="toggleMobileMenu()" class="text-accent-muted hover:text-accent transition-colors">
+      <span class="material-icons">{{ isMobileMenuOpen() ? 'close' : 'menu' }}</span>
+    </button>
+  </div>
+
+  <!-- Sidebar Overlay -->
+  @if (isMobileMenuOpen()) {
+    <div class="lg:hidden fixed inset-0 bg-black/80 z-40 backdrop-blur-sm transition-opacity" 
+         (click)="toggleMobileMenu()"
+         (keydown.escape)="toggleMobileMenu()"
+         role="button"
+         tabindex="0"
+         aria-label="Close menu"></div>
+  }
+
   <!-- Sidebar -->
-  <aside class="w-64 border-r border-white/5 bg-metallic-black flex flex-col z-20">
-    <div class="p-8 border-b border-white/5">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-        <h2 class="tech-label">Admin Panel</h2>
+  <aside 
+    [class.w-64]="!isSidebarCollapsed()" 
+    [class.w-20]="isSidebarCollapsed()"
+    [class.translate-x-0]="isMobileMenuOpen()"
+    [class.-translate-x-full]="!isMobileMenuOpen()"
+    class="fixed lg:static inset-y-0 left-0 border-r border-white/5 bg-metallic-black flex flex-col z-50 transition-all duration-300 transform lg:translate-x-0 overflow-hidden">
+    
+    <div class="p-8 border-b border-white/5 flex items-center justify-between min-h-[100px]">
+      <div class="flex flex-col overflow-hidden" [class.hidden]="isSidebarCollapsed()">
+        <div class="flex items-center gap-3 mb-2 whitespace-nowrap">
+          <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+          <h2 class="tech-label">Admin Panel</h2>
+        </div>
+        <h1 class="text-xl font-bold tracking-tighter font-serif truncate uppercase">IDEAZONE 3D</h1>
       </div>
-      <h1 class="text-xl font-bold tracking-tighter italic font-serif">IDEA Zone 3D</h1>
+      <button (click)="toggleSidebar()" class="hidden lg:flex p-1 rounded border border-white/10 text-accent-muted hover:text-accent transition-colors">
+        <span class="material-icons text-sm">{{ isSidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}</span>
+      </button>
+      <button (click)="toggleMobileMenu()" class="lg:hidden text-accent-muted hover:text-accent">
+        <span class="material-icons">close</span>
+      </button>
     </div>
 
-    <nav class="flex-grow p-4 space-y-1">
-      <div class="px-4 py-2 tech-label opacity-50">Store Management</div>
-      <button (click)="activeTab.set('dashboard')"
+    <nav class="flex-grow p-4 space-y-1 overflow-y-auto custom-scrollbar">
+      <div class="px-4 py-2 tech-label opacity-50 whitespace-nowrap" [class.hidden]="isSidebarCollapsed()">Store Management</div>
+      @if (isSidebarCollapsed()) {
+        <div class="h-8 flex items-center justify-center lg:hidden">
+          <div class="h-px w-8 bg-white/5"></div>
+        </div>
+      }
+      
+      <button (click)="activeTab.set('dashboard'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'dashboard'" [class.text-accent]="activeTab() === 'dashboard'"
-        [class.text-accent-muted]="activeTab() !== 'dashboard'">
+        [class.text-accent-muted]="activeTab() !== 'dashboard'"
+        [title]="isSidebarCollapsed() ? 'Dashboard' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">dashboard</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Dashboard</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap lg:opacity-0 lg:group-hover:opacity-100 transition-opacity" 
+              [class.lg:opacity-100]="!isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed() && !isMobileMenuOpen()">Dashboard</span>
       </button>
-      <button (click)="activeTab.set('orders')"
+
+      <button (click)="activeTab.set('orders'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'orders'" [class.text-accent]="activeTab() === 'orders'"
-        [class.text-accent-muted]="activeTab() !== 'orders'">
+        [class.text-accent-muted]="activeTab() !== 'orders'"
+        [title]="isSidebarCollapsed() ? 'Orders' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">shopping_bag</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Orders</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Orders</span>
       </button>
-      <button (click)="activeTab.set('products')"
+
+      <button (click)="activeTab.set('products'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'products'" [class.text-accent]="activeTab() === 'products'"
-        [class.text-accent-muted]="activeTab() !== 'products'">
+        [class.text-accent-muted]="activeTab() !== 'products'"
+        [title]="isSidebarCollapsed() ? 'Product Management' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">inventory_2</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Product Management</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Products</span>
       </button>
-      <button (click)="activeTab.set('categories')"
+
+      <button (click)="activeTab.set('categories'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'categories'" [class.text-accent]="activeTab() === 'categories'"
-        [class.text-accent-muted]="activeTab() !== 'categories'">
+        [class.text-accent-muted]="activeTab() !== 'categories'"
+        [title]="isSidebarCollapsed() ? 'Categories Management' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">category</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Categories Management</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Categories</span>
       </button>
-      <button (click)="activeTab.set('customers')"
+
+      <button (click)="activeTab.set('customers'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'customers'" [class.text-accent]="activeTab() === 'customers'"
-        [class.text-accent-muted]="activeTab() !== 'customers'">
+        [class.text-accent-muted]="activeTab() !== 'customers'"
+        [title]="isSidebarCollapsed() ? 'Customers' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">people</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Customers</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Customers</span>
       </button>
 
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Content Management</div>
-      <button (click)="activeTab.set('hero')"
+      <div class="px-4 py-2 mt-4 tech-label opacity-50 whitespace-nowrap" [class.hidden]="isSidebarCollapsed()">Content Management</div>
+      
+      <button (click)="activeTab.set('hero'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'hero'" [class.text-accent]="activeTab() === 'hero'"
-        [class.text-accent-muted]="activeTab() !== 'hero'">
+        [class.text-accent-muted]="activeTab() !== 'hero'"
+        [title]="isSidebarCollapsed() ? 'Hero Section' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">view_quilt</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Hero Section</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Hero Section</span>
       </button>
-      <button (click)="activeTab.set('about')"
+
+      <button (click)="activeTab.set('about'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'about'" [class.text-accent]="activeTab() === 'about'"
-        [class.text-accent-muted]="activeTab() !== 'about'">
+        [class.text-accent-muted]="activeTab() !== 'about'"
+        [title]="isSidebarCollapsed() ? 'About' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">info</span>
-        <span class="font-medium text-xs uppercase tracking-widest">About</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">About</span>
       </button>
-      <button (click)="activeTab.set('contact')"
+
+      <button (click)="activeTab.set('contact'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'contact'" [class.text-accent]="activeTab() === 'contact'"
-        [class.text-accent-muted]="activeTab() !== 'contact'">
+        [class.text-accent-muted]="activeTab() !== 'contact'"
+        [title]="isSidebarCollapsed() ? 'Contact' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">call</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Contact</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Contact</span>
       </button>
-      <button (click)="activeTab.set('footer')"
+
+      <button (click)="activeTab.set('footer'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'footer'" [class.text-accent]="activeTab() === 'footer'"
-        [class.text-accent-muted]="activeTab() !== 'footer'">
+        [class.text-accent-muted]="activeTab() !== 'footer'"
+        [title]="isSidebarCollapsed() ? 'Footer' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">view_stream</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Footer</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Footer</span>
       </button>
 
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Customer Service</div>
-      <button (click)="activeTab.set('chat')"
+      <div class="px-4 py-2 mt-4 tech-label opacity-50 whitespace-nowrap" [class.hidden]="isSidebarCollapsed()">Communication</div>
+      
+      <button (click)="activeTab.set('chat'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'chat'" [class.text-accent]="activeTab() === 'chat'"
-        [class.text-accent-muted]="activeTab() !== 'chat'">
+        [class.text-accent-muted]="activeTab() !== 'chat'"
+        [title]="isSidebarCollapsed() ? 'Live Chat' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">chat</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Chat</span>
-      </button>
-      <button (click)="activeTab.set('messages')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
-        [class.bg-white/5]="activeTab() === 'messages'" [class.text-accent]="activeTab() === 'messages'"
-        [class.text-accent-muted]="activeTab() !== 'messages'">
-        <span class="material-icons text-lg group-hover:scale-110 transition-transform">email</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Messages</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Chat</span>
       </button>
 
-      <div class="px-4 py-2 mt-4 tech-label opacity-50">Payment Settings</div>
-      <button (click)="activeTab.set('payments')"
+      <button (click)="activeTab.set('messages'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
-        [class.bg-white/5]="activeTab() === 'payments'" [class.text-accent]="activeTab() === 'payments'"
-        [class.text-accent-muted]="activeTab() !== 'payments'">
-        <span class="material-icons text-lg group-hover:scale-110 transition-transform">account_balance_wallet</span>
-        <span class="font-medium text-xs uppercase tracking-widest">Payments</span>
+        [class.bg-white/5]="activeTab() === 'messages'" [class.text-accent]="activeTab() === 'messages'"
+        [class.text-accent-muted]="activeTab() !== 'messages'"
+        [title]="isSidebarCollapsed() ? 'Messages' : ''">
+        <span class="material-icons text-lg group-hover:scale-110 transition-transform">email</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Messages</span>
       </button>
-      <button (click)="activeTab.set('whatsapp')"
+
+      <button (click)="activeTab.set('whatsapp'); isMobileMenuOpen.set(false)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
         [class.bg-white/5]="activeTab() === 'whatsapp'" [class.text-accent]="activeTab() === 'whatsapp'"
-        [class.text-accent-muted]="activeTab() !== 'whatsapp'">
+        [class.text-accent-muted]="activeTab() !== 'whatsapp'"
+        [title]="isSidebarCollapsed() ? 'WhatsApp' : ''">
         <span class="material-icons text-lg group-hover:scale-110 transition-transform">chat_bubble</span>
-        <span class="font-medium text-xs uppercase tracking-widest">WhatsApp</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">WhatsApp</span>
+      </button>
+      
+      <button (click)="activeTab.set('payments'); isMobileMenuOpen.set(false)"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+        [class.bg-white/5]="activeTab() === 'payments'" [class.text-accent]="activeTab() === 'payments'"
+        [class.text-accent-muted]="activeTab() !== 'payments'"
+        [title]="isSidebarCollapsed() ? 'Payments' : ''">
+        <span class="material-icons text-lg group-hover:scale-110 transition-transform">account_balance_wallet</span>
+        <span class="font-medium text-xs uppercase tracking-widest whitespace-nowrap" 
+              [class.hidden]="isSidebarCollapsed()">Payments</span>
       </button>
     </nav>
 
     <div class="p-6 border-t border-white/5">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+        <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent flex-shrink-0">
           <span class="material-icons text-sm">person</span>
         </div>
-        <div class="flex-grow min-w-0">
-          <p class="text-xs font-bold truncate">{{ authService.profile()?.name || 'Admin User' }}</p>
-          <p class="text-[10px] text-accent-muted truncate">System Administrator</p>
+        <div class="flex-grow min-w-0" [class.hidden]="isSidebarCollapsed()">
+          <p class="text-xs font-bold truncate">{{ authService.profile()?.name || 'Admin' }}</p>
+          <p class="text-[10px] text-accent-muted truncate uppercase tracking-tighter">System Admin</p>
         </div>
       </div>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-grow overflow-y-auto bg-[#050505]">
-    <div class="p-12 max-w-7xl mx-auto">
-      <header class="mb-12 flex justify-between items-end">
+  <main class="flex-grow overflow-y-auto bg-[#050505] pt-16 lg:pt-0">
+    <div class="p-4 md:p-12 max-w-7xl mx-auto">
+      <header class="mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <div class="tech-label mb-2">Subsystem / {{ activeTab() | uppercase }}</div>
-          <h1 class="text-5xl font-bold tracking-tighter italic font-serif">{{ getTabDisplayName(activeTab()) }}</h1>
+          <div class="tech-label mb-2 opacity-50">Subsystem / {{ activeTab() | uppercase }}</div>
+          <h1 class="text-3xl md:text-5xl font-bold tracking-tighter font-serif">{{ getTabDisplayName(activeTab()) }}</h1>
         </div>
-        <div class="text-right">
-          <div class="tech-label mb-1">System Clock</div>
-          <div class="tech-value text-xl">{{ '2026-04-09T12:33:41-07:00' | date:'HH:mm:ss' }}</div>
+        <div class="text-left md:text-right w-full md:w-auto p-4 md:p-0 bg-white/[0.02] md:bg-transparent rounded border md:border-0 border-white/5">
+          <div class="tech-label mb-1 opacity-50 uppercase text-[10px]">System Chronometer</div>
+          <div class="tech-value text-xl font-mono text-accent">{{ '2026-04-25T14:28:32' | date:'HH:mm:ss' }}</div>
         </div>
       </header>
 
@@ -158,10 +235,10 @@
             <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">payments</span>
           </div>
           <div class="tech-value text-3xl font-bold mb-1">{{ totalRevenue() | currency:'INR' }}</div>
-          <!-- <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
+          <div class="text-[10px] text-green-500 flex items-center gap-1 font-mono">
             <span class="material-icons text-[10px]">trending_up</span>
             +12.5% VS PREVIOUS PERIOD
-          </div> -->
+          </div>
         </div>
 
         <div class="tech-card p-6 group hover:border-accent/30 transition-colors">
@@ -386,12 +463,12 @@
               </div>
             </div>
 
-            <div class="md:col-span-3 pt-6 border-t border-white/5 flex gap-4">
-              <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs" [disabled]="isUploading()">
+            <div class="md:col-span-3 pt-6 border-t border-white/5 flex flex-col sm:flex-row gap-4">
+              <button (click)="saveProduct()" class="metallic-button py-2 px-8 text-xs w-full sm:w-auto" [disabled]="isUploading()">
                 {{ isUploading() ? 'Saving...' : (editingProduct() ? 'Update Product' : 'Save Product') }}
               </button>
               <button (click)="cancelProductEdit()"
-                class="metallic-button-outline py-2 px-8 text-xs">Cancel</button>
+                class="metallic-button-outline py-2 px-8 text-xs w-full sm:w-auto">Cancel</button>
             </div>
           </div>
         </div>
@@ -538,10 +615,10 @@
 
       <!-- Chat View -->
       @if (activeTab() === 'chat') {
-      <div class="tech-card h-[700px] flex overflow-hidden">
+      <div class="tech-card h-full min-h-[600px] lg:h-[700px] flex flex-col md:flex-row overflow-hidden">
         <!-- Chat List -->
-        <div class="w-80 border-r border-white/5 flex flex-col bg-white/[0.02]">
-          <div class="p-4 border-b border-white/5 bg-white/[0.02]">
+        <div [class.hidden]="chatService.selectedChat()" class="md:flex w-full md:w-80 border-r border-white/5 flex flex-col bg-white/[0.02]">
+          <div class="p-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
             <h3 class="tech-label">Active Sessions</h3>
           </div>
           <div class="flex-grow overflow-y-auto">
@@ -551,12 +628,12 @@
               [class.bg-accent/10]="chatService.selectedChat()?.id === chat.id">
               <div class="flex justify-between items-start mb-1">
                 <span class="text-xs font-bold truncate pr-2" [class.text-accent]="chatService.selectedChat()?.id === chat.id">
-                  {{ chat.customer_name }}
+                  {{ chat.customerName }}
                 </span>
-                <span class="text-[8px] font-mono opacity-40">{{ chat.last_message_at | date:'HH:mm' }}</span>
+                <span class="text-[8px] font-mono opacity-40">{{ chat.lastMessageAt | date:'HH:mm' }}</span>
               </div>
               <p class="text-[10px] text-accent-muted truncate opacity-70 group-hover:opacity-100 transition-opacity">
-                {{ chat.last_message }}
+                {{ chat.lastMessage }}
               </p>
               @if (chatService.selectedChat()?.id === chat.id) {
               <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-accent"></div>
@@ -570,53 +647,56 @@
           </div>
         </div>
         <!-- Chat Window -->
-        <div class="flex-grow flex flex-col bg-black/20">
+        <div [class.flex]="chatService.selectedChat()" [class.hidden]="!chatService.selectedChat()" class="md:flex flex-grow flex flex-col bg-black/20 overflow-hidden">
           @if (chatService.selectedChat()) {
-          <div class="tech-header border-b border-white/5">
+          <div class="tech-header border-b border-white/5 flex flex-wrap gap-4">
             <div class="flex items-center gap-3">
+              <button (click)="chatService.selectChat(null)" class="md:hidden text-accent-muted">
+                <span class="material-icons">arrow_back</span>
+              </button>
               <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span class="tech-label">Chatting with {{ chatService.selectedChat()?.customer_name }}</span>
+              <span class="tech-label truncate max-w-[150px]">Chatting with {{ chatService.selectedChat()?.customerName }}</span>
             </div>
-            <div class="flex items-center gap-4">
-              <span class="tech-label text-[10px] opacity-50">UID: {{ chatService.selectedChat()?.customer_id }}</span>
+            <div class="flex items-center gap-4 ml-auto">
+              <span class="hidden sm:inline tech-label text-[10px] opacity-50">UID: {{ chatService.selectedChat()?.customerId }}</span>
               <button (click)="closeChat()" class="text-red-500 hover:text-red-400 tech-label text-[10px]">Close Session</button>
             </div>
           </div>
 
-          <div class="flex-grow overflow-y-auto p-8 space-y-6">
+          <div class="flex-grow overflow-y-auto p-4 sm:p-8 space-y-6">
             @for (msg of chatService.messages(); track msg.timestamp) {
-            <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.profile()?.id">
+            <div class="flex flex-col" [class.items-end]="msg.sender_id === authService.user()?.uid">
               <div class="flex items-center gap-2 mb-2 px-1">
                 <span class="tech-label text-[8px] opacity-70">{{ msg.sender_name }}</span>
                 <span class="tech-value text-[8px] opacity-40">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
               </div>
-              <div class="max-w-[70%] p-4 rounded-lg text-sm font-mono border"
-                [class.bg-accent]="msg.sender_id === authService.profile()?.id"
-                [class.text-metallic-black]="msg.sender_id === authService.profile()?.id"
-                [class.border-accent]="msg.sender_id === authService.profile()?.id"
-                [class.bg-white/5]="msg.sender_id !== authService.profile()?.id"
-                [class.border-white/10]="msg.sender_id !== authService.profile()?.id">
+              <div class="max-w-[85%] md:max-w-[70%] p-4 rounded-lg text-sm font-mono border"
+                [class.bg-accent]="msg.sender_id === authService.user()?.uid"
+                [class.text-metallic-black]="msg.sender_id === authService.user()?.uid"
+                [class.border-accent]="msg.sender_id === authService.user()?.uid"
+                [class.bg-white/5]="msg.sender_id !== authService.user()?.uid"
+                [class.border-white/10]="msg.sender_id !== authService.user()?.uid">
                 {{ msg.text }}
               </div>
             </div>
             }
           </div>
 
-          <div class="p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
+          <div class="p-4 sm:p-6 border-t border-white/5 bg-white/[0.02] space-y-4">
             <div class="flex flex-wrap gap-2">
               @for (reply of quickReplies; track reply) {
               <button (click)="chatMessage = reply; sendMessage()"
-                class="tech-label text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded">
+                class="tech-label text-[7px] sm:text-[8px] px-2 py-1 border border-white/10 hover:border-accent/50 hover:text-accent transition-all rounded">
                 {{ reply }}
               </button>
               }
             </div>
-            <div class="flex gap-4">
+            <div class="flex gap-2 sm:gap-4">
               <input type="text" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()"
-                placeholder="Type your message..." class="input-field font-mono text-sm">
-              <button (click)="sendMessage()" class="metallic-button px-8 flex items-center gap-2">
+                placeholder="Type..." class="input-field font-mono text-sm">
+              <button (click)="sendMessage()" class="metallic-button px-4 sm:px-8 flex items-center gap-2">
                 <span class="material-icons text-sm">send</span>
-                Send
+                <span class="hidden xs:inline">Send</span>
               </button>
             </div>
           </div>
@@ -636,7 +716,7 @@
         <div class="tech-header">
           <span class="tech-label">WhatsApp Configuration</span>
         </div>
-        <div class="p-8 space-y-6">
+        <div class="p-4 sm:p-8 space-y-6">
           <div class="flex items-center gap-3">
             <input id="w-enabled" type="checkbox" [(ngModel)]="whatsappSettings.apiEnabled"
               class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent">
@@ -707,13 +787,13 @@
               </button>
             </div>
 
-            <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div class="space-y-6">
-                <div class="space-y-2">
-                  <label [for]="'h-title-' + $index" class="tech-label">Title</label>
-                  <input [id]="'h-title-' + $index" type="text" [(ngModel)]="slide.title"
-                    class="input-field font-serif italic text-lg" placeholder="Main Heading">
-                </div>
+            <div class="space-y-2">
+              <label [for]="'h-title-' + $index" class="tech-label">Title</label>
+              <input [id]="'h-title-' + $index" type="text" [(ngModel)]="slide.title"
+                class="input-field font-bold text-lg uppercase" placeholder="Main Heading">
+            </div>
                 <div class="space-y-2">
                   <label [for]="'h-sub-' + $index" class="tech-label">Subtitle</label>
                   <textarea [id]="'h-sub-' + $index" [(ngModel)]="slide.subtitle" class="input-field text-sm" rows="3"
@@ -779,12 +859,12 @@
         <div class="tech-header">
           <span class="tech-label">Identity Management Module</span>
         </div>
-        <div class="p-8 space-y-8">
+        <div class="p-4 sm:p-8 space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-2">
               <label for="a-title" class="tech-label">Corporate Headline</label>
               <input id="a-title" type="text" [(ngModel)]="aboutForm().title"
-                class="input-field font-serif italic text-xl" placeholder="About Us">
+                class="input-field font-bold text-xl uppercase" placeholder="About Us">
             </div>
             <div class="space-y-2">
               <label for="a-subtitle" class="tech-label">Narrative Subtitle</label>
@@ -883,7 +963,7 @@
         <div class="tech-header">
           <span class="tech-label">Communication Protocol Config</span>
         </div>
-        <div class="p-8 space-y-8">
+        <div class="p-4 sm:p-8 space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-2">
               <label for="c-email" class="tech-label">Email Uplink</label>
@@ -920,7 +1000,7 @@
         <div class="tech-header">
           <span class="tech-label">Footer Configuration Module</span>
         </div>
-        <div class="p-8 space-y-8">
+        <div class="p-4 sm:p-8 space-y-8">
           <div class="space-y-2">
             <label for="f-desc" class="tech-label">Footer Description</label>
             <textarea id="f-desc" [(ngModel)]="footerForm().description" class="input-field text-sm leading-relaxed"
@@ -966,7 +1046,7 @@
           <div class="space-y-2">
             <label for="f-copy" class="tech-label">Copyright Text</label>
             <input id="f-copy" type="text" [(ngModel)]="footerForm().copyrightText" class="input-field text-sm"
-              placeholder="© 2026 IDEA Zone 3D. All rights reserved.">
+              placeholder="© 2026 IDEAZONE 3D. All rights reserved.">
           </div>
 
           <div class="pt-8 border-t border-white/5">
@@ -994,7 +1074,7 @@
           <div class="tech-header">
             <span class="tech-label">Taxonomy Provisioning Module</span>
           </div>
-          <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-4 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-4">
               <div class="space-y-2">
                 <label for="c-name" class="tech-label">Designation</label>
@@ -1204,7 +1284,7 @@
             <span class="tech-label text-[10px]">{{ razorpayForm().enabled ? 'ACTIVE' : 'INACTIVE' }}</span>
           </div>
         </div>
-        <div class="p-8 space-y-8">
+        <div class="p-4 sm:p-8 space-y-8">
           <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
             <div>
               <h3 class="font-bold text-sm">Enable Razorpay</h3>

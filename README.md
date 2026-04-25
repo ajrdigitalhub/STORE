@@ -1,4 +1,4 @@
-# IDEA Zone 3D - E-commerce Platform
+# IDEAZONE 3D - E-commerce Platform
 
 A full-stack 3D printing e-commerce application built with Angular and Node.js. This platform allows users to browse 3D printed products, manage categories, place orders, and communicate via real-time chat.
 

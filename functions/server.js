@@ -16,7 +16,7 @@ async function initDB() {
       );
     `);
 
-    // Add customization fields to products if they don't exist
+    // Add customizations fields to products if they don't exist
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -27,6 +27,18 @@ async function initDB() {
           ALTER TABLE products ADD COLUMN customization_type VARCHAR(50) DEFAULT 'none';
         END IF;
       END $$;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) NOT NULL,
+          subject VARCHAR(255),
+          message TEXT NOT NULL,
+          status VARCHAR(50) DEFAULT 'new',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     await pool.query(`

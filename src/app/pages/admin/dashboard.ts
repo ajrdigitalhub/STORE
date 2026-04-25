@@ -53,6 +53,8 @@ export class AdminDashboardComponent implements AfterViewInit {
   private el = inject(ElementRef);
 
   activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'whatsapp' | 'hero' | 'footer'>('dashboard');
+  isSidebarCollapsed = signal(false);
+  isMobileMenuOpen = signal(false);
   showProductForm = signal(false);
   editingProduct = signal<Product | null>(null);
   showCategoryForm = signal(false);
@@ -62,7 +64,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Your order is currently being processed.',
     'We offer a variety of materials including PLA, PETG, and ABS.',
     'Please share your order ID for further assistance.',
-    'Thank you for reaching out to IDEA Zone 3D!'
+    'Thank you for reaching out to IDEAZONE 3D!'
   ];
 
   whatsappSettings = {
@@ -213,8 +215,8 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async loadMessages() {
     try {
-      const res = await this.http.get<Message[]>('/api/messages').toPromise();
-      if (res) this.messages.set(res);
+      const res = await this.http.get<{ messages: Message[] }>('/api/messages').toPromise();
+      if (res?.messages) this.messages.set(res.messages);
     } catch (error) {
       console.error('Failed to load messages', error);
     }
@@ -375,6 +377,12 @@ export class AdminDashboardComponent implements AfterViewInit {
         this.toastService.show('Maximum 3 images allowed per product', 'error');
         return;
       }
+      
+      // Check file sizes
+      for (const file of Array.from(files)) {
+        if (!this.checkFileSize(file)) return;
+      }
+
       this.isUploading.set(true);
       try {
         const urls = await this.uploadService.uploadImages(files);
@@ -392,6 +400,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
+      if (!this.checkFileSize(file)) return;
       this.isUploading.set(true);
       try {
         const url = await this.uploadService.uploadImage(file);
@@ -406,6 +415,15 @@ export class AdminDashboardComponent implements AfterViewInit {
         this.isUploading.set(false);
       }
     }
+  }
+
+  private checkFileSize(file: File): boolean {
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      this.toastService.show(`File ${file.name} is too large. Maximum size is 2MB.`, 'error');
+      return false;
+    }
+    return true;
   }
 
   addHeroSlide() {
@@ -535,6 +553,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
+      if (!this.checkFileSize(file)) return;
       this.isUploading.set(true);
       try {
         const url = await this.uploadService.uploadImage(file);
@@ -552,6 +571,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
+      if (!this.checkFileSize(file)) return;
       this.isUploading.set(true);
       try {
         const url = await this.uploadService.uploadImage(file);
@@ -589,12 +609,20 @@ export class AdminDashboardComponent implements AfterViewInit {
     const selected = this.chatService.selectedChat();
     if (selected && confirm('Are you sure you want to close this chat session?')) {
       try {
-        await this.http.post(`/api/chats/${selected.id}/status`, { isActive: false }).toPromise();
+        await this.chatService.closeChat(selected.id);
         this.toastService.show('Chat session closed', 'success');
-        this.chatService.loadActiveChats();
       } catch (error) {
         console.error('Failed to close chat', error);
+        this.toastService.show('Failed to close session', 'error');
       }
     }
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed.update(v => !v);
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.update(v => !v);
   }
 }

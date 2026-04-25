@@ -103,9 +103,9 @@ export class ConfigService {
       ]
     },
     about: {
-      title: 'About IDEA Zone 3D',
+      title: 'About IDEAZONE 3D',
       subtitle: 'Pioneering the future of additive manufacturing with precision and passion.',
-      content: 'Founded in 2020, IDEA Zone 3D started with a simple mission: to make industrial-grade 3D printing accessible to everyone. What began as a small workshop with two printers has evolved into a state-of-the-art fabrication hub serving clients across the globe.\n\nWe believe that the only limit to what you can create should be your imagination. Our team of engineers and designers works tirelessly to push the boundaries of what\'s possible with 3D printing technology, from rapid prototyping to final production parts.',
+      content: 'Founded in 2020, IDEAZONE 3D started with a simple mission: to make industrial-grade 3D printing accessible to everyone. What began as a small workshop with two printers has evolved into a state-of-the-art fabrication hub serving clients across the globe.\n\nWe believe that the only limit to what you can create should be your imagination. Our team of engineers and designers works tirelessly to push the boundaries of what\'s possible with 3D printing technology, from rapid prototyping to final production parts.',
       imageUrl: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=2000',
       mission: 'To empower creators by providing the most advanced, reliable, and accessible 3D printing solutions in the industry.',
       vision: 'To become the global standard for on-demand manufacturing, where any idea can be transformed into a physical reality within hours.',
@@ -116,7 +116,7 @@ export class ConfigService {
       ]
     },
     contact: {
-      email: 'contact@ideazone3d.com',
+      email: 'contact@IDEAZONE 3D.com',
       phone: '+1 (555) 123-4567',
       address: '123 Maker Street, Innovation City, Tech State 10101',
       mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.097746536531!2d-122.39568368468205!3d37.79252897975618!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085806255555555%3A0x1234567890abcdef!2sTech%20Hub!5e0!3m2!1sen!2sus!4v1611234567890!5m2!1sen!2sus'
@@ -128,7 +128,7 @@ export class ConfigService {
         { platform: 'Twitter', url: '#', icon: 'share' },
         { platform: 'Instagram', url: '#', icon: 'camera_alt' }
       ],
-      copyrightText: '© 2026 IDEA Zone 3D. All rights reserved.'
+      copyrightText: '© 2026 IDEAZONE 3D. All rights reserved.'
     },
     razorpay: {
       keyId: '',

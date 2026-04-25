@@ -20,7 +20,7 @@ import { ConfigService } from '../services/config';
         
         <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
           <div class="tech-label mb-6 inline-block px-4 py-1 border border-accent/30 rounded-full bg-accent/5">Established 2020</div>
-          <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 italic font-serif leading-none">
+          <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 leading-none">
             {{ configService.config().about.title }}
           </h1>
           <p class="text-xl md:text-2xl text-accent-muted max-w-2xl mx-auto font-light leading-relaxed">
@@ -103,7 +103,7 @@ import { ConfigService } from '../services/config';
       <!-- CTA Section -->
       <section class="py-32 px-4 bg-accent/5 border-y border-white/5">
         <div class="max-w-4xl mx-auto text-center">
-          <h2 class="text-4xl md:text-5xl font-bold mb-8 italic font-serif">Ready to bring your ideas to life?</h2>
+          <h2 class="text-4xl md:text-5xl font-bold mb-8">Ready to bring your ideas to life?</h2>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a routerLink="/products" class="metallic-button px-10 py-4 text-lg">Browse Collection</a>
             <a routerLink="/contact" class="metallic-button-outline px-10 py-4 text-lg">Contact Our Team</a>

@@ -2,17 +2,16 @@
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
     <div class="space-y-6">
       <a routerLink="/" class="text-2xl font-display font-bold tracking-tighter text-white">
-        IDEA Zone 3D
+        IDEAZONE 3D
       </a>
       <p class="text-accent-muted text-sm leading-relaxed">
         {{ configService.config().footer.description }}
       </p>
       <div class="flex gap-4">
         @for (link of configService.config().footer.socialLinks; track link.platform) {
-        <a [href]="link.url" target="_blank"
-          class="w-10 h-10 rounded-full bg-metallic-light flex items-center justify-center text-accent hover:bg-accent hover:text-metallic-black transition-all">
-          <span class="material-icons text-sm">{{ link.icon }}</span>
-        </a>
+          <a [href]="link.url" target="_blank" class="w-10 h-10 rounded-full bg-metallic-light flex items-center justify-center text-accent hover:bg-accent hover:text-metallic-black transition-all">
+            <span class="material-icons text-sm">{{ link.icon }}</span>
+          </a>
         }
       </div>
     </div>
@@ -56,15 +55,11 @@
     </div>
   </div>
 
-  <div
-    class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest">
+  <div class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest">
     <p>
-      {{ configService.config().footer.copyrightText }} |
-      <a href="https://www.instagram.com/ajr_digital_hub" target="_blank"
-        class="text-accent font-bold animate-pulse drop-shadow-[0_0_8px_currentColor] hover:text-white transition-all">Developed
-        BY AJR DIGITAL HUB</a>
+      {{ configService.config().footer.copyrightText }} | 
+      <a href="https://www.instagram.com/ajrdigitalhub" target="_blank" class="text-accent font-bold animate-pulse drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:text-white transition-all">Developed BY AJR DIGITAL HUB</a>
     </p>
-
     <div class="flex gap-8">
       <a routerLink="/terms" class="hover:text-white transition-colors">Terms of Service</a>
       <a routerLink="/returns" class="hover:text-white transition-colors">Return Policy</a>

@@ -19,7 +19,7 @@ class PaymentConfig {
       return await this.create({
         razorpay_keyid: '',
         razorpay_key_secret: '',
-        merchant_name: 'IDEAZONE3D',
+        merchant_name: 'IDEAZONE 3D',
         merchant_logo: ''
       });
     }
@@ -28,7 +28,7 @@ class PaymentConfig {
 
   // Create config
   static async create(configData) {
-    const { razorpay_keyid, razorpay_key_secret, merchant_name = 'IDEAZONE3D', merchant_logo = '' } = configData;
+    const { razorpay_keyid, razorpay_key_secret, merchant_name = 'IDEAZONE 3D', merchant_logo = '' } = configData;
 
     const query = `
       INSERT INTO payment_configs (razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo)

@@ -46,7 +46,7 @@ import { animate, stagger } from "motion";
         
         @if (configService.config().hero.slides[currentImageIndex()]; as currentSlide) {
           <div class="overflow-hidden mb-6">
-            <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.9] text-white hero-title">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-white hero-title">
               @let titleParts = currentSlide.title.split(' ');
               @for (part of titleParts; track $index) {
                 <span class="block overflow-hidden">
@@ -57,7 +57,7 @@ import { animate, stagger } from "motion";
           </div>
           
           <div class="max-w-2xl mx-auto overflow-hidden mb-12">
-            <p class="text-base md:text-lg text-white/60 font-light leading-relaxed subtitle text-balance">
+            <p class="text-sm md:text-base text-white/60 font-light leading-relaxed subtitle text-balance">
               {{ currentSlide.subtitle }}
             </p>
           </div>
@@ -91,12 +91,6 @@ import { animate, stagger } from "motion";
           }
         </div>
       }
-      
-      <!-- Scroll Hint -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-30">
-        <span class="text-[10px] uppercase tracking-widest text-white">Scroll</span>
-        <div class="w-px h-12 bg-gradient-to-b from-white to-transparent"></div>
-      </div>
     </section>
   `,
   styles: [`
