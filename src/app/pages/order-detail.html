@@ -5,135 +5,141 @@
       <a routerLink="/" class="hover:text-accent transition-colors">Home</a>
       <span class="material-icons text-[10px]">chevron_right</span>
       @if (authService.isAdmin()) {
-        <a routerLink="/admin" class="hover:text-accent transition-colors">Admin</a>
+      <a routerLink="/admin" class="hover:text-accent transition-colors">Admin</a>
       } @else {
-        <a routerLink="/profile" class="hover:text-accent transition-colors">Profile</a>
+      <a routerLink="/profile" class="hover:text-accent transition-colors">Profile</a>
       }
       <span class="material-icons text-[10px]">chevron_right</span>
       <span class="text-accent">Order Details</span>
     </nav>
 
     @if (isLoading()) {
-      <div class="space-y-8">
-        <div class="flex justify-between items-end">
-          <div class="space-y-2">
-            <app-skeleton width="200px" height="2.5rem"></app-skeleton>
-            <app-skeleton width="150px" height="1rem"></app-skeleton>
-          </div>
-          <app-skeleton width="120px" height="2rem" className="rounded-full"></app-skeleton>
+    <div class="space-y-8">
+      <div class="flex justify-between items-end">
+        <div class="space-y-2">
+          <app-skeleton width="200px" height="2.5rem"></app-skeleton>
+          <app-skeleton width="150px" height="1rem"></app-skeleton>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <app-skeleton height="200px" className="rounded-3xl"></app-skeleton>
-          <app-skeleton height="200px" className="rounded-3xl"></app-skeleton>
-        </div>
-        <app-skeleton height="400px" className="rounded-3xl"></app-skeleton>
+        <app-skeleton width="120px" height="2rem" className="rounded-full"></app-skeleton>
       </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <app-skeleton height="200px" className="rounded-3xl"></app-skeleton>
+        <app-skeleton height="200px" className="rounded-3xl"></app-skeleton>
+      </div>
+      <app-skeleton height="400px" className="rounded-3xl"></app-skeleton>
+    </div>
     } @else if (order(); as o) {
-      <div class="space-y-8">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-          <div>
-            <h1 class="text-4xl font-bold tracking-tighter mb-2">Order {{ o.order_number }}</h1>
-            <p class="text-accent-muted">Placed on {{ o.created_at | date:'medium' }}</p>
+    <div class="space-y-8">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+          <h1 class="text-4xl font-bold tracking-tighter mb-2">Order {{ o.order_number }}</h1>
+          <p class="text-accent-muted">Placed on {{ o.created_at | date:'medium' }}</p>
+        </div>
+        <div class="flex gap-3">
+          <span
+            [class]="'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest ' + getStatusColor(o.order_status)">
+            {{ o.order_status }}
+          </span>
+          <span
+            [class]="'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest ' + (o.payment_status === 'paid' ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10')">
+            {{ o.payment_status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Shipping Address -->
+        <div class="glass-card p-4 sm:p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="material-icons text-accent">local_shipping</span>
+            <h3 class="text-lg font-bold">Shipping Address</h3>
           </div>
-          <div class="flex gap-3">
-            <span [class]="'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest ' + getStatusColor(o.order_status)">
-              {{ o.order_status }}
-            </span>
-            <span [class]="'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest ' + (o.payment_status === 'paid' ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10')">
-              {{ o.payment_status }}
-            </span>
+          <div class="space-y-1 text-accent-muted">
+            <p class="text-white font-bold">{{ o.shipping_address.name }}</p>
+            <p>{{ o.shipping_address.address }}</p>
+            <p>{{ o.shipping_address.city }}, {{ o.shipping_address.state }} {{ o.shipping_address.zip }}</p>
+            <p class="pt-4 flex items-center gap-2">
+              <span class="material-icons text-xs">phone</span>
+              {{ o.shipping_address.phone }}
+            </p>
+            <p class="flex items-center gap-2">
+              <span class="material-icons text-xs">email</span>
+              {{ o.shipping_address.email }}
+            </p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <!-- Shipping Address -->
-          <div class="glass-card p-4 sm:p-8">
-            <div class="flex items-center gap-3 mb-6">
-              <span class="material-icons text-accent">local_shipping</span>
-              <h3 class="text-lg font-bold">Shipping Address</h3>
-            </div>
-            <div class="space-y-1 text-accent-muted">
-              <p class="text-white font-bold">{{ o.shipping_address.name }}</p>
-              <p>{{ o.shipping_address.address }}</p>
-              <p>{{ o.shipping_address.city }}, {{ o.shipping_address.state }} {{ o.shipping_address.zip }}</p>
-              <p class="pt-4 flex items-center gap-2">
-                <span class="material-icons text-xs">phone</span>
-                {{ o.shipping_address.phone }}
-              </p>
-              <p class="flex items-center gap-2">
-                <span class="material-icons text-xs">email</span>
-                {{ o.shipping_address.email }}
-              </p>
-            </div>
+        <!-- Payment Info -->
+        <div class="glass-card p-4 sm:p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="material-icons text-accent">payments</span>
+            <h3 class="text-lg font-bold">Payment Information</h3>
           </div>
-
-          <!-- Payment Info -->
-          <div class="glass-card p-4 sm:p-8">
-            <div class="flex items-center gap-3 mb-6">
-              <span class="material-icons text-accent">payments</span>
-              <h3 class="text-lg font-bold">Payment Information</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Method</p>
+              <p class="font-bold uppercase">{{ o.payment_method }}</p>
             </div>
-            <div class="space-y-4">
-              <div>
-                <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Method</p>
-                <p class="font-bold uppercase">{{ o.payment_method }}</p>
-              </div>
-              @if (o.razorpay_orderid) {
-                <div>
-                  <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Razorpay Order ID</p>
-                  <p class="font-mono text-xs">{{ o.razorpay_orderid }}</p>
-                </div>
-              }
-              @if (o.razorpay_paymentid) {
-                <div>
-                  <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Razorpay Payment ID</p>
-                  <p class="font-mono text-xs">{{ o.razorpay_paymentid }}</p>
-                </div>
-              }
+            @if (o.razorpay_orderid) {
+            <div>
+              <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Razorpay Order ID</p>
+              <p class="font-mono text-xs">{{ o.razorpay_orderid }}</p>
             </div>
+            }
+            @if (o.razorpay_paymentid) {
+            <div>
+              <p class="text-xs text-accent-muted uppercase tracking-widest mb-1">Razorpay Payment ID</p>
+              <p class="font-mono text-xs">{{ o.razorpay_paymentid }}</p>
+            </div>
+            }
           </div>
         </div>
+      </div>
 
-        <!-- Items -->
-        <div class="glass-card overflow-hidden">
-          <div class="p-4 sm:p-8 border-b border-white/5">
-            <h3 class="text-lg font-bold">Order Items</h3>
-          </div>
-          <div class="divide-y divide-white/5">
-            @for (item of o.items; track item.product) {
+      <!-- Items -->
+      <div class="glass-card overflow-hidden">
+        <div class="p-4 sm:p-8 border-b border-white/5">
+          <h3 class="text-lg font-bold">Order Items</h3>
+        </div>
+        <div class="divide-y divide-white/5">
+          @for (item of o.items; track item.product) {
           <div class="p-4 sm:p-8 flex items-center gap-6 flex-col sm:flex-row">
-            <img [src]="item.image" [alt]="item.name" class="w-20 h-20 rounded-xl object-cover border border-white/10" referrerpolicy="no-referrer">
+            <img [src]="item.image" [alt]="item.name" class="w-20 h-20 rounded-xl object-cover border border-white/10"
+              referrerpolicy="no-referrer">
             <div class="flex-grow w-full text-center sm:text-left">
               <h4 class="font-bold text-lg mb-1">{{ item.name }}</h4>
               <p class="text-sm text-accent-muted">Quantity: {{ item.quantity }}</p>
-              
+
               @if (item.customization) {
-                <div class="mt-2 p-3 bg-accent/5 border border-accent/10 rounded-lg space-y-2 text-left">
-                  <div class="flex items-center gap-2 text-accent">
-                    <span class="material-icons text-xs">auto_awesome</span>
-                    <span class="text-[10px] uppercase font-bold tracking-widest">Customization Details</span>
-                  </div>
-                  
-                  @if (item.customization.text) {
-                    <div class="space-y-1">
-                      <p class="text-[9px] text-accent-muted uppercase tracking-widest">Custom Text</p>
-                      <p class="text-sm font-mono text-white">{{ item.customization.text }}</p>
-                    </div>
-                  }
-                  
-                  @if (item.customization.image) {
-                    <div class="space-y-1">
-                      <p class="text-[9px] text-accent-muted uppercase tracking-widest">Custom Design</p>
-                      <a [href]="item.customization.image" target="_blank" class="block relative w-16 h-16 group mx-auto sm:mx-0">
-                        <img [src]="item.customization.image" alt="Custom Design" class="w-full h-full object-cover rounded border border-white/10" referrerpolicy="no-referrer">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span class="material-icons text-white text-xs">open_in_new</span>
-                        </div>
-                      </a>
-                    </div>
-                  }
+              <div class="mt-2 p-3 bg-accent/5 border border-accent/10 rounded-lg space-y-2 text-left">
+                <div class="flex items-center gap-2 text-accent">
+                  <span class="material-icons text-xs">auto_awesome</span>
+                  <span class="text-[10px] uppercase font-bold tracking-widest">Customization Details</span>
                 </div>
+
+                @if (item.customization.text) {
+                <div class="space-y-1">
+                  <p class="text-[9px] text-accent-muted uppercase tracking-widest">Custom Text</p>
+                  <p class="text-sm font-mono text-white">{{ item.customization.text }}</p>
+                </div>
+                }
+
+                @if (item.customization.image) {
+                <div class="space-y-1">
+                  <p class="text-[9px] text-accent-muted uppercase tracking-widest">Custom Design</p>
+                  <a [href]="item.customization.image" target="_blank"
+                    class="block relative w-16 h-16 group mx-auto sm:mx-0">
+                    <img [src]="item.customization.image" alt="Custom Design"
+                      class="w-full h-full object-cover rounded border border-white/10" referrerpolicy="no-referrer">
+                    <div
+                      class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span class="material-icons text-white text-xs">open_in_new</span>
+                    </div>
+                  </a>
+                </div>
+                }
+              </div>
               }
             </div>
             <div class="text-center sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-0 border-white/5">
@@ -141,74 +147,81 @@
               <p class="text-xs text-accent-muted">Total: {{ (item.price * item.quantity) | currency:'INR' }}</p>
             </div>
           </div>
-            }
-          </div>
-          <div class="bg-white/5 p-4 sm:p-8">
-            <div class="max-w-xs ml-auto space-y-4">
-              <div class="flex justify-between text-accent-muted">
-                <span>Subtotal</span>
-                <span>{{ o.total_amount | currency:'INR' }}</span>
-              </div>
-              <div class="flex justify-between text-accent-muted">
-                <span>Shipping</span>
-                <span class="text-green-500">FREE</span>
-              </div>
-              <div class="flex justify-between text-xl font-bold pt-4 border-t border-white/10">
-                <span>Total</span>
-                <span class="text-accent">{{ o.total_amount | currency:'INR' }}</span>
-              </div>
+          }
+        </div>
+        <div class="bg-white/5 p-4 sm:p-8">
+          <div class="max-w-xs ml-auto space-y-4">
+            <div class="flex justify-between text-accent-muted">
+              <span>Subtotal</span>
+              <span>{{ (o.total_amount - (o.gst_amount || 0) - (o.shipping_charge || 0)) | currency:'INR' }}</span>
+            </div>
+            <div class="flex justify-between text-accent-muted">
+              <span>GST (18%)</span>
+              <span>{{ o.gst_amount | currency:'INR' }}</span>
+            </div>
+            <div class="flex justify-between text-accent-muted">
+              <span>Shipping</span>
+              @if (o.shipping_charge && o.shipping_charge > 0) {
+              <span>{{ o.shipping_charge | currency:'INR' }}</span>
+              } @else {
+              <span class="text-green-500">FREE</span>
+              }
+            </div>
+            <div class="flex justify-between text-xl font-bold pt-4 border-t border-white/10">
+              <span>Total</span>
+              <span class="text-accent">{{ o.total_amount | currency:'INR' }}</span>
             </div>
           </div>
         </div>
+      </div>
 
-        @if (authService.isAdmin()) {
-          <div class="glass-card p-4 sm:p-8 border-accent/20">
-            <div class="flex items-center gap-3 mb-6">
-              <span class="material-icons text-accent">admin_panel_settings</span>
-              <h3 class="text-lg font-bold">Admin: Update Order Status</h3>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div class="space-y-2">
-                <label for="orderStatus" class="text-xs text-accent-muted uppercase tracking-widest">Order Status</label>
-                <select id="orderStatus" [(ngModel)]="selectedOrderStatus" class="input-field py-3">
-                  @for (status of orderStatuses; track status) {
-                    <option [value]="status">{{ status | uppercase }}</option>
-                  }
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label for="paymentStatus" class="text-xs text-accent-muted uppercase tracking-widest">Payment Status</label>
-                <select id="paymentStatus" [(ngModel)]="selectedPaymentStatus" class="input-field py-3">
-                  @for (status of paymentStatuses; track status) {
-                    <option [value]="status">{{ status | uppercase }}</option>
-                  }
-                </select>
-              </div>
-            </div>
+      @if (authService.isAdmin()) {
+      <div class="glass-card p-4 sm:p-8 border-accent/20">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="material-icons text-accent">admin_panel_settings</span>
+          <h3 class="text-lg font-bold">Admin: Update Order Status</h3>
+        </div>
 
-            <div class="flex justify-end gap-4">
-               <button 
-                (click)="updateStatus()" 
-                [disabled]="isUpdating()"
-                class="metallic-button px-12 py-3 text-xs uppercase tracking-widest flex items-center gap-2"
-               >
-                @if (isUpdating()) {
-                  <span class="material-icons animate-spin text-sm">refresh</span>
-                }
-                Update Order
-               </button>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="space-y-2">
+            <label for="orderStatus" class="text-xs text-accent-muted uppercase tracking-widest">Order Status</label>
+            <select id="orderStatus" [(ngModel)]="selectedOrderStatus" class="input-field py-3">
+              @for (status of orderStatuses; track status) {
+              <option [value]="status">{{ status | uppercase }}</option>
+              }
+            </select>
           </div>
-        }
+          <div class="space-y-2">
+            <label for="paymentStatus" class="text-xs text-accent-muted uppercase tracking-widest">Payment
+              Status</label>
+            <select id="paymentStatus" [(ngModel)]="selectedPaymentStatus" class="input-field py-3">
+              @for (status of paymentStatuses; track status) {
+              <option [value]="status">{{ status | uppercase }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+          <button (click)="updateStatus()" [disabled]="isUpdating()"
+            class="metallic-button px-12 py-3 text-xs uppercase tracking-widest flex items-center gap-2">
+            @if (isUpdating()) {
+            <span class="material-icons animate-spin text-sm">refresh</span>
+            }
+            Update Order
+          </button>
+        </div>
       </div>
+      }
+    </div>
     } @else {
-      <div class="glass-card p-24 text-center">
-        <span class="material-icons text-6xl text-accent-muted mb-6">search_off</span>
-        <h2 class="text-2xl font-bold mb-2">Order Not Found</h2>
-        <p class="text-accent-muted mb-8">The order you're looking for doesn't exist or you don't have permission to view it.</p>
-        <a routerLink="/" class="metallic-button">Return Home</a>
-      </div>
+    <div class="glass-card p-24 text-center">
+      <span class="material-icons text-6xl text-accent-muted mb-6">search_off</span>
+      <h2 class="text-2xl font-bold mb-2">Order Not Found</h2>
+      <p class="text-accent-muted mb-8">The order you're looking for doesn't exist or you don't have permission to view
+        it.</p>
+      <a routerLink="/" class="metallic-button">Return Home</a>
+    </div>
     }
   </div>
 </div>

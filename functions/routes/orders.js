@@ -9,11 +9,13 @@ const router = express.Router();
 // POST /api/orders — create order (customer)
 router.post('/', auth, async (req, res, next) => {
   try {
-    const { 
-      items, 
-      shippingAddress, 
-      paymentMethod, 
+    const {
+      items,
+      shippingAddress,
+      paymentMethod,
       totalAmount,
+      gst_amount,
+      shipping_charge,
       razorpay_orderid,
       razorpay_paymentid,
       razorpay_signature
@@ -63,6 +65,8 @@ router.post('/', auth, async (req, res, next) => {
       payment_method: paymentMethod,
       payment_status: paymentStatus,
       order_status: orderStatus,
+      gst_amount,
+      shipping_charge,
       razorpay_orderid,
       razorpay_paymentid,
       razorpay_signature
@@ -103,11 +107,11 @@ router.get('/', auth, async (req, res, next) => {
       result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
     }
 
-    res.json({ 
-      orders: result.orders, 
-      total: result.total, 
-      page: Number(page), 
-      pages: Math.ceil(result.total / Number(limit)) 
+    res.json({
+      orders: result.orders,
+      total: result.total,
+      page: Number(page),
+      pages: Math.ceil(result.total / Number(limit))
     });
   } catch (error) {
     next(error);

@@ -31,6 +31,8 @@ export interface Order {
   userid: number;
   items: OrderItem[];
   total_amount: number;
+  gst_amount?: number;
+  shipping_charge?: number;
   shipping_address: ShippingAddress;
   payment_method: 'razorpay' | 'cod';
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
@@ -75,7 +77,7 @@ export class OrderService {
     if (!profile) return;
 
     this.isLoading.set(true);
-    this.api.get<{orders: Order[], total: number}>('/orders').subscribe({
+    this.api.get<{ orders: Order[], total: number }>('/orders').subscribe({
       next: (response) => {
         this.ordersSignal.set(response.orders || []);
         this.isLoading.set(false);

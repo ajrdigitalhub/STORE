@@ -28,14 +28,14 @@ export class CheckoutComponent {
   toastService = inject(ToastService);
   router = inject(Router);
 
-  address = { 
-    name: '', 
-    email: '', 
-    phone: '', 
-    address: '', 
-    city: '', 
-    state: '', 
-    zip: '' 
+  address = {
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: ''
   };
   paymentMethod = signal<'Razorpay'>('Razorpay');
   isProcessing = signal(false);
@@ -45,7 +45,11 @@ export class CheckoutComponent {
 
     this.isProcessing.set(true);
     try {
-      const total = this.cartService.totalPrice() * 1.18;
+      const subtotal = this.cartService.totalPrice();
+      const gstAmount = subtotal * 0.18;
+      const shippingCharge = 0; // FREE shipping
+      const total = subtotal + gstAmount + shippingCharge;
+
       const profile = this.authService.profile();
       if (!profile) {
         throw new Error('User profile not loaded. Please login again.');
@@ -67,7 +71,7 @@ export class CheckoutComponent {
 
         const rzpOrder = await this.paymentService.createRazorpayOrder(total);
         const rzpKey = await this.paymentService.getRazorpayKey();
-        
+
         const options = {
           key: rzpKey,
           amount: rzpOrder.amount,
@@ -83,6 +87,8 @@ export class CheckoutComponent {
                 userid: profile.id,
                 items: orderItems,
                 total_amount: total,
+                gst_amount: gstAmount,
+                shipping_charge: shippingCharge,
                 payment_method: 'razorpay',
                 shipping_address: this.address,
                 // Pass Razorpay details for verification on backend
@@ -122,6 +128,8 @@ export class CheckoutComponent {
           userid: profile.id,
           items: orderItems,
           total_amount: total,
+          gst_amount: gstAmount,
+          shipping_charge: shippingCharge,
           order_status: 'pending',
           payment_status: 'pending',
           payment_method: 'cod',
@@ -145,7 +153,7 @@ export class CheckoutComponent {
       this.toastService.show('Please fill in all shipping details.', 'error');
       return false;
     }
-    
+
     const items = this.cartService.items();
     if (items.length === 0) {
       this.toastService.show('Your cart is empty.', 'error');

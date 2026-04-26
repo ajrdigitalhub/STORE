@@ -62,6 +62,8 @@ CREATE TABLE orders (
     razorpay_paymentid VARCHAR(255),
     razorpay_signature VARCHAR(500),
     order_number VARCHAR(20) UNIQUE NOT NULL,
+    gst_amount DECIMAL(10,2) DEFAULT 0,
+    shipping_charge DECIMAL(10,2) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

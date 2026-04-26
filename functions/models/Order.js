@@ -10,6 +10,8 @@ class Order {
     this.payment_method = data.payment_method;
     this.payment_status = data.payment_status;
     this.order_status = data.order_status;
+    this.gst_amount = parseFloat(data.gst_amount || 0);
+    this.shipping_charge = parseFloat(data.shipping_charge || 0);
     this.razorpay_orderid = data.razorpay_orderid;
     this.razorpay_paymentid = data.razorpay_paymentid;
     this.razorpay_signature = data.razorpay_signature;
@@ -53,6 +55,8 @@ class Order {
         payment_method,
         payment_status = 'pending',
         order_status = 'pending',
+        gst_amount = 0,
+        shipping_charge = 0,
         razorpay_orderid,
         razorpay_paymentid,
         razorpay_signature
@@ -95,9 +99,10 @@ class Order {
         INSERT INTO orders (
           user_id, items, total_amount, shipping_address, payment_method, 
           order_number, payment_status, order_status, 
+          gst_amount, shipping_charge,
           razorpay_orderid, razorpay_paymentid, razorpay_signature
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         RETURNING *
       `;
       const values = [
@@ -109,6 +114,8 @@ class Order {
         orderNumber,
         payment_status,
         order_status,
+        gst_amount,
+        shipping_charge,
         razorpay_orderid,
         razorpay_paymentid,
         razorpay_signature
