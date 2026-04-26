@@ -55,6 +55,20 @@ export class AdminDashboardComponent implements AfterViewInit {
   activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'whatsapp' | 'hero' | 'footer'>('dashboard');
   isSidebarCollapsed = signal(false);
   isMobileMenuOpen = signal(false);
+  
+  expandedSections = signal<Record<string, boolean>>({
+    'store': true,
+    'content': true,
+    'communication': true
+  });
+
+  toggleSection(section: string) {
+    this.expandedSections.update(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  }
+
   showProductForm = signal(false);
   editingProduct = signal<Product | null>(null);
   showCategoryForm = signal(false);
@@ -64,7 +78,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     'Your order is currently being processed.',
     'We offer a variety of materials including PLA, PETG, and ABS.',
     'Please share your order ID for further assistance.',
-    'Thank you for reaching out to IDEAZONE 3D!'
+    'Thank you for reaching out to  IDEAZONE 3D!'
   ];
 
   whatsappSettings = {

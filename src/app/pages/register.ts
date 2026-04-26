@@ -54,24 +54,8 @@ export class RegisterComponent {
       this.showWelcomePopup.set(true);
     } catch (error: unknown) {
       console.error(error);
-      const err = error as { code?: string; message?: string };
-      
-      switch (err.code) {
-        case 'auth/email-already-in-use':
-          this.errorMessage.set('This email is already registered.');
-          break;
-        case 'auth/invalid-email':
-          this.errorMessage.set('The email address is badly formatted.');
-          break;
-        case 'auth/operation-not-allowed':
-          this.errorMessage.set('Email/password accounts are not enabled.');
-          break;
-        case 'auth/weak-password':
-          this.errorMessage.set('The password is too weak (min 6 characters).');
-          break;
-        default:
-          this.errorMessage.set('Registration failed. Please try again.');
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+      this.errorMessage.set(errorMessage);
     } finally {
       this.isLoading.set(false);
     }

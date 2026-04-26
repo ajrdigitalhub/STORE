@@ -276,7 +276,7 @@ export class ChatFabComponent implements AfterViewChecked {
     
     let finalMessage = '';
     if (text && !isCommon) {
-      finalMessage = `Hi IDEAZONE 3D, ${text}`;
+      finalMessage = `Hi  IDEAZONE 3D, ${text}`;
     } else {
       finalMessage = this.whatsappMessage;
     }

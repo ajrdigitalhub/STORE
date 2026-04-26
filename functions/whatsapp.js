@@ -32,7 +32,7 @@ async function getSettings() {
     // Frontend stores it as 'whatsapp', but this file expects 'whatsappSettings'
     return {
       whatsappSettings: configValue.whatsapp || {},
-      siteName: configValue.about?.title || 'IDEA Zone 3D',
+      siteName: configValue.about?.title || 'IDEAZONE 3D',
       currency: '₹', // Default currency
       ...configValue
     };
@@ -215,13 +215,13 @@ async function sendOrderConfirmation(order) {
           type: "body",
           parameters: [
             { type: "text", text: String(customerName || 'Customer') }, // 1
-            { type: "text", text: String(siteName || 'IDEA Zone 3D') }, // 2
+            { type: "text", text: String(siteName || 'IDEAZONE 3D') }, // 2
             { type: "text", text: String(order.orderNumber || 'N/A') }, // 3
             { type: "text", text: String(`${currency || '₹'}${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}`) }, // 4
             { type: "text", text: String(paymentMethod || 'N/A') }, // 5
             { type: "text", text: String(paymentStatus || 'N/A') }, // 6
             { type: "text", text: String(customerName || 'Customer') }, // 7
-            { type: "text", text: String(siteName || 'IDEA Zone 3D') }, // 8
+            { type: "text", text: String(siteName || 'IDEAZONE 3D') }, // 8
           ],
         },
         {

@@ -131,6 +131,9 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/contact-config', contactConfigRoutes);
 app.use('/api/payment-config', paymentConfigRoutes);
 app.use('/api/app-config', appConfigRoutes);
+app.get('/api/runtime-config', (req, res) => {
+  res.json({ useMockData: process.env.USE_MOCK_DATA === 'true' });
+});
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/upload', express.raw({ type: 'multipart/form-data', limit: '10mb' }), (req, res, next) => {
@@ -218,7 +221,7 @@ app.use(express.static(browserDistPath));
 app.get(/^(?!\/api).*/, (req, res) => {
   const indexPath = path.join(browserDistPath, 'index.html');
   const csrIndexPath = path.join(browserDistPath, 'index.csr.html');
-
+  
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else if (require('fs').existsSync(csrIndexPath)) {

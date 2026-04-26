@@ -1,7 +1,8 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ApiService } from './api.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface Category {
   id: number;
@@ -58,14 +59,22 @@ export class ProductService {
 
   private async checkConfig() {
     try {
-      const config = await firstValueFrom(this.api.get<{ useMockData: boolean }>('/runtime-config'));
+      // Try to load from the correct route
+      const config = await firstValueFrom(
+        this.api.get<{ useMockData: boolean }>('/app-config/runtime').pipe(
+          catchError(() => this.api.get<{ useMockData: boolean }>('/runtime-config')),
+          catchError(() => of({ useMockData: true }))
+        )
+      );
+      
       if (config) {
         this.useMockData.set(config.useMockData);
         this.loadProducts();
         this.loadCategories();
       }
-    } catch (error: unknown) {
-      console.error('Failed to load config', error instanceof Error ? error.message : error);
+    } catch {
+      // Silently fail as it can fall back to default mock data
+      console.warn('Config load failed, using default settings');
     }
   }
 
