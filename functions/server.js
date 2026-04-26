@@ -20,12 +20,37 @@ async function initDB() {
     await pool.query(`
       DO $$ 
       BEGIN 
+        -- Products table columns
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='customizable') THEN
           ALTER TABLE products ADD COLUMN customizable BOOLEAN DEFAULT FALSE;
         END IF;
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='customization_type') THEN
           ALTER TABLE products ADD COLUMN customization_type VARCHAR(50) DEFAULT 'none';
         END IF;
+
+        -- Orders table columns for Razorpay
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='razorpay_orderid') THEN
+          ALTER TABLE orders ADD COLUMN razorpay_orderid VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='razorpay_paymentid') THEN
+          ALTER TABLE orders ADD COLUMN razorpay_paymentid VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='razorpay_signature') THEN
+          ALTER TABLE orders ADD COLUMN razorpay_signature VARCHAR(500);
+        END IF;
+
+        -- WhatsApp logs table
+        CREATE TABLE IF NOT EXISTS whatsapp_logs (
+          id SERIAL PRIMARY KEY,
+          recipient_number VARCHAR(20),
+          message_content TEXT,
+          status VARCHAR(50),
+          reason TEXT,
+          order_id INTEGER,
+          user_id INTEGER,
+          message_type VARCHAR(100),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
       END $$;
     `);
 
@@ -193,7 +218,7 @@ app.use(express.static(browserDistPath));
 app.get(/^(?!\/api).*/, (req, res) => {
   const indexPath = path.join(browserDistPath, 'index.html');
   const csrIndexPath = path.join(browserDistPath, 'index.csr.html');
-  
+
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else if (require('fs').existsSync(csrIndexPath)) {

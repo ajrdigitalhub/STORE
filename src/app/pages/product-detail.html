@@ -1,311 +1,303 @@
 @if (product(); as p) {
-  <div class="min-h-screen bg-metallic-black pb-24">
-    <!-- Breadcrumbs -->
-    <div class="max-w-7xl mx-auto px-4 pt-10 pb-8">
-      <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest text-accent-muted">
-        <a routerLink="/" class="hover:text-accent transition-colors">Home</a>
-        <span class="material-icons text-[10px]">chevron_right</span>
-        <a routerLink="/products" class="hover:text-accent transition-colors">Products</a>
-        <span class="material-icons text-[10px]">chevron_right</span>
-        <span class="text-accent">{{ p.name }}</span>
-      </nav>
-    </div>
+<div class="min-h-screen bg-metallic-black pb-24">
+  <!-- Breadcrumbs -->
+  <div class="max-w-7xl mx-auto px-4 pt-10 pb-8">
+    <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest text-accent-muted">
+      <a routerLink="/" class="hover:text-accent transition-colors">Home</a>
+      <span class="material-icons text-[10px]">chevron_right</span>
+      <a routerLink="/products" class="hover:text-accent transition-colors">Products</a>
+      <span class="material-icons text-[10px]">chevron_right</span>
+      <span class="text-accent">{{ p.name }}</span>
+    </nav>
+  </div>
 
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
-        <!-- Image Gallery -->
-        <div class="lg:col-span-7 space-y-6">
-          <div class="flex flex-col-reverse md:flex-row gap-6">
-            <!-- Thumbnails -->
-            <div class="flex-shrink-0 flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto max-h-[600px] no-scrollbar pb-2 md:pb-0 px-1">
-              @for (img of p.images; track img) {
-                <button 
-                  (click)="selectedImage.set(img)" 
-                  class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden glass-card p-1 border-2 transition-all hover:scale-105 active:scale-95"
-                  [class.border-accent]="selectedImage() === img"
-                  [class.border-transparent]="selectedImage() !== img"
-                >
-                  <img [src]="img" [alt]="p.name" class="w-full h-full object-cover rounded-lg" referrerpolicy="no-referrer">
-                </button>
-              }
-            </div>
-            <!-- Main Image -->
-            <div 
-              class="flex-grow min-w-0 aspect-square glass-card p-2 rounded-3xl overflow-hidden relative group cursor-crosshair bg-white"
-              (mousemove)="onMouseMove($event)"
-              (mouseenter)="onMouseEnter()"
-              (mouseleave)="onMouseLeave()"
-            >
-              <img 
-                [src]="selectedImage() || (p.images && p.images.length > 0 ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/800/800')" 
-                [alt]="p.name" 
-                class="w-full h-full object-contain rounded-2xl transition-opacity duration-300" 
-                [class.opacity-0]="isZoomed()"
-                referrerpolicy="no-referrer"
-              >
-              @if (isZoomed()) {
-                <div 
-                  class="absolute inset-0 rounded-2xl bg-no-repeat pointer-events-none"
-                  [style.backgroundImage]="'url(' + (selectedImage() || (p.images && p.images.length > 0 ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/800/800')) + ')'"
-                  [style.backgroundPosition]="zoomBackgroundPosition()"
-                  [style.backgroundSize]="'250%'"
-                ></div>
-              }
-              <div class="absolute top-6 right-6 pointer-events-none">
-                <button class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all">
-                  <span class="material-icons">zoom_in</span>
-                </button>
-              </div>
-            </div>
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+      <!-- Image Gallery -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="flex flex-col-reverse md:flex-row gap-6">
+          <!-- Thumbnails -->
+          <div
+            class="flex-shrink-0 flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto max-h-[600px] no-scrollbar pb-2 md:pb-0 px-1">
+            @for (img of p.images; track img) {
+            <button (click)="selectedImage.set(img)"
+              class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden glass-card p-1 border-2 transition-all hover:scale-105 active:scale-95"
+              [class.border-accent]="selectedImage() === img" [class.border-transparent]="selectedImage() !== img">
+              <img [src]="img" [alt]="p.name" class="w-full h-full object-cover rounded-lg"
+                referrerpolicy="no-referrer">
+            </button>
+            }
           </div>
-
-          <!-- Description Section -->
-          <div class="pt-12 border-t border-white/5 hidden">
-            <h3 class="tech-label mb-6">Technical Specifications</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-              @for (spec of specifications(); track spec.label) {
-                <div class="flex justify-between py-3 border-b border-white/5">
-                  <span class="text-xs text-accent-muted uppercase tracking-widest">{{ spec.label }}</span>
-                  <span class="text-sm font-bold">{{ spec.value }}</span>
-                </div>
-              }
+          <!-- Main Image -->
+          <div
+            class="flex-grow min-w-0 aspect-square glass-card p-2 rounded-3xl overflow-hidden relative group cursor-crosshair bg-white"
+            (mousemove)="onMouseMove($event)" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+            <img
+              [src]="selectedImage() || (p.images && p.images.length > 0 ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/800/800')"
+              [alt]="p.name" class="w-full h-full object-contain rounded-2xl transition-opacity duration-300"
+              [class.opacity-0]="isZoomed()" referrerpolicy="no-referrer">
+            @if (isZoomed()) {
+            <div class="absolute inset-0 rounded-2xl bg-no-repeat pointer-events-none"
+              [style.backgroundImage]="'url(' + (selectedImage() || (p.images && p.images.length > 0 ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/800/800')) + ')'"
+              [style.backgroundPosition]="zoomBackgroundPosition()" [style.backgroundSize]="'250%'"></div>
+            }
+            <div class="absolute top-6 right-6 pointer-events-none">
+              <button
+                class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all">
+                <span class="material-icons">zoom_in</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Product Info (Sticky) -->
-        <div class="lg:col-span-5">
-          <div class="sticky top-32 space-y-8">
-            <div>
-              <div class="flex items-center gap-3 mb-4">
-                <span class="tech-label px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[10px]">
-                  {{ p.category_name || 'Uncategorized' }}
-                </span>
-                @if (p.stock > 0) {
-                  <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                    In Stock
-                  </span>
-                }
-              </div>
-              <h1 class="text-5xl font-bold tracking-tighter mb-4 leading-none">{{ p.name }}</h1>
-              
-              <!-- Rating & Tags -->
-              <div class="flex flex-wrap items-center gap-4 mb-6">
-                @if (p.rating) {
-                  <div class="flex items-center gap-1 bg-accent/10 px-2 py-1 rounded border border-accent/20">
-                    <span class="material-icons text-accent text-sm">star</span>
-                    <span class="text-xs font-bold text-accent">{{ p.rating }}</span>
-                    <span class="text-[10px] text-accent-muted ml-1">({{ p.reviews_count }} reviews)</span>
-                  </div>
-                }
-                @for (tag of p.tags; track tag) {
-                  <span class="text-[10px] uppercase tracking-widest text-accent-muted border border-white/10 px-2 py-1 rounded hover:border-accent/40 transition-colors cursor-default">
-                    #{{ tag }}
-                  </span>
-                }
-              </div>
+        <!-- Description Section -->
+        <div class="pt-12 border-t border-white/5 hidden">
+          <h3 class="tech-label mb-6">Technical Specifications</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+            @for (spec of specifications(); track spec.label) {
+            <div class="flex justify-between py-3 border-b border-white/5">
+              <span class="text-xs text-accent-muted uppercase tracking-widest">{{ spec.label }}</span>
+              <span class="text-sm font-bold">{{ spec.value }}</span>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
 
-              <div class="flex items-end gap-4 mb-8">
-                <span class="text-4xl font-bold text-accent">{{ p.price | currency:'INR' }}</span>
-                @if (p.compare_price && p.compare_price > p.price) {
-                  <span class="text-lg text-accent-muted line-through mb-1">{{ p.compare_price | currency:'INR' }}</span>
-                  <span class="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded mb-1 border border-accent/20">
-                    {{ ((p.compare_price - p.price) / p.compare_price * 100) | number:'1.0-0' }}% OFF
-                  </span>
-                }
+      <!-- Product Info (Sticky) -->
+      <div class="lg:col-span-5">
+        <div class="sticky top-32 space-y-8">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <span class="tech-label px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[10px]">
+                {{ p.category_name || 'Uncategorized' }}
+              </span>
+              @if (p.stock > 0) {
+              <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                In Stock
+              </span>
+              } @else {
+              <span class="text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                Out of Stock
+              </span>
+              }
+            </div>
+            <h1 class="text-5xl font-bold tracking-tighter mb-4 leading-none">{{ p.name }}</h1>
+
+            <!-- Rating & Tags -->
+            <div class="flex flex-wrap items-center gap-4 mb-6">
+              @if (p.rating) {
+              <div class="flex items-center gap-1 bg-accent/10 px-2 py-1 rounded border border-accent/20">
+                <span class="material-icons text-accent text-sm">star</span>
+                <span class="text-xs font-bold text-accent">{{ p.rating }}</span>
+                <span class="text-[10px] text-accent-muted ml-1">({{ p.reviews_count }} reviews)</span>
               </div>
-              <p class="text-accent-muted leading-relaxed text-lg font-light">
-                {{ p.description }}
-              </p>
+              }
+              @for (tag of p.tags; track tag) {
+              <span
+                class="text-[10px] uppercase tracking-widest text-accent-muted border border-white/10 px-2 py-1 rounded hover:border-accent/40 transition-colors cursor-default">
+                #{{ tag }}
+              </span>
+              }
             </div>
 
-            <!-- Customization Options -->
-            @if (p.customizable) {
-              <div class="tech-card border-accent/20 p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div class="flex items-center gap-2 text-accent">
-                  <span class="material-icons text-sm">auto_awesome</span>
-                  <span class="tech-label text-xs uppercase tracking-widest">Custom Options</span>
-                </div>
+            <div class="flex items-end gap-4 mb-8">
+              <span class="text-4xl font-bold text-accent">{{ p.price | currency:'INR' }}</span>
+              @if (p.compare_price && p.compare_price > p.price) {
+              <span class="text-lg text-accent-muted line-through mb-1">{{ p.compare_price | currency:'INR' }}</span>
+              <span
+                class="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded mb-1 border border-accent/20">
+                {{ ((p.compare_price - p.price) / p.compare_price * 100) | number:'1.0-0' }}% OFF
+              </span>
+              }
+            </div>
+            <p class="text-accent-muted leading-relaxed text-lg font-light">
+              {{ p.description }}
+            </p>
+          </div>
 
-                @if (p.customization_type === 'text') {
-                  <div class="space-y-2">
-                    <label for="custom-text-input" class="tech-label text-[10px] text-accent-muted">Enter Name / Text</label>
-                    <input 
-                      id="custom-text-input"
-                      type="text" 
-                      [ngModel]="customText()" 
-                      (ngModelChange)="customText.set($event)"
-                      placeholder="Ex: Your Name or Brand"
-                      class="input-field text-sm font-mono"
-                    >
-                  </div>
-                }
+          <!-- Customization Options -->
+          @if (p.customizable) {
+          <div class="tech-card border-accent/20 p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="flex items-center gap-2 text-accent">
+              <span class="material-icons text-sm">auto_awesome</span>
+              <span class="tech-label text-xs uppercase tracking-widest">Custom Options</span>
+            </div>
 
-                @if (p.customization_type === 'image_file') {
-                  <div class="space-y-2">
-                    <span class="tech-label text-[10px] text-accent-muted block">Upload Design / Image</span>
-                    <div class="flex items-center gap-4">
-                      <button 
-                        (click)="customImageInput.click()"
-                        class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2"
-                        [disabled]="isUploading()"
-                      >
-                        <span class="material-icons text-xs">{{ isUploading() ? 'refresh' : 'upload' }}</span>
-                        {{ isUploading() ? 'Uploading...' : 'Choose file' }}
-                      </button>
-                      <span class="text-[10px] text-accent-muted font-mono truncate max-w-[200px]">
-                        {{ customImageUrl() ? 'File uploaded successfully' : 'No file chosen' }}
-                      </span>
-                    </div>
-                    @if (customImageUrl()) {
-                      <div class="mt-2 relative w-20 h-20 group">
-                        <img [src]="customImageUrl()" alt="Custom Design Preview" class="w-full h-full object-cover rounded border border-accent/20" referrerpolicy="no-referrer">
-                        <button 
-                          (click)="customImageUrl.set(null)"
-                          class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <span class="material-icons text-[10px]">close</span>
-                        </button>
-                      </div>
-                    }
-                    <input 
-                      type="file" 
-                      #customImageInput 
-                      class="hidden" 
-                      (change)="onCustomImageSelected($event)"
-                      accept="image/*"
-                    >
-                  </div>
-                }
-              </div>
+            @if (p.customization_type === 'text') {
+            <div class="space-y-2">
+              <label for="custom-text-input" class="tech-label text-[10px] text-accent-muted">Enter Name / Text</label>
+              <input id="custom-text-input" type="text" [ngModel]="customText()"
+                (ngModelChange)="customText.set($event)" placeholder="Ex: Your Name or Brand"
+                class="input-field text-sm font-mono">
+            </div>
             }
 
-            <div class="space-y-6">
+            @if (p.customization_type === 'image_file') {
+            <div class="space-y-2">
+              <span class="tech-label text-[10px] text-accent-muted block">Upload Design / Image</span>
               <div class="flex items-center gap-4">
-                <div class="flex items-center glass-card p-1 rounded-2xl border border-white/5">
-                  <button (click)="updateQuantity(-1)" class="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl transition-colors">
-                    <span class="material-icons">remove</span>
-                  </button>
-                  <span class="w-12 text-center font-bold text-lg">{{ quantity() }}</span>
-                  <button (click)="updateQuantity(1)" class="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl transition-colors">
-                    <span class="material-icons">add</span>
-                  </button>
-                </div>
-                <div class="text-[10px] text-accent-muted uppercase tracking-widest">
-                  Quantity Selection
-                </div>
-              </div>
-
-              <div class="flex gap-4">
-                <button 
-                  (click)="addToCart()" 
-                  class="metallic-button flex-grow py-5 text-lg tracking-widest flex items-center justify-center gap-3" 
-                  [disabled]="p.stock <= 0"
-                >
-                  <span class="material-icons">shopping_bag</span>
-                  ADD TO CART
+                <button (click)="customImageInput.click()"
+                  class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2" [disabled]="isUploading()">
+                  <span class="material-icons text-xs">{{ isUploading() ? 'refresh' : 'upload' }}</span>
+                  {{ isUploading() ? 'Uploading...' : 'Choose file' }}
                 </button>
-                <button class="w-16 h-16 rounded-2xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors group">
-                  <span class="material-icons text-accent-muted group-hover:text-accent transition-colors">favorite_border</span>
+                <span class="text-[10px] text-accent-muted font-mono truncate max-w-[200px]">
+                  {{ customImageUrl() ? 'File uploaded successfully' : 'No file chosen' }}
+                </span>
+              </div>
+              @if (customImageUrl()) {
+              <div class="mt-2 relative w-20 h-20 group">
+                <img [src]="customImageUrl()" alt="Custom Design Preview"
+                  class="w-full h-full object-cover rounded border border-accent/20" referrerpolicy="no-referrer">
+                <button (click)="customImageUrl.set(null)"
+                  class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="material-icons text-[10px]">close</span>
                 </button>
               </div>
+              }
+              <input type="file" #customImageInput class="hidden" (change)="onCustomImageSelected($event)"
+                accept="image/*">
             </div>
-
-            <!-- Features List -->
-            <div class="flex flex-wrap gap-3 pt-8 border-t border-white/5">
-              <div class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
-                <div class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
-                  <span class="material-icons text-lg">local_shipping</span>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Express Fabrication</h4>
-                  <p class="text-[9px] text-accent-muted uppercase tracking-tighter">48h Dispatch</p>
-                </div>
-              </div>
-              <div class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
-                <div class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
-                  <span class="material-icons text-lg">verified</span>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Quality Certified</h4>
-                  <p class="text-[9px] text-accent-muted uppercase tracking-tighter">100% Integrity</p>
-                </div>
-              </div>
-              <div class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
-                <div class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
-                  <span class="material-icons text-lg">security</span>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Secure Payment</h4>
-                  <p class="text-[9px] text-accent-muted uppercase tracking-tighter">Encrypted</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Related Products -->
-      @if (relatedProducts().length > 0) {
-        <div class="mt-32 pt-24 border-t border-white/5">
-          <div class="flex justify-between items-end mb-12">
-            <div>
-              <div class="tech-label mb-2">Complementary Assets</div>
-              <h2 class="text-4xl font-bold italic font-serif tracking-tight">You May Also Require</h2>
-            </div>
-            <a routerLink="/products" class="tech-label hover:text-accent transition-colors flex items-center gap-2">
-              View All <span class="material-icons text-xs">arrow_forward</span>
-            </a>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            @for (product of relatedProducts(); track product.id) {
-              <app-product-card [product]="product"></app-product-card>
             }
           </div>
-        </div>
-      }
-    </div>
-  </div>
-} @else {
-  <div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="flex items-center gap-2 mb-12">
-      <app-skeleton width="100px" height="1rem"></app-skeleton>
-    </div>
+          }
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-      <div class="space-y-6">
-        <app-skeleton height="600px" className="rounded-3xl"></app-skeleton>
-        <div class="grid grid-cols-4 gap-4">
-          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
-          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
-          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
-          <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
-        </div>
-      </div>
+          <div class="space-y-6">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center glass-card p-1 rounded-2xl border border-white/5"
+                [class.opacity-50]="p.stock <= 0">
+                <button (click)="updateQuantity(-1)" [disabled]="p.stock <= 0"
+                  class="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl transition-colors">
+                  <span class="material-icons">remove</span>
+                </button>
+                <span class="w-12 text-center font-bold text-lg">{{ quantity() }}</span>
+                <button (click)="updateQuantity(1)" [disabled]="p.stock <= 0"
+                  class="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl transition-colors">
+                  <span class="material-icons">add</span>
+                </button>
+              </div>
+              <div class="text-[10px] text-accent-muted uppercase tracking-widest">
+                Quantity Selection
+              </div>
+            </div>
 
-      <div class="flex flex-col space-y-8">
-        <div>
-          <app-skeleton width="120px" height="1.5rem" className="mb-4 rounded-full"></app-skeleton>
-          <app-skeleton width="80%" height="3rem" className="mb-4"></app-skeleton>
-          <app-skeleton width="40%" height="2.5rem" className="mb-6"></app-skeleton>
-          <div class="space-y-2">
-            <app-skeleton width="100%" height="1rem"></app-skeleton>
-            <app-skeleton width="100%" height="1rem"></app-skeleton>
-            <app-skeleton width="60%" height="1rem"></app-skeleton>
+            <div class="flex gap-4">
+              <button (click)="addToCart()"
+                class="metallic-button flex-grow py-5 text-lg tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="p.stock <= 0">
+                <span class="material-icons">{{ p.stock <= 0 ? 'block' : 'shopping_bag' }}</span>
+                    {{ p.stock <= 0 ? 'OUT OF STOCK' : 'ADD TO CART' }} </button>
+                      <button
+                        class="w-16 h-16 rounded-2xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors group">
+                        <span
+                          class="material-icons text-accent-muted group-hover:text-accent transition-colors">favorite_border</span>
+                      </button>
+            </div>
+          </div>
+
+          <!-- Features List -->
+          <div class="flex flex-wrap gap-3 pt-8 border-t border-white/5">
+            <div
+              class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
+              <div
+                class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
+                <span class="material-icons text-lg">local_shipping</span>
+              </div>
+              <div>
+                <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Express Fabrication</h4>
+                <p class="text-[9px] text-accent-muted uppercase tracking-tighter">48h Dispatch</p>
+              </div>
+            </div>
+            <div
+              class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
+              <div
+                class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
+                <span class="material-icons text-lg">verified</span>
+              </div>
+              <div>
+                <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Quality Certified</h4>
+                <p class="text-[9px] text-accent-muted uppercase tracking-tighter">100% Integrity</p>
+              </div>
+            </div>
+            <div
+              class="flex-1 min-w-[140px] flex items-center gap-3 group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-accent/20 transition-all">
+              <div
+                class="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center text-accent border border-accent/10 group-hover:bg-accent group-hover:text-metallic-black transition-all flex-shrink-0">
+                <span class="material-icons text-lg">security</span>
+              </div>
+              <div>
+                <h4 class="text-[10px] font-bold uppercase tracking-wider leading-tight">Secure Payment</h4>
+                <p class="text-[9px] text-accent-muted uppercase tracking-tighter">Encrypted</p>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div class="flex items-center gap-6">
-          <app-skeleton width="120px" height="3rem" className="rounded-xl"></app-skeleton>
-          <app-skeleton width="150px" height="1rem"></app-skeleton>
+    <!-- Related Products -->
+    @if (relatedProducts().length > 0) {
+    <div class="mt-32 pt-24 border-t border-white/5">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+          <div class="tech-label mb-2">Complementary Assets</div>
+          <h2 class="text-4xl font-bold italic font-serif tracking-tight">You May Also Require</h2>
         </div>
+        <a routerLink="/products" class="tech-label hover:text-accent transition-colors flex items-center gap-2">
+          View All <span class="material-icons text-xs">arrow_forward</span>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        @for (product of relatedProducts(); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+        }
+      </div>
+    </div>
+    }
+  </div>
+</div>
+} @else {
+<div class="max-w-7xl mx-auto px-4 py-12">
+  <div class="flex items-center gap-2 mb-12">
+    <app-skeleton width="100px" height="1rem"></app-skeleton>
+  </div>
 
-        <div class="flex gap-4">
-          <app-skeleton width="70%" height="4rem" className="rounded-full"></app-skeleton>
-          <app-skeleton width="60px" height="4rem" className="rounded-full"></app-skeleton>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+    <div class="space-y-6">
+      <app-skeleton height="600px" className="rounded-3xl"></app-skeleton>
+      <div class="grid grid-cols-4 gap-4">
+        <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+        <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+        <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+        <app-skeleton height="100px" className="rounded-xl"></app-skeleton>
+      </div>
+    </div>
+
+    <div class="flex flex-col space-y-8">
+      <div>
+        <app-skeleton width="120px" height="1.5rem" className="mb-4 rounded-full"></app-skeleton>
+        <app-skeleton width="80%" height="3rem" className="mb-4"></app-skeleton>
+        <app-skeleton width="40%" height="2.5rem" className="mb-6"></app-skeleton>
+        <div class="space-y-2">
+          <app-skeleton width="100%" height="1rem"></app-skeleton>
+          <app-skeleton width="100%" height="1rem"></app-skeleton>
+          <app-skeleton width="60%" height="1rem"></app-skeleton>
         </div>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <app-skeleton width="120px" height="3rem" className="rounded-xl"></app-skeleton>
+        <app-skeleton width="150px" height="1rem"></app-skeleton>
+      </div>
+
+      <div class="flex gap-4">
+        <app-skeleton width="70%" height="4rem" className="rounded-full"></app-skeleton>
+        <app-skeleton width="60px" height="4rem" className="rounded-full"></app-skeleton>
       </div>
     </div>
   </div>
+</div>
 }

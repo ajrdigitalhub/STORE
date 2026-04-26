@@ -16,6 +16,10 @@ class Order {
     this.order_number = data.order_number;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
+
+    // Include user details if present (from JOIN queries)
+    this.user_name = data.user_name;
+    this.user_email = data.user_email;
   }
 
   // Generate unique order number
@@ -40,12 +44,12 @@ class Order {
     try {
       await client.query('BEGIN');
 
-      const { 
-        user_id, 
-        userid, 
-        items, 
-        total_amount, 
-        shipping_address, 
+      const {
+        user_id,
+        userid,
+        items,
+        total_amount,
+        shipping_address,
         payment_method,
         payment_status = 'pending',
         order_status = 'pending',
@@ -67,7 +71,7 @@ class Order {
           console.error('Order.create - Item missing product ID:', JSON.stringify(item, null, 2));
           throw new Error(`Order item is missing a valid product ID. Item: ${JSON.stringify(item)}`);
         }
-        
+
         console.log('Validating item:', JSON.stringify(item, null, 2));
         const productResult = await client.query('SELECT stock FROM products WHERE id = $1 AND active = true', [item.product]);
         if (productResult.rows.length === 0) {
@@ -97,11 +101,11 @@ class Order {
         RETURNING *
       `;
       const values = [
-        finalUserId, 
-        JSON.stringify(items), 
-        total_amount, 
-        JSON.stringify(shipping_address), 
-        payment_method, 
+        finalUserId,
+        JSON.stringify(items),
+        total_amount,
+        JSON.stringify(shipping_address),
+        payment_method,
         orderNumber,
         payment_status,
         order_status,

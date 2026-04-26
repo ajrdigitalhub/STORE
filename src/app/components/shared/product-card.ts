@@ -16,7 +16,9 @@ import { CartService } from '../../services/cart';
              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
              referrerpolicy="no-referrer">
         <div class="absolute top-4 right-4 flex flex-col gap-2">
-          @if (product && product.stock < 5) {
+          @if (product && product.stock <= 0) {
+            <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">Out of Stock</span>
+          } @else if (product && product.stock < 5) {
             <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">Low Stock</span>
           }
           @if (product && product.compare_price && product.compare_price > product.price) {
@@ -50,8 +52,10 @@ import { CartService } from '../../services/cart';
         
         <div class="pt-4 border-t border-white/5">
           @if (product) {
-            <button (click)="cartService.addToCart(product)" class="metallic-button w-full py-3 text-xs font-bold uppercase tracking-widest">
-              Add to Cart
+            <button (click)="cartService.addToCart(product)" 
+                    class="metallic-button w-full py-3 text-xs font-bold uppercase tracking-widest"
+                    [disabled]="product.stock <= 0">
+              {{ product.stock <= 0 ? 'Out of Stock' : 'Add to Cart' }}
             </button>
           }
         </div>

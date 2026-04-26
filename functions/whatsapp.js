@@ -24,9 +24,18 @@ async function logWhatsappMessage({ recipientNumber, messageContent, status, rea
 async function getSettings() {
   try {
     const { rows } = await db.query(
-      'SELECT config FROM settings WHERE id = 1'
+      "SELECT value FROM config WHERE key = 'app'"
     );
-    return rows[0]?.config || {};
+    const configValue = rows[0]?.value || {};
+
+    // Normalize properties for legacy whatsapp.js expectations
+    // Frontend stores it as 'whatsapp', but this file expects 'whatsappSettings'
+    return {
+      whatsappSettings: configValue.whatsapp || {},
+      siteName: configValue.about?.title || 'IDEA Zone 3D',
+      currency: '₹', // Default currency
+      ...configValue
+    };
   } catch (error) {
     console.error("❌ Failed to fetch settings:", error);
     return {};
@@ -144,15 +153,15 @@ async function sendWelcomeMessage(user) {
       return;
     }
 
-   const components = [
-  {
-    type: "body",
-    parameters: [
-      { type: "text", text: user.full_name || "Customer" },
-      { type: "text", text: "https://ajrmart.com" },
-    ],
-  },
-];
+    const components = [
+      {
+        type: "body",
+        parameters: [
+          { type: "text", text: user.full_name || "Customer" },
+          { type: "text", text: "https://ajrmart.com" },
+        ],
+      },
+    ];
 
     const result = await sendWhatsappMessage(recipientNumber, templateName, components);
     await logWhatsappMessage({
@@ -188,7 +197,7 @@ async function sendOrderConfirmation(order) {
 
     // 1. Send CLIENT Notification
     const clientTemplateName = whatsappSettings?.orderConfirmationClientTemplateName || 'order_confirmation';
-    const recipientNumber = order.shippingAddress?.whatsappNumber;
+    const recipientNumber = order.shippingAddress?.whatsappNumber || order.shippingAddress?.phone || order.phone;
 
     if (recipientNumber) {
       const paymentMethodMap = {
@@ -196,22 +205,23 @@ async function sendOrderConfirmation(order) {
         'cod': 'Cash on Delivery',
         'manual': 'Manual Payment'
       };
-      const paymentMethod = paymentMethodMap[order.paymentMethod] || order.paymentMethod || 'Cash on Delivery';
+      const paymentMethod = paymentMethodMap[order.paymentMethod] || order.paymentMethod || 'Payment';
       const isPaid = !!order.paymentId || (order.status !== 'Pending Payment' && order.paymentMethod !== 'cod');
       const paymentStatus = isPaid ? 'Paid ✅' : 'Pending ⏳';
+      const customerName = order.customerName || order.user_name || order.shippingAddress?.name || 'Customer';
 
       const clientComponents = [
         {
           type: "body",
           parameters: [
-            { type: "text", text: order.customerName }, // 1
-            { type: "text", text: siteName || 'AJR Mart' }, // 2
-            { type: "text", text: order.orderNumber }, // 3
-            { type: "text", text: `${currency || '₹'}${order.totalAmount.toFixed(2)}` }, // 4
-            { type: "text", text: paymentMethod }, // 5
-            { type: "text", text: paymentStatus }, // 6
-            { type: "text", text: order.customerName }, // 7
-            { type: "text", text: siteName || 'AJR Mart' }, // 8
+            { type: "text", text: String(customerName || 'Customer') }, // 1
+            { type: "text", text: String(siteName || 'IDEA Zone 3D') }, // 2
+            { type: "text", text: String(order.orderNumber || 'N/A') }, // 3
+            { type: "text", text: String(`${currency || '₹'}${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}`) }, // 4
+            { type: "text", text: String(paymentMethod || 'N/A') }, // 5
+            { type: "text", text: String(paymentStatus || 'N/A') }, // 6
+            { type: "text", text: String(customerName || 'Customer') }, // 7
+            { type: "text", text: String(siteName || 'IDEA Zone 3D') }, // 8
           ],
         },
         {
@@ -219,7 +229,7 @@ async function sendOrderConfirmation(order) {
           sub_type: "url",
           index: "0",
           parameters: [
-              { type: "text", text: `account/orders/${order.id}` } // Just the ID for the dynamic URL
+            { type: "text", text: String(`account/orders/${order.id}`) } // Just the ID for the dynamic URL
           ]
         }
       ];
@@ -243,39 +253,49 @@ async function sendOrderConfirmation(order) {
     const adminPhoneNumber = whatsappSettings?.adminPhoneNumber;
 
     if (adminPhoneNumber) {
-      const address = order.shippingAddress;
-      const fullAddress = `${address.fullName}, ${address.addressLine1}, ${address.city}, ${address.state}, ${address.postalCode}`;
-      const itemsSummary = order.items.map(item => `${item.quantity} x ${item.product.name}`).join(', ');
+      const address = order.shippingAddress || {};
+      const fullName = address.fullName || address.name || 'Customer';
+      const addrLine1 = address.addressLine1 || address.address || 'Address N/A';
+      const city = address.city || 'City N/A';
+      const state = address.state || 'State N/A';
+      const zip = address.postalCode || address.zip || 'ZIP N/A';
+
+      const fullAddress = `${fullName}, ${addrLine1}, ${city}, ${state}, ${zip}`;
+      const itemsSummary = order.items.map(item => {
+        const name = item.name || (item.product && item.product.name) || 'Product';
+        return `${item.quantity} x ${name}`;
+      }).join(', ') || 'Quantity x Product';
 
       const paymentMethodMap = {
         'razorpay': 'Online Payment',
         'cod': 'Cash on Delivery',
         'manual': 'Manual Payment'
       };
-      const paymentMethod = paymentMethodMap[order.paymentMethod] || order.paymentMethod || 'Cash on Delivery';
+      const paymentMethod = paymentMethodMap[order.paymentMethod] || order.paymentMethod || 'Payment';
       const isPaid = !!order.paymentId || (order.status !== 'Pending Payment' && order.paymentMethod !== 'cod');
       const paymentStatus = isPaid ? 'Paid' : 'Pending';
+      const customerName = order.customerName || order.user_name || fullName || 'Customer';
 
       const adminComponents = [
         {
           type: "body",
           parameters: [
-            { type: "text", text: order.customerName },
-            { type: "text", text: recipientNumber || 'N/A' },
-            { type: "text", text: order.orderNumber },
-            { type: "text", text: `${currency || '₹'}${order.totalAmount.toFixed(2)}` },
-            { type: "text", text: `${paymentMethod} (${paymentStatus})` },
-            { type: "text", text: new Date(order.orderDate).toLocaleDateString('en-IN') },
-            { type: "text", text: fullAddress },
-            { type: "text", text: itemsSummary },
+            { type: "text", text: String(customerName || 'Customer') },
+            { type: "text", text: String(recipientNumber || 'N/A') },
+            { type: "text", text: String(order.orderNumber || 'N/A') },
+            { type: "text", text: String(`${currency || '₹'}${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}`) },
+            { type: "text", text: String(`${paymentMethod} (${paymentStatus})`) },
+            { type: "text", text: String(new Date(order.orderDate || Date.now()).toLocaleDateString('en-IN')) },
+            { type: "text", text: String(fullAddress || 'N/A') },
+            { type: "text", text: String(itemsSummary || 'N/A') },
           ],
         },
-         {
+        {
           type: "button",
           sub_type: "url",
           index: "0",
           parameters: [
-              { type: "text", text: `admin/orders/${order.id}` } // Just the ID for the dynamic URL
+            { type: "text", text: String(`admin/orders/${order.id}`) } // Just the ID for the dynamic URL
           ]
         }
       ];
@@ -325,7 +345,7 @@ async function sendOrderStatusUpdate(order, status) {
     }
 
     const templateName = whatsappSettings?.orderStatusUpdateTemplateName || 'order_status_update';
-    
+
     let orderDetails = "";
     switch (status) {
       case "Processing":
@@ -356,15 +376,15 @@ async function sendOrderStatusUpdate(order, status) {
         type: "body",
         parameters: [
           { type: "text", text: order.customerName }, // 1
-          { type: "text", text: siteName || 'AJR Mart' }, // 2
+          { type: "text", text: siteName || 'IDEAZONE 3D' }, // 2
           { type: "text", text: order.orderNumber }, // 3
           { type: "text", text: status }, // 4
           { type: "text", text: `${currency || '₹'}${order.totalAmount.toFixed(2)}` }, // 5
           { type: "text", text: paymentMethod }, // 6
           { type: "text", text: orderDetails }, // 7
           { type: "text", text: order.customerName }, // 8
-          { type: "text", text: siteName || 'AJR Mart' }, // 9
-          { type: "text", text: siteName || 'AJR Mart' }, // 10
+          { type: "text", text: siteName || 'IDEAZONE 3D' }, // 9
+          { type: "text", text: siteName || 'IDEAZONE 3D' }, // 10
         ],
       },
       {
@@ -372,7 +392,7 @@ async function sendOrderStatusUpdate(order, status) {
         sub_type: "url",
         index: "0",
         parameters: [
-            { type: "text", text: `account/orders/${order.id}` }
+          { type: "text", text: `account/orders/${order.id}` }
         ]
       }
     ];
