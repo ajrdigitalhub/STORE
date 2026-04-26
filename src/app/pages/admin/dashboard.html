@@ -347,7 +347,7 @@
               @for (order of recentOrders(); track order.id) {
               <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
                 <td class="py-4 px-6 tech-value text-xs">{{ order.order_number }}</td>
-                <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.userid }}</td>
+                <td class="py-4 px-6 text-xs text-accent-muted font-mono">{{ order.user_name }}</td>
                 <td class="py-4 px-6 tech-value text-sm font-bold">{{ order.total_amount | currency:'INR' }}</td>
                 <td class="py-4 px-6">
                   <span class="px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20">
@@ -607,7 +607,7 @@
             <thead>
               <tr class="border-b border-white/5 bg-white/[0.02]">
                 <th class="py-3 px-6 tech-label">Order Number</th>
-                <th class="py-3 px-6 tech-label">Customer ID</th>
+                <th class="py-3 px-6 tech-label">Customer Name</th>
                 <th class="py-3 px-6 tech-label">Total Amount</th>
                 <th class="py-3 px-6 tech-label">Status</th>
                 <th class="py-3 px-6 tech-label">Update Status</th>
@@ -618,7 +618,7 @@
               @for (order of orderService.orders(); track order.id) {
               <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td class="py-4 px-6 tech-value text-xs font-bold">{{ order.order_number }}</td>
-                <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.userid }}</td>
+                <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">{{ order.user_name }}</td>
                 <td class="py-4 px-6 tech-value font-bold">{{ order.total_amount | currency:'INR' }}</td>
                 <td class="py-4 px-6">
                   <span class="px-2 py-1 rounded-sm text-[9px] font-mono font-bold uppercase border border-accent/20"

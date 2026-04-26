@@ -158,7 +158,7 @@ async function sendWelcomeMessage(user) {
         type: "body",
         parameters: [
           { type: "text", text: user.full_name || "Customer" },
-          { type: "text", text: "https://ajrmart.com" },
+          { type: "text", text: "https://ideazone3d.com" },
         ],
       },
     ];
