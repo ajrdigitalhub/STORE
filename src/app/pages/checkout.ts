@@ -46,9 +46,8 @@ export class CheckoutComponent {
     this.isProcessing.set(true);
     try {
       const subtotal = this.cartService.totalPrice();
-      const gstAmount = subtotal * 0.18;
       const shippingCharge = 0; // FREE shipping
-      const total = subtotal + gstAmount + shippingCharge;
+      const total = subtotal + shippingCharge;
 
       const profile = this.authService.profile();
       if (!profile) {
@@ -87,7 +86,6 @@ export class CheckoutComponent {
                 userid: profile.id,
                 items: orderItems,
                 total_amount: total,
-                gst_amount: gstAmount,
                 shipping_charge: shippingCharge,
                 payment_method: 'razorpay',
                 shipping_address: this.address,
@@ -128,7 +126,6 @@ export class CheckoutComponent {
           userid: profile.id,
           items: orderItems,
           total_amount: total,
-          gst_amount: gstAmount,
           shipping_charge: shippingCharge,
           order_status: 'pending',
           payment_status: 'pending',
