@@ -1,11 +1,25 @@
 <div class="min-h-screen flex items-center justify-center px-4 py-2 bg-metallic-black relative overflow-hidden">
-  <!-- Background ambient glow -->
-  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-green-900/20 rounded-full blur-3xl animate-pulse"></div>
-  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-900/20 rounded-full blur-3xl animate-pulse"
-    style="animation-delay: 2s;"></div>
 
-  <div
-    class="glass-card w-full max-w-md p-4 sm:p-5 relative z-10 border-t border-l border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] backdrop-blur-xl transform transition-all duration-500 hover:shadow-[0_0_40px_rgba(74,222,128,0.15)]">
+  <!-- Moving Background Text -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+
+    <div class="moving-text moving-left">
+      IDEAZONE3D • IDEAZONE3D • IDEAZONE3D • IDEAZONE3D •
+    </div>
+
+    <div class="moving-text moving-right">
+      CUSTOM PRINTING • RAPID PROTOTYPING • 3D SOLUTIONS •
+    </div>
+
+  </div>
+
+  <!-- Background ambient glow -->
+  <!-- <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-green-900/20 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-900/20 rounded-full blur-3xl animate-pulse"
+    style="animation-delay: 2s;"></div> -->
+
+  <div class="glass-card w-full max-w-md p-4 sm:p-5 relative z-10 transition-all duration-500">
+
 
     <!-- Simple Logo -->
     <div class="text-center mb-6">
@@ -20,52 +34,137 @@
     </p>
 
     @if (errorMessage()) {
-    <div class="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] text-center flex items-center justify-center gap-2">
+    <div
+      class="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] text-center flex items-center justify-center gap-2">
       <span class="material-icons text-xs">error_outline</span>
       {{ errorMessage() }}
     </div>
     }
 
-    <form (submit)="handleSubmit()" class="space-y-4 mb-4">
-      <div class="space-y-1 group">
-        <label for="email" class="tech-label text-[9px] group-focus-within:text-white transition-colors">Email
-          Address</label>
+    <form (submit)="handleSubmit()" class="space-y-5 mb-4">
+
+      <!-- Email Field -->
+      <div class="space-y-2 group">
+
+        <label for="email"
+          class="text-[11px] tracking-wide text-gray-400 group-focus-within:text-white transition-colors duration-300">
+          Email Address
+        </label>
+
         <div class="relative">
+
+          <!-- Icon -->
           <span
-            class="absolute left-3 top-1/2 -translate-y-1/2 material-icons text-accent-muted text-xs group-focus-within:text-white transition-colors"
-            style="left: 7px;">email</span>
-          <input id="email" type="email" [(ngModel)]="email" name="email"
-            class="input-field text-xs pl-8 py-2 bg-black/40 border-white/10 focus:border-white/50 focus:ring-1 focus:ring-white/50 transition-all"
-            placeholder="name@example.com" required>
+            class="absolute left-4 top-1/2 -translate-y-1/2 material-icons text-gray-500 text-[18px] z-10 transition-colors duration-300 group-focus-within:text-white">
+            email
+          </span>
+
+          <!-- Input -->
+          <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="name@example.com" required class="w-full rounded-2xl bg-white/[0.04] border border-white/[0.08]
+               pl-12 pr-4 py-2 text-sm text-white
+               placeholder:text-gray-500
+               backdrop-blur-xl
+               outline-none
+               transition-all duration-300
+               focus:bg-white/[0.06]
+               focus:border-white/20
+               hover:bg-white/[0.05]" />
+
         </div>
-      </div>
-      <div class="space-y-1 group">
-        <label for="password"
-          class="tech-label text-[9px] group-focus-within:text-white transition-colors">Password</label>
-        <div class="relative">
-          <span
-            class="absolute left-3 top-1/2 -translate-y-1/2 material-icons text-accent-muted text-xs group-focus-within:text-white transition-colors"
-            style="left: 7px;">lock</span>
-          <input id="password" [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password"
-            class="input-field text-xs pl-8 pr-10 py-2 bg-black/40 border-white/10 focus:border-white/50 focus:ring-1 focus:ring-white/50 transition-all"
-            placeholder="••••••••" required>
-          <button type="button" (click)="showPassword.set(!showPassword())"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-accent-muted hover:text-white transition-colors focus:outline-none">
-            <span class="material-icons text-sm">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
-          </button>
-        </div>
+
       </div>
 
-      <button type="submit" [disabled]="isLoading()"
-        class="w-full py-2 mt-4 bg-white hover:bg-white/90 text-metallic-black text-xs font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+      <!-- Password Field -->
+      <div class="space-y-2 group">
+
+        <label for="password"
+          class="text-[11px] tracking-wide text-gray-400 group-focus-within:text-white transition-colors duration-300">
+          Password
+        </label>
+
+        <div class="relative">
+
+          <!-- Lock Icon -->
+          <span
+            class="absolute left-4 top-1/2 -translate-y-1/2 material-icons text-gray-500 text-[18px] z-10 transition-colors duration-300 group-focus-within:text-white">
+            lock
+          </span>
+
+          <!-- Password Input -->
+          <input id="password" [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password"
+            placeholder="••••••••" required class="w-full rounded-2xl bg-white/[0.04] border border-white/[0.08]
+               pl-12 pr-12 py-2 text-sm text-white
+               placeholder:text-gray-500
+               backdrop-blur-xl
+               outline-none
+               transition-all duration-300
+               focus:bg-white/[0.06]
+               focus:border-white/20
+               hover:bg-white/[0.05]" />
+
+          <!-- Show Password Button -->
+          <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-4 top-1/2 -translate-y-1/2
+               text-gray-500 hover:text-white
+               transition-colors duration-300
+               focus:outline-none">
+
+            <span class="material-icons text-[18px]">
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <button type="submit" [disabled]="isLoading()" class="group w-full rounded-2xl
+         bg-white/[0.05]
+         border border-white/[0.08]
+         backdrop-blur-xl
+         py-3 px-5
+         text-sm font-medium text-white
+         transition-all duration-300
+         enabled:hover:bg-white/[0.08]
+         enabled:hover:border-white/20
+         enabled:hover:-translate-y-1
+         enabled:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)]
+         active:scale-[0.98]
+         disabled:opacity-50
+         disabled:cursor-not-allowed">
+
         @if (isLoading()) {
-        <span class="animate-spin material-icons text-xs">refresh</span>
-        Authenticating...
+
+        <div class="flex items-center justify-center gap-2">
+          <span class="animate-spin material-icons text-sm">
+            refresh
+          </span>
+
+          <span>
+            Authenticating...
+          </span>
+        </div>
+
         } @else {
-        Login to Dashboard
-        <span class="material-icons text-xs">arrow_forward</span>
+
+        <div class="flex items-center justify-center gap-3">
+
+          <span class="tracking-wide">
+            Login to Dashboard
+          </span>
+
+          <span class="material-icons text-[20px] transition-transform duration-300 group-hover:translate-x-1">
+            arrow_forward
+          </span>
+
+        </div>
+
         }
+
       </button>
+
     </form>
 
     <div class="flex flex-col gap-3 mt-6 pt-4 border-t border-white/5">
@@ -74,11 +173,10 @@
         <span class="material-icons text-sm transition-transform group-hover:-translate-x-1">arrow_back</span>
         Back to Home
       </a>
-      
+
       <p class="text-center text-[10px] text-accent-muted">
         New here?
-        <a routerLink="/register"
-          class="text-white hover:underline font-bold ml-1">Create an Account</a>
+        <a routerLink="/register" class="text-white hover:underline font-bold ml-1">Create an Account</a>
       </p>
     </div>
   </div>
