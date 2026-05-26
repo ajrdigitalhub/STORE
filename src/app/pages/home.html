@@ -13,23 +13,23 @@
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-10 animate-section">
     @if (productService.isLoading()) {
-      @for (i of [1, 2, 3]; track i) {
-        <div class="glass-card rounded-3xl overflow-hidden border border-white/5">
-          <app-skeleton height="300px" className="rounded-none"></app-skeleton>
-          <div class="p-6 space-y-4">
-            <app-skeleton width="60%" height="1.5rem"></app-skeleton>
-            <app-skeleton width="40%" height="1rem"></app-skeleton>
-            <div class="flex justify-between items-center pt-4">
-              <app-skeleton width="30%" height="1.5rem"></app-skeleton>
-              <app-skeleton width="40px" height="40px" className="rounded-full"></app-skeleton>
-            </div>
-          </div>
+    @for (i of [1, 2, 3]; track i) {
+    <div class="glass-card rounded-3xl overflow-hidden border border-white/5">
+      <app-skeleton height="300px" className="rounded-none"></app-skeleton>
+      <div class="p-6 space-y-4">
+        <app-skeleton width="60%" height="1.5rem"></app-skeleton>
+        <app-skeleton width="40%" height="1rem"></app-skeleton>
+        <div class="flex justify-between items-center pt-4">
+          <app-skeleton width="30%" height="1.5rem"></app-skeleton>
+          <app-skeleton width="40px" height="40px" className="rounded-full"></app-skeleton>
         </div>
-      }
+      </div>
+    </div>
+    }
     } @else {
-      @for (product of productService.products().slice(0, 3); track product.id) {
-        <app-product-card [product]="product"></app-product-card>
-      }
+    @for (product of productService.products().slice(0, 3); track product.id) {
+    <app-product-card [product]="product"></app-product-card>
+    }
     }
   </div>
 </section>
@@ -42,17 +42,20 @@
       <div class="text-center animate-item">
         <span class="material-icons text-5xl text-accent mb-6">speed</span>
         <h3 class="text-xl font-bold mb-4">Fast Turnaround</h3>
-        <p class="text-accent-muted">We prioritize speed without compromising on quality, ensuring your projects are delivered on time.</p>
+        <p class="text-accent-muted">We prioritize speed without compromising on quality, ensuring your projects are
+          delivered on time.</p>
       </div>
       <div class="text-center animate-item">
         <span class="material-icons text-5xl text-accent mb-6">verified</span>
         <h3 class="text-xl font-bold mb-4">Quality Guaranteed</h3>
-        <p class="text-accent-muted">Our industrial-grade printers and rigorous testing ensure every part meets the highest standards.</p>
+        <p class="text-accent-muted">Our industrial-grade printers and rigorous testing ensure every part meets the
+          highest standards.</p>
       </div>
       <div class="text-center animate-item">
         <span class="material-icons text-5xl text-accent mb-6">support_agent</span>
         <h3 class="text-xl font-bold mb-4">Expert Support</h3>
-        <p class="text-accent-muted">Our team of engineers is here to assist you with design optimization and material selection.</p>
+        <p class="text-accent-muted">Our team of engineers is here to assist you with design optimization and material
+          selection.</p>
       </div>
     </div>
   </div>
@@ -64,22 +67,32 @@
     <h2 class="text-4xl font-bold mb-16 text-center">What Our Clients Say</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
       <div class="glass-card p-8 rounded-3xl animate-item">
-        <p class="text-lg italic mb-6">"The precision of their 3D prints is unmatched. They helped us prototype our new product in record time."</p>
+        <p class="text-lg italic mb-6">"Buying my 3D printer from Ideazone3D was an amazing experience, especially as a
+          beginner. Their outstanding support guided me through installation, setup, and software troubleshooting with
+          incredible patience. They stay dedicated long after the purchase, always ready to help whenever issues arise.
+          I highly recommend them to anyone entering the world of 3D printing!"</p>
         <div class="flex items-center gap-4">
-          <img src="https://picsum.photos/seed/client1/100/100" alt="Client" class="w-12 h-12 rounded-full" referrerpolicy="no-referrer">
+          <img src="https://picsum.photos/seed/client1/100/100" alt="Client" class="w-12 h-12 rounded-full"
+            referrerpolicy="no-referrer">
           <div>
-            <h4 class="font-bold">3D Hub</h4>
-            <p class="text-sm text-accent-muted">Product Designer</p>
+            <h4 class="font-bold">Sunil</h4>
+            <p class="text-sm text-accent-muted">CUSTOMER</p>
           </div>
         </div>
       </div>
       <div class="glass-card p-8 rounded-3xl animate-item">
-        <p class="text-lg italic mb-6">"Excellent service and expert advice. They truly understand the complexities of 3D printing."</p>
+        <p class="text-lg italic mb-6">"Hi Ideazone Team,
+          I recently purchased the Bambu lab a1 Combo from Idea Zone, and the experience has been exceptional! The
+          machine arrived in flawless condition with no defects, and the installation was smooth thanks to their helpful
+          team. What truly stands out is their customer service; they’ve been incredibly responsive and resolved any
+          technical issues promptly. Their dedication to customer satisfaction is truly top-notch. I highly recommend
+          Idea Zone for anyone looking for quality products and outstanding service!"</p>
         <div class="flex items-center gap-4">
-          <img src="https://picsum.photos/seed/client2/100/100" alt="Client" class="w-12 h-12 rounded-full" referrerpolicy="no-referrer">
+          <img src="https://portal.bblmw.com/p2s/0zzhnrks5h7i/highlight/2.jpg" alt="Client"
+            class="w-12 h-12 rounded-full" referrerpolicy="no-referrer">
           <div>
-            <h4 class="font-bold">AJRMart.com</h4>
-            <p class="text-sm text-accent-muted">Engineer</p>
+            <h4 class="font-bold">Ravi</h4>
+            <p class="text-sm text-accent-muted">CUSTOMER</p>
           </div>
         </div>
       </div>
@@ -90,22 +103,29 @@
 <section class="relative py-32 px-4 overflow-hidden">
   <!-- Decorative background elements -->
   <div class="absolute top-0 left-0 w-full h-full z-0">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/5 rounded-full blur-[120px]"></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/5 rounded-full blur-[120px]">
+    </div>
   </div>
 
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center relative z-10">
     <div class="relative">
       <div class="glass-card p-3 rounded-[2.5rem] relative z-10 overflow-hidden group">
-        <img src="https://picsum.photos/seed/printer/800/800" alt="3D Printer" class="w-full h-full object-cover rounded-[2rem] transition-transform duration-700 group-hover:scale-105" referrerpolicy="no-referrer">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-10">
+        <img src="https://portal.bblmw.com/p2s/0zzhnrks5h7i/highlight/2.jpg" alt="3D Printer"
+          class="w-full h-full object-cover rounded-[2rem] transition-transform duration-700 group-hover:scale-105"
+          referrerpolicy="no-referrer">
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-10">
           <p class="text-white font-medium">Precision Engineering in every layer.</p>
         </div>
       </div>
       <!-- Decorative rings -->
       <div class="absolute -top-10 -left-10 w-40 h-40 border border-accent/20 rounded-full animate-spin-slow"></div>
-      <div class="absolute -bottom-10 -right-10 w-60 h-60 border border-white/10 rounded-full animate-reverse-spin-slow"></div>
+      <div
+        class="absolute -bottom-10 -right-10 w-60 h-60 border border-white/10 rounded-full animate-reverse-spin-slow">
+      </div>
     </div>
-    
+
     <div class="space-y-10">
       <div class="inline-block">
         <span class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4 block">Custom Solutions</span>
@@ -113,13 +133,15 @@
           Custom 3D <br> <span class="text-accent">Printing</span> <br> On Demand
         </h2>
       </div>
-      
+
       <p class="text-accent-muted text-xl leading-relaxed font-light">
-        Have a specific design in mind? Our featured products allow for custom name and image uploads. We bring your unique ideas to life with industrial-grade precision.
+        Have a specific design in mind? Our featured products allow for custom name and image uploads. We bring your
+        unique ideas to life with industrial-grade precision.
       </p>
-      
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/30 transition-colors">
+        <div
+          class="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/30 transition-colors">
           <span class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent flex-shrink-0">
             <span class="material-icons">precision_manufacturing</span>
           </span>
@@ -128,7 +150,8 @@
             <p class="text-xs text-accent-muted">Ultra-fine detail for intricate designs.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/30 transition-colors">
+        <div
+          class="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/30 transition-colors">
           <span class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent flex-shrink-0">
             <span class="material-icons">layers</span>
           </span>
@@ -138,9 +161,10 @@
           </div>
         </div>
       </div>
-      
+
       <div class="pt-6">
-        <a routerLink="/contact" class="group relative inline-flex items-center gap-4 px-10 py-5 bg-white text-black font-bold uppercase tracking-widest rounded-full transition-all hover:bg-accent">
+        <a routerLink="/contact"
+          class="group relative inline-flex items-center gap-4 px-10 py-5 bg-white text-black font-bold uppercase tracking-widest rounded-full transition-all hover:bg-accent">
           <span>Get a Quote</span>
           <span class="material-icons group-hover:translate-x-2 transition-transform">arrow_forward</span>
         </a>
