@@ -5,25 +5,32 @@
     <div class="lg:col-span-2 space-y-8">
       <div class="glass-card p-8">
         <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
-          <span class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">1</span>
+          <span
+            class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">1</span>
           Shipping Address
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-2">
-            <label for="fullName" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Full Name</label>
+            <label for="fullName" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Full
+              Name</label>
             <input id="fullName" type="text" [(ngModel)]="address.name" placeholder="Your Name" class="input-field">
           </div>
           <div class="space-y-2">
-            <label for="phone" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Phone Number</label>
+            <label for="phone" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Phone
+              Number</label>
             <input id="phone" type="text" [(ngModel)]="address.phone" placeholder="+91 9876543210" class="input-field">
           </div>
           <div class="space-y-2">
-            <label for="email" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Email Address</label>
-            <input id="email" type="email" [(ngModel)]="address.email" placeholder="john@example.com" class="input-field">
+            <label for="email" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Email
+              Address</label>
+            <input id="email" type="email" [(ngModel)]="address.email" placeholder="john@example.com"
+              class="input-field">
           </div>
           <div class="md:col-span-2 space-y-2">
-            <label for="street" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Street Address</label>
-            <input id="street" type="text" [(ngModel)]="address.address" placeholder="123, Tech Park" class="input-field">
+            <label for="street" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Street
+              Address</label>
+            <input id="street" type="text" [(ngModel)]="address.address" placeholder="123, Tech Park"
+              class="input-field">
           </div>
           <div class="space-y-2">
             <label for="city" class="text-xs font-bold uppercase tracking-widest text-accent-muted">City</label>
@@ -42,7 +49,8 @@
 
       <div class="glass-card p-8">
         <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
-          <span class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">2</span>
+          <span
+            class="w-8 h-8 bg-accent text-metallic-black rounded-lg flex items-center justify-center text-sm">2</span>
           Payment Method
         </h2>
         <div class="grid grid-cols-1 gap-4">
@@ -52,7 +60,8 @@
               <span class="material-icons text-accent text-sm">check_circle</span>
             </div>
             <h4 class="font-bold mb-1">Razorpay Secure</h4>
-            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking. (COD is currently disabled)</p>
+            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking. (COD is currently
+              disabled)</p>
           </div>
         </div>
       </div>
@@ -63,24 +72,25 @@
         <h2 class="text-2xl font-bold mb-8">Order Summary</h2>
         <div class="space-y-4 mb-8">
           @for (item of cartService.items(); track item.id) {
-            <div class="flex justify-between text-sm">
-              <span class="text-accent-muted">{{ item.name }} x {{ item.quantity }}</span>
-              <span>{{ item.price * item.quantity | currency:'INR' }}</span>
-            </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-accent-muted">{{ item.name }} x {{ item.quantity }}</span>
+            <span>{{ item.price * item.quantity | currency:'INR' }}</span>
+          </div>
           }
           <div class="border-t border-white/5 pt-4 flex justify-between text-xl font-bold text-white">
             <span>Total</span>
-            <span>{{ cartService.totalPrice() * 1.18 | currency:'INR' }}</span>
+            <span>{{ cartService.totalPrice() * 1 | currency:'INR' }}</span>
           </div>
         </div>
 
-        <button (click)="placeOrder()" [disabled]="isProcessing()" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
+        <button (click)="placeOrder()" [disabled]="isProcessing()"
+          class="metallic-button w-full py-4 flex items-center justify-center gap-3">
           @if (isProcessing()) {
-            <span class="animate-spin material-icons text-sm">refresh</span>
-            Processing...
+          <span class="animate-spin material-icons text-sm">refresh</span>
+          Processing...
           } @else {
-            Place Order
-            <span class="material-icons">check_circle</span>
+          Place Order
+          <span class="material-icons">check_circle</span>
           }
         </button>
       </div>
