@@ -37,7 +37,7 @@ export class CheckoutComponent {
     state: '',
     zip: ''
   };
-  paymentMethod = signal<'Razorpay'>('Razorpay');
+  paymentMethod = signal<'Razorpay' | 'COD'>('Razorpay');
   isProcessing = signal(false);
 
   async placeOrder() {

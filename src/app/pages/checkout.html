@@ -54,15 +54,35 @@
           Payment Method
         </h2>
         <div class="grid grid-cols-1 gap-4">
-          <div class="glass-card p-6 text-left border-2 border-accent bg-accent/5">
+          <button type="button" (click)="paymentMethod.set('Razorpay')" 
+            [ngClass]="paymentMethod() === 'Razorpay' ? 'border-accent bg-accent/5' : 'border-white/10 opacity-70 hover:border-white/30'"
+            class="glass-card p-6 text-left border-2 transition-all w-full">
             <div class="flex items-center justify-between mb-4">
-              <span class="material-icons text-accent">payment</span>
-              <span class="material-icons text-accent text-sm">check_circle</span>
+              <div class="flex items-center gap-3">
+                <span class="material-icons text-accent">payment</span>
+                <h4 class="font-bold">Razorpay Secure</h4>
+              </div>
+              <span class="material-icons text-sm" [ngClass]="paymentMethod() === 'Razorpay' ? 'text-accent' : 'text-accent-muted'">
+                {{ paymentMethod() === 'Razorpay' ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
             </div>
-            <h4 class="font-bold mb-1">Razorpay Secure</h4>
-            <p class="text-xs text-accent-muted">Pay securely with Cards, UPI, or NetBanking. (COD is currently
-              disabled)</p>
-          </div>
+            <p class="text-xs text-accent-muted ml-9">Pay securely with Cards, UPI, or NetBanking.</p>
+          </button>
+
+          <button type="button" (click)="paymentMethod.set('COD')" 
+            [ngClass]="paymentMethod() === 'COD' ? 'border-accent bg-accent/5' : 'border-white/10 opacity-70 hover:border-white/30'"
+            class="glass-card p-6 text-left border-2 transition-all w-full">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <span class="material-icons text-accent">local_shipping</span>
+                <h4 class="font-bold">Cash on Delivery (COD)</h4>
+              </div>
+              <span class="material-icons text-sm" [ngClass]="paymentMethod() === 'COD' ? 'text-accent' : 'text-accent-muted'">
+                {{ paymentMethod() === 'COD' ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+            <p class="text-xs text-accent-muted ml-9">Pay with cash upon delivery.</p>
+          </button>
         </div>
       </div>
     </div>
