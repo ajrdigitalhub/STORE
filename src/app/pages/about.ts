@@ -44,10 +44,10 @@ import { ConfigService } from '../services/config';
             <div class="relative">
               <div class="aspect-square rounded-3xl overflow-hidden glass-card p-2">
                 <img 
-                  src="/assets/ideazone3d.png"  
+                  src="/assets/ideazone3dnewimage.png"  
                   alt="Process" 
                   class="w-full h-full object-cover rounded-2xl"
-                  referrerpolicy="no-referrer"
+                  referrerpolicy="no-referrer" 
                 >
               </div>
               <div class="absolute -bottom-10 -left-10 glass-card p-8 hidden md:block">
