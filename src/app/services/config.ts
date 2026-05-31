@@ -47,6 +47,7 @@ export interface FooterConfig {
 export interface RazorpayConfig {
   keyId: string;
   enabled: boolean;
+  codEnabled: boolean;
 }
 
 export interface WhatsAppConfig {
@@ -132,7 +133,8 @@ export class ConfigService {
     },
     razorpay: {
       keyId: '',
-      enabled: false
+      enabled: false,
+      codEnabled: false
     },
     whatsapp: {
       apiEnabled: false,

@@ -12,14 +12,36 @@ import messageRoutes from './routes/messages.js';
 import { serverConfig } from './config.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {environment} from '../src/environments/environment.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000',environment.apiUrl)
+
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS origin denied: ${origin}`));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
 export const createApp = () => {
   const app = express();
   
-  app.use(cors());
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 

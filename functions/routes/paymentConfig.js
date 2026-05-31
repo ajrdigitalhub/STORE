@@ -10,7 +10,8 @@ router.get('/public', async (req, res, next) => {
     res.json({
       razorpayKeyId: config.razorpay_keyid,
       merchantName: config.merchant_name,
-      merchantLogo: config.merchant_logo
+      merchantLogo: config.merchant_logo,
+      codEnabled: config.cod_enabled
     });
   } catch (error) {
     next(error);

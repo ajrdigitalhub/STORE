@@ -337,9 +337,9 @@ async function sendOrderStatusUpdate(order, status) {
   try {
     const settings = await getSettings();
     const { whatsappSettings, currency, siteName } = settings;
-
-    recipientNumber = order.shippingAddress?.whatsappNumber;
+    recipientNumber = order.shipping_address.phone;
     if (!recipientNumber) {
+      console.log(order,'sg',status)
       console.log(`⚠️ No WhatsApp number for order ${order.orderNumber}`);
       return;
     }

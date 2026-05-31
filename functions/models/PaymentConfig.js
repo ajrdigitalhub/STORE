@@ -7,6 +7,7 @@ class PaymentConfig {
     this.razorpay_key_secret = data.razorpay_key_secret;
     this.merchant_name = data.merchant_name;
     this.merchant_logo = data.merchant_logo;
+    this.cod_enabled = data.cod_enabled;
     this.updated_at = data.updated_at;
   }
 
@@ -28,14 +29,14 @@ class PaymentConfig {
 
   // Create config
   static async create(configData) {
-    const { razorpay_keyid, razorpay_key_secret, merchant_name = 'IDEAZONE 3D', merchant_logo = '' } = configData;
+    const { razorpay_keyid, razorpay_key_secret, merchant_name = 'IDEAZONE3D', merchant_logo = '', cod_enabled = false } = configData;
 
     const query = `
-      INSERT INTO payment_configs (razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO payment_configs (razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo, cod_enabled)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
-    const values = [razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo];
+    const values = [razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo, cod_enabled];
 
     const result = await pool.query(query, values);
     return new PaymentConfig(result.rows[0]);
@@ -43,7 +44,7 @@ class PaymentConfig {
 
   // Update config
   static async update(configData) {
-    const { razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo } = configData;
+    const { razorpay_keyid, razorpay_key_secret, merchant_name, merchant_logo, cod_enabled } = configData;
 
     const fields = [];
     const values = [];
@@ -70,6 +71,12 @@ class PaymentConfig {
     if (merchant_logo !== undefined) {
       fields.push(`merchant_logo = $${paramIndex}`);
       values.push(merchant_logo);
+      paramIndex++;
+    }
+    
+    if (cod_enabled !== undefined) {
+      fields.push(`cod_enabled = $${paramIndex}`);
+      values.push(cod_enabled);
       paramIndex++;
     }
 

@@ -99,6 +99,7 @@ CREATE TABLE payment_configs (
     razorpay_key_secret VARCHAR(255),
     merchant_name VARCHAR(255),
     merchant_logo VARCHAR(500),
+    cod_enabled BOOLEAN DEFAULT FALSE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

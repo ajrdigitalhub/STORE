@@ -104,15 +104,37 @@ const Chat = require('./models/Chat');
 
 const app = express();
 const server = http.createServer(app);
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:4200,https://ideazone3d.com/')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS origin denied: ${origin}`));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -231,10 +253,10 @@ app.get(/^(?!\/api).*/, (req, res) => {
   }
 });
 
-if (require.main === module) {
-  server.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
+// if (require.main === module) {
+//   server.listen(port, () => {
+//     console.log(`Server running on port ${port}`);
+//   });
+// }
 
-module.exports = { app, io };
+module.exports = app;

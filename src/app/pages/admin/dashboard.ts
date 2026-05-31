@@ -136,10 +136,11 @@ export class AdminDashboardComponent implements AfterViewInit {
     mapUrl: ''
   });
 
-  razorpayForm = signal({
+  paymentSettings = signal({
     keyId: '',
     keySecret: '',
-    enabled: false
+    enabled: false,
+    codEnabled: false
   });
 
   footerForm = signal({
@@ -190,8 +191,8 @@ export class AdminDashboardComponent implements AfterViewInit {
         if (!this.contactForm().email && config.contact?.email) {
           this.contactForm.set({ ...config.contact });
         }
-        if (!this.razorpayForm().keyId && config.razorpay?.keyId) {
-          this.razorpayForm.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled }));
+        if (!this.paymentSettings().keyId && config.razorpay?.keyId) {
+          this.paymentSettings.update(f => ({ ...f, keyId: config.razorpay.keyId, enabled: config.razorpay.enabled, codEnabled: config.razorpay.codEnabled }));
           this.loadRazorpaySecret();
         }
         if (config.whatsapp && !this.whatsappSettings.apiUrl && config.whatsapp.apiUrl) {
@@ -240,7 +241,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     try {
       const res = await this.configService.getRazorpaySecret();
       if (res) {
-        this.razorpayForm.update(f => ({ ...f, keySecret: res.keySecret }));
+        this.paymentSettings.update(f => ({ ...f, keySecret: res.keySecret }));
       }
     } catch (error) {
       console.warn('Razorpay secret not found', error);
@@ -507,13 +508,14 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async saveRazorpayConfig() {
     const currentConfig = this.configService.config();
-    const form = this.razorpayForm();
+    const form = this.paymentSettings();
     
     const newConfig: AppConfig = {
       ...currentConfig,
       razorpay: {
         keyId: form.keyId,
-        enabled: form.enabled
+        enabled: form.enabled,
+        codEnabled: form.codEnabled
       }
     };
     
@@ -560,7 +562,11 @@ export class AdminDashboardComponent implements AfterViewInit {
   }
 
   toggleRazorpay() {
-    this.razorpayForm.update(f => ({ ...f, enabled: !f.enabled }));
+    this.paymentSettings.update(f => ({ ...f, enabled: !f.enabled }));
+  }
+
+  toggleCod() {
+    this.paymentSettings.update(f => ({ ...f, codEnabled: !f.codEnabled }));
   }
 
   async onCategoryImageSelected(event: Event) {

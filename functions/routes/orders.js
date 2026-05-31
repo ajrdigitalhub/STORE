@@ -9,10 +9,10 @@ const router = express.Router();
 // POST /api/orders — create order (customer)
 router.post('/', auth, async (req, res, next) => {
   try {
-    const {
-      items,
-      shippingAddress,
-      paymentMethod,
+    const { 
+      items, 
+      shippingAddress, 
+      paymentMethod, 
       totalAmount,
       gst_amount,
       shipping_charge,
@@ -107,11 +107,11 @@ router.get('/', auth, async (req, res, next) => {
       result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
     }
 
-    res.json({
-      orders: result.orders,
-      total: result.total,
-      page: Number(page),
-      pages: Math.ceil(result.total / Number(limit))
+    res.json({ 
+      orders: result.orders, 
+      total: result.total, 
+      page: Number(page), 
+      pages: Math.ceil(result.total / Number(limit)) 
     });
   } catch (error) {
     next(error);
@@ -140,6 +140,25 @@ router.put('/:id/status', adminAuth, async (req, res, next) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
     const order = await Order.updateStatus(req.params.id, { orderStatus, paymentStatus });
+    
+    // Send WhatsApp notification
+    const { sendOrderStatusUpdate } = require('../whatsapp');
+    const orderWithDetails = await Order.findById(req.params.id);
+    
+    if (orderWithDetails) {
+      sendOrderStatusUpdate({
+        ...orderWithDetails,
+        whatsappNumber: orderWithDetails.whatsappNumber || orderWithDetails.shippingAddress?.whatsappNumber,
+        customerName: orderWithDetails.user_name,
+        orderNumber: orderWithDetails.order_number,
+        totalAmount: orderWithDetails.total_amount,
+        paymentMethod: orderWithDetails.payment_method,
+        status: orderWithDetails.order_status,
+        shippingAddress: typeof orderWithDetails.shipping_address === 'string' ? JSON.parse(orderWithDetails.shipping_address) : orderWithDetails.shipping_address,
+        userId: orderWithDetails.user_id
+      }, orderStatus).catch(err => console.error('WhatsApp status update notification failed:', err));
+    }
+    
     res.json(order);
   } catch (error) {
     next(error);

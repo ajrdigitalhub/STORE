@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CartService } from '../services/cart';
 import { OrderService } from '../services/order';
 import { PaymentService } from '../services/payment';
+import { ConfigService } from '../services/config';
 import { AuthService } from '../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
@@ -24,21 +25,26 @@ export class CheckoutComponent {
   cartService = inject(CartService);
   orderService = inject(OrderService);
   paymentService = inject(PaymentService);
+  configService = inject(ConfigService);
   authService = inject(AuthService);
   toastService = inject(ToastService);
   router = inject(Router);
 
-  address = {
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zip: ''
+  address = { 
+    name: '', 
+    email: '', 
+    phone: '', 
+    address: '', 
+    city: '', 
+    state: '', 
+    zip: '' 
   };
-  paymentMethod = signal<'Razorpay'>('Razorpay');
+  paymentMethod = signal<'Razorpay' | 'cod'>('Razorpay');
   isProcessing = signal(false);
+
+  get isCodEnabled() {
+    return this.configService.config().razorpay.codEnabled;
+  }
 
   async placeOrder() {
     if (!this.validateForm()) return;
@@ -46,9 +52,10 @@ export class CheckoutComponent {
     this.isProcessing.set(true);
     try {
       const subtotal = this.cartService.totalPrice();
+      const gstAmount = 0;
       const shippingCharge = 0; // FREE shipping
-      const total = subtotal + shippingCharge;
-
+      const total = subtotal + gstAmount + shippingCharge;
+      
       const profile = this.authService.profile();
       if (!profile) {
         throw new Error('User profile not loaded. Please login again.');
@@ -70,7 +77,7 @@ export class CheckoutComponent {
 
         const rzpOrder = await this.paymentService.createRazorpayOrder(total);
         const rzpKey = await this.paymentService.getRazorpayKey();
-
+        
         const options = {
           key: rzpKey,
           amount: rzpOrder.amount,
@@ -86,6 +93,7 @@ export class CheckoutComponent {
                 userid: profile.id,
                 items: orderItems,
                 total_amount: total,
+                gst_amount: gstAmount,
                 shipping_charge: shippingCharge,
                 payment_method: 'razorpay',
                 shipping_address: this.address,
@@ -126,6 +134,7 @@ export class CheckoutComponent {
           userid: profile.id,
           items: orderItems,
           total_amount: total,
+          gst_amount: gstAmount,
           shipping_charge: shippingCharge,
           order_status: 'pending',
           payment_status: 'pending',
@@ -150,7 +159,7 @@ export class CheckoutComponent {
       this.toastService.show('Please fill in all shipping details.', 'error');
       return false;
     }
-
+    
     const items = this.cartService.items();
     if (items.length === 0) {
       this.toastService.show('Your cart is empty.', 'error');
