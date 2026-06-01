@@ -133,8 +133,7 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -259,4 +258,4 @@ app.get(/^(?!\/api).*/, (req, res) => {
 //   });
 // }
 
-module.exports = app;
+module.exports = { app, io };

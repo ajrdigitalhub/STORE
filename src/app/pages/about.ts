@@ -44,7 +44,7 @@ import { ConfigService } from '../services/config';
             <div class="relative">
               <div class="aspect-square rounded-3xl overflow-hidden glass-card p-2">
                 <img 
-                  src="https://scontent.fvga3-1.fna.fbcdn.net/v/t39.30808-1/471842474_122138153156380293_3321397475518283298_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=111&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=W7djg-IxdJwQ7kNvwEdMSrl&_nc_oc=AdqYgYGkxCYglyo5ftDKTbljZUUPKIiXBsStP96zVHPCO2asvS-zhCrGYeWlf-dY4l0&_nc_zt=24&_nc_ht=scontent.fvga3-1.fna&_nc_gid=U-1CSZnj1WTtYy0ieqs1cw&_nc_ss=7a2a8&oh=00_Af5lS46Na7mvQRLJzZZOd749Immc73nFUcxSoJnwAku2Vg&oe=6A1AF7A8" 
+                  src="assets/IdeaZoneBanner.png" 
                   alt="Process" 
                   class="w-full h-full object-cover rounded-2xl"
                   referrerpolicy="no-referrer"

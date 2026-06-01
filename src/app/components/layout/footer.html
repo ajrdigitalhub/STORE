@@ -1,17 +1,25 @@
 <footer class="bg-metallic-gray border-t border-white/5 pt-16 pb-8 px-4 mt-20">
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
     <div class="space-y-6">
-      <a routerLink="/" class="text-2xl font-display font-bold tracking-tighter text-white">
-         IDEAZONE 3D
+      <a
+        routerLink="/"
+        class="text-2xl font-display font-bold tracking-tighter text-white"
+      >
+        IDEAZONE 3D
       </a>
       <p class="text-accent-muted text-sm leading-relaxed">
         {{ configService.config().footer.description }}
       </p>
       <div class="flex gap-4">
-        @for (link of configService.config().footer.socialLinks; track link.platform) {
-          <a [href]="link.url" target="_blank" class="w-10 h-10 rounded-full bg-metallic-light flex items-center justify-center text-accent hover:bg-accent hover:text-metallic-black transition-all">
-            <span class="material-icons text-sm">{{ link.icon }}</span>
-          </a>
+        @for (link of configService.config().footer.socialLinks; track
+        link.platform) {
+        <a
+          [href]="link.url"
+          target="_blank"
+          class="w-10 h-10 rounded-full bg-metallic-light flex items-center justify-center text-accent hover:bg-accent hover:text-metallic-black transition-all"
+        >
+          <span class="material-icons text-sm">{{ link.icon }}</span>
+        </a>
         }
       </div>
     </div>
@@ -19,20 +27,50 @@
     <div>
       <h4 class="text-white font-bold mb-6">Quick Links</h4>
       <ul class="space-y-4 text-sm text-accent-muted">
-        <li><a routerLink="/" class="hover:text-white transition-colors">Home</a></li>
-        <li><a routerLink="/products" class="hover:text-white transition-colors">Shop</a></li>
-        <li><a routerLink="/about" class="hover:text-white transition-colors">About Us</a></li>
-        <li><a routerLink="/contact" class="hover:text-white transition-colors">Contact</a></li>
+        <li>
+          <a routerLink="/" class="hover:text-white transition-colors">Home</a>
+        </li>
+        <li>
+          <a routerLink="/products" class="hover:text-white transition-colors"
+            >Shop</a
+          >
+        </li>
+        <li>
+          <a routerLink="/about" class="hover:text-white transition-colors"
+            >About Us</a
+          >
+        </li>
+        <li>
+          <a routerLink="/contact" class="hover:text-white transition-colors"
+            >Contact</a
+          >
+        </li>
       </ul>
     </div>
 
     <div>
       <h4 class="text-white font-bold mb-6">Customer Service</h4>
       <ul class="space-y-4 text-sm text-accent-muted">
-        <li><a routerLink="/profile" class="hover:text-white transition-colors">My Account</a></li>
-        <li><a routerLink="/terms" class="hover:text-white transition-colors">Terms & Conditions</a></li>
-        <li><a routerLink="/returns" class="hover:text-white transition-colors">Return Policy</a></li>
-        <li><a routerLink="/contact" class="hover:text-white transition-colors">Support</a></li>
+        <li>
+          <a routerLink="/profile" class="hover:text-white transition-colors"
+            >My Account</a
+          >
+        </li>
+        <li>
+          <a routerLink="/terms" class="hover:text-white transition-colors"
+            >Terms & Conditions</a
+          >
+        </li>
+        <li>
+          <a routerLink="/returns" class="hover:text-white transition-colors"
+            >Return Policy</a
+          >
+        </li>
+        <li>
+          <a routerLink="/contact" class="hover:text-white transition-colors"
+            >Support</a
+          >
+        </li>
       </ul>
     </div>
 
@@ -40,7 +78,9 @@
       <h4 class="text-white font-bold mb-6">Contact Us</h4>
       <ul class="space-y-4 text-sm text-accent-muted">
         <li class="flex items-start gap-3">
-          <span class="material-icons text-accent text-sm mt-1">location_on</span>
+          <span class="material-icons text-accent text-sm mt-1"
+            >location_on</span
+          >
           <span>{{ configService.config().contact.address }}</span>
         </li>
         <li class="flex items-center gap-3">
@@ -55,15 +95,40 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest">
-    <p>
-      {{ configService.config().footer.copyrightText }} | 
-      <a href="https://www.instagram.com/ajrdigitalhub" target="_blank" class="text-accent font-bold animate-pulse drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:text-white transition-all">Developed BY AJR DIGITAL HUB</a>
+  <div
+    class="max-w-7xl mx-auto border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-accent-muted uppercase tracking-widest"
+  >
+    <p class="font-poppins flex items-center gap-2 flex-wrap">
+      <span class="text-zinc-400 tracking-wide">
+        {{ configService.config().footer.copyrightText }}
+      </span>
+
+      <span class="text-zinc-600">|</span>
+
+      <span
+        class="text-slate-400 text-[11px] md:text-xs font-medium tracking-[0.18em] uppercase"
+      >
+        Developed by
+      </span>
+
+      <a
+        href="https://www.instagram.com/ajr_digital_hub"
+        target="_blank"
+        class="text-sm md:text-base font-semibold tracking-[0.2em] bg-gradient-to-r from-cyan-400 via-sky-300 to-violet-400 bg-clip-text text-transparent hover:brightness-125 hover:scale-[1.03] transition-all duration-300"
+      >
+        AJR DIGITAL HUB
+      </a>
     </p>
     <div class="flex gap-8">
-      <a routerLink="/terms" class="hover:text-white transition-colors">Terms of Service</a>
-      <a routerLink="/returns" class="hover:text-white transition-colors">Return Policy</a>
-      <a routerLink="/contact" class="hover:text-white transition-colors">Contact Us</a>
+      <a routerLink="/terms" class="hover:text-white transition-colors"
+        >Terms of Service</a
+      >
+      <a routerLink="/returns" class="hover:text-white transition-colors"
+        >Return Policy</a
+      >
+      <a routerLink="/contact" class="hover:text-white transition-colors"
+        >Contact Us</a
+      >
     </div>
   </div>
 </footer>
