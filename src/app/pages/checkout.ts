@@ -5,6 +5,7 @@ import { OrderService } from '../services/order';
 import { PaymentService } from '../services/payment';
 import { ConfigService } from '../services/config';
 import { AuthService } from '../services/auth';
+import { ApiService } from '../services/api.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
@@ -27,6 +28,7 @@ export class CheckoutComponent {
   paymentService = inject(PaymentService);
   configService = inject(ConfigService);
   authService = inject(AuthService);
+  apiService = inject(ApiService);
   toastService = inject(ToastService);
   router = inject(Router);
 
@@ -41,6 +43,38 @@ export class CheckoutComponent {
   };
   paymentMethod = signal<'Razorpay' | 'cod'>('Razorpay');
   isProcessing = signal(false);
+  showGuestPopup = signal(false);
+
+  constructor() {
+    const profile = this.authService.profile();
+    if (profile) {
+      this.address.name = profile.name || '';
+      this.address.email = profile.email || '';
+      this.address.phone = profile.phone || '';
+      if (profile.address) {
+        this.address.address = profile.address.street || '';
+        this.address.city = profile.address.city || '';
+        this.address.state = profile.address.state || '';
+        this.address.zip = profile.address.zip || '';
+      }
+      // Track registered checkout start
+      this.apiService.post('/analytics/event', { eventType: 'checkout_start_registered' }).subscribe({
+        error: (err) => console.error('Failed to log checkout start registered:', err)
+      });
+    } else {
+      this.showGuestPopup.set(true);
+    }
+  }
+
+  startGuestCheckoutAnalytics() {
+    this.apiService.post('/analytics/event', { eventType: 'checkout_start_guest' }).subscribe({
+      error: (err) => console.error('Failed to log checkout start guest:', err)
+    });
+  }
+
+  redirectToLogin() {
+    this.router.navigate(['/login'], { queryParams: { redirect: '/checkout' } });
+  }
 
   get isCodEnabled() {
     return this.configService.config().razorpay.codEnabled;
@@ -57,9 +91,7 @@ export class CheckoutComponent {
       const total = subtotal + gstAmount + shippingCharge;
       
       const profile = this.authService.profile();
-      if (!profile) {
-        throw new Error('User profile not loaded. Please login again.');
-      }
+      const isGuest = !profile;
 
       const orderItems = this.cartService.items().map(item => ({
         product: item.id,
@@ -90,23 +122,34 @@ export class CheckoutComponent {
             try {
               // 2. Create order ONLY after successful payment
               const order = await this.orderService.createOrder({
-                userid: profile.id,
+                userid: profile ? profile.id : null,
                 items: orderItems,
                 total_amount: total,
                 gst_amount: gstAmount,
                 shipping_charge: shippingCharge,
                 payment_method: 'razorpay',
                 shipping_address: this.address,
-                // Pass Razorpay details for verification on backend
                 razorpay_orderid: response.razorpay_orderid,
                 razorpay_paymentid: response.razorpay_paymentid,
-                razorpay_signature: response.razorpay_signature
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                razorpay_signature: response.razorpay_signature,
+                isGuest: isGuest,
+                guestName: isGuest ? this.address.name : null,
+                guestPhone: isGuest ? this.address.phone : null,
+                guestEmail: isGuest ? this.address.email : null,
+                firebaseUid: profile ? (this.authService.user()?.uid || null) : null
               } as any);
 
               this.toastService.show('Order placed successfully!', 'success');
               this.cartService.clearCart();
-              this.router.navigate(['/orders', order.id]);
+              // For guests, direct them to tracking page or order success page. We can navigate to tracking page, 
+              // or let them view the order-detail page since our optionalAuth / public track page is available.
+              // Wait, since order-detail page requires login, redirecting a guest to /orders/id will trigger login redirect!
+              // So for guests, we MUST navigate them to the public tracking page /track?orderNumber=ORD-XXX&phone=YYY!
+              if (isGuest) {
+                this.router.navigate(['/track'], { queryParams: { orderNumber: order.order_number, phone: this.address.phone } });
+              } else {
+                this.router.navigate(['/orders', order.id]);
+              }
             } catch (err) {
               console.error('Order creation failed', err);
               this.toastService.show('Order creation failed. Please contact support.', 'error');
@@ -117,7 +160,7 @@ export class CheckoutComponent {
           prefill: {
             name: this.address.name,
             contact: this.address.phone,
-            email: this.authService.profile()?.email || ''
+            email: this.address.email || (this.authService.profile()?.email || '')
           },
           theme: { color: "#e5e5e5" },
           modal: {
@@ -129,9 +172,9 @@ export class CheckoutComponent {
         const rzp = new Razorpay(options);
         rzp.open();
       } else {
-        // COD Flow (if implemented later)
+        // COD Flow
         const order = await this.orderService.createOrder({
-          userid: profile.id,
+          userid: profile ? profile.id : null,
           items: orderItems,
           total_amount: total,
           gst_amount: gstAmount,
@@ -139,11 +182,20 @@ export class CheckoutComponent {
           order_status: 'pending',
           payment_status: 'pending',
           payment_method: 'cod',
-          shipping_address: this.address
+          shipping_address: this.address,
+          isGuest: isGuest,
+          guestName: isGuest ? this.address.name : null,
+          guestPhone: isGuest ? this.address.phone : null,
+          guestEmail: isGuest ? this.address.email : null,
+          firebaseUid: profile ? (this.authService.user()?.uid || null) : null
         });
         this.toastService.show('Order placed successfully!', 'success');
         this.cartService.clearCart();
-        this.router.navigate(['/orders', order.id]);
+        if (isGuest) {
+          this.router.navigate(['/track'], { queryParams: { orderNumber: order.order_number, phone: this.address.phone } });
+        } else {
+          this.router.navigate(['/orders', order.id]);
+        }
         this.isProcessing.set(false);
       }
     } catch (error: unknown) {

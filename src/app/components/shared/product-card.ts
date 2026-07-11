@@ -10,12 +10,12 @@ import { CartService } from '../../services/cart';
   imports: [RouterLink, CurrencyPipe, DecimalPipe],
   template: `
     <div class="glass-card group overflow-hidden h-full flex flex-col">
-      <div class="relative aspect-square overflow-hidden">
+      <a [routerLink]="['/products', product.id]" class="relative aspect-square overflow-hidden block cursor-pointer">
         <img [src]="(product && product.images && product.images.length > 0) ? product.images[0] : 'https://picsum.photos/seed/' + (product.id || 'placeholder') + '/600/600'" 
              [alt]="product.name || 'Product Image'" 
              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
              referrerpolicy="no-referrer">
-        <div class="absolute top-4 right-4 flex flex-col gap-2">
+        <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
           @if (product && product.stock <= 0) {
             <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">Out of Stock</span>
           } @else if (product && product.stock < 5) {
@@ -30,30 +30,32 @@ import { CartService } from '../../services/cart';
           }
         </div>
         
-        <!-- Hover Overlay -->
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+        <!-- Hover Overlay (Desktop only) -->
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center gap-4">
           @if (product) {
-            <a [routerLink]="['/products', product.id]" class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:bg-accent transition-colors">
+            <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:bg-accent transition-colors">
               <span class="material-icons">visibility</span>
-            </a>
-            <button (click)="cartService.addToCart(product)" class="w-12 h-12 rounded-full bg-accent text-black flex items-center justify-center hover:bg-white transition-colors">
+            </div>
+            <button (click)="$event.preventDefault(); $event.stopPropagation(); cartService.addToCart(product)" class="w-12 h-12 rounded-full bg-accent text-black flex-shrink-0 flex items-center justify-center hover:bg-white transition-colors">
               <span class="material-icons">shopping_cart</span>
             </button>
           }
         </div>
-      </div>
+      </a>
       
-      <div class="p-6 flex-grow flex flex-col">
-        <div class="flex justify-between items-start mb-2">
-          <h3 class="text-xl font-bold group-hover:text-accent transition-colors">{{ product.name }}</h3>
-          <span class="text-accent font-bold">{{ product.price | currency:'INR' }}</span>
+      <div class="p-4 sm:p-6 flex-grow flex flex-col">
+        <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+          <h3 class="text-lg sm:text-xl font-bold group-hover:text-accent transition-colors">
+            <a [routerLink]="['/products', product.id]" class="hover:underline">{{ product.name }}</a>
+          </h3>
+          <span class="text-accent font-bold whitespace-nowrap">{{ product.price | currency:'INR' }}</span>
         </div>
-        <p class="text-accent-muted text-sm mb-6 line-clamp-2 flex-grow">{{ product.description }}</p>
+        <p class="text-accent-muted text-xs sm:text-sm mb-4 sm:mb-6 line-clamp-2 flex-grow">{{ product.description }}</p>
         
         <div class="pt-4 border-t border-white/5">
           @if (product) {
             <button (click)="cartService.addToCart(product)" 
-                    class="metallic-button w-full py-3 text-xs font-bold uppercase tracking-widest"
+                    class="metallic-button w-full py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest"
                     [disabled]="product.stock <= 0">
               {{ product.stock <= 0 ? 'Out of Stock' : 'Add to Cart' }}
             </button>

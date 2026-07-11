@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ConfigService } from '../../services/config';
 
@@ -12,4 +12,12 @@ import { ConfigService } from '../../services/config';
 })
 export class FooterComponent {
   configService = inject(ConfigService);
+  showMarketingPopup = signal(false);
+
+  toggleMarketingPopup(event?: Event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.showMarketingPopup.update(val => !val);
+  }
 }

@@ -49,7 +49,7 @@
             Order {{ o.order_number }}
           </h1>
           <p class="text-accent-muted">
-            Placed on {{ o.created_at | date:'medium' }}
+          Placed on {{ o.created_at | date:'medium':'' }}
           </p>
         </div>
         <div class="flex gap-3">
@@ -128,6 +128,30 @@
           </div>
         </div>
       </div>
+
+      <!-- Delivery Tracking Card -->
+      @if (o.courier_name || o.tracking_number) {
+      <div class="glass-card p-4 sm:p-8 border border-accent/20 bg-accent/5">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="material-icons text-accent">local_shipping</span>
+          <h3 class="text-lg font-bold text-white tracking-wide">Delivery & Tracking Information</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          @if (o.courier_name) {
+          <div>
+            <p class="text-[10px] text-accent-muted uppercase tracking-widest mb-1">Courier Partner</p>
+            <p class="font-bold text-lg text-white font-serif">{{ o.courier_name }}</p>
+          </div>
+          }
+          @if (o.tracking_number) {
+          <div>
+            <p class="text-[10px] text-accent-muted uppercase tracking-widest mb-1">Tracking Number</p>
+            <p class="font-mono font-bold text-lg text-accent select-all">{{ o.tracking_number }}</p>
+          </div>
+          }
+        </div>
+      </div>
+      }
 
       <!-- Items -->
       <div class="glass-card overflow-hidden">
@@ -285,6 +309,30 @@
               <option [value]="status">{{ status | uppercase }}</option>
               }
             </select>
+          </div>
+        </div>
+
+        <!-- Courier & Tracking inputs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 pt-4 border-t border-white/5">
+          <div class="space-y-2">
+            <label for="courierName" class="text-xs text-accent-muted uppercase tracking-widest">Courier Partner</label>
+            <input
+              id="courierName"
+              type="text"
+              [(ngModel)]="courierName"
+              placeholder="Ex: DTDC, Delhivery"
+              class="input-field py-3"
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="trackingNumber" class="text-xs text-accent-muted uppercase tracking-widest">Tracking Number</label>
+            <input
+              id="trackingNumber"
+              type="text"
+              [(ngModel)]="trackingNumber"
+              placeholder="Ex: AW12345678"
+              class="input-field py-3 font-mono"
+            />
           </div>
         </div>
 

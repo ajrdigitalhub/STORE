@@ -41,6 +41,13 @@ export interface Order {
   razorpay_orderid?: string;
   razorpay_paymentid?: string;
   razorpay_signature?: string;
+  is_guest?: boolean;
+  guest_name?: string;
+  guest_phone?: string;
+  guest_email?: string;
+  firebase_uid?: string;
+  courier_name?: string;
+  tracking_number?: string;
   created_at: string;
   updated_at: string;
   // Joined fields
@@ -89,24 +96,42 @@ export class OrderService {
     });
   }
 
-  async createOrder(order: Omit<Order, 'id' | 'order_number' | 'created_at' | 'updated_at'>): Promise<Order> {
-    // Map frontend fields to backend expected fields if necessary, 
-    // but we already updated the Order interface to match backend.
-    const payload = {
-      items: order.items,
-      shippingAddress: order.shipping_address,
-      paymentMethod: order.payment_method,
-      totalAmount: order.total_amount
-    };
-    return firstValueFrom(this.api.post<Order>('/orders', payload));
+  loadAdminOrders(filterType?: 'all' | 'guest' | 'registered') {
+    const profile = this.authService.profile();
+    if (!profile || profile.role !== 'admin') return;
+
+    this.isLoading.set(true);
+    let url = '/orders';
+    if (filterType && filterType !== 'all') {
+      url += `?isGuest=${filterType === 'guest' ? 'true' : 'false'}`;
+    }
+
+    this.api.get<{ orders: Order[], total: number }>(url).subscribe({
+      next: (response) => {
+        this.ordersSignal.set(response.orders || []);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load admin orders', error);
+        this.isLoading.set(false);
+      }
+    });
   }
 
-  async updateOrderStatus(id: number, orderStatus: Order['order_status'], paymentStatus?: Order['payment_status']) {
-    await firstValueFrom(this.api.put<Order>(`/orders/${id}/status`, { orderStatus, paymentStatus }));
+  async createOrder(order: any): Promise<Order> {
+    return firstValueFrom(this.api.post<Order>('/orders', order));
+  }
+
+  async updateOrderStatus(id: number, orderStatus: Order['order_status'], paymentStatus?: Order['payment_status'], courierName?: string, trackingNumber?: string) {
+    await firstValueFrom(this.api.put<Order>(`/orders/${id}/status`, { orderStatus, paymentStatus, courierName, trackingNumber }));
     this.loadUserOrders(); // Refresh the list
   }
 
   async getOrder(id: number): Promise<Order> {
     return firstValueFrom(this.api.get<Order>(`/orders/${id}`));
+  }
+
+  async trackOrder(orderNumber: string, phone: string): Promise<Order> {
+    return firstValueFrom(this.api.get<Order>(`/orders/track?orderNumber=${orderNumber}&phone=${phone}`));
   }
 }

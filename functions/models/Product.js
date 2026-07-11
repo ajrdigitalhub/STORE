@@ -19,6 +19,7 @@ class Product {
     this.featured = data.featured || false;
     this.customizable = data.customizable || false;
     this.customization_type = data.customization_type || 'none';
+    this.enable_tutorials_after_purchase = data.enable_tutorials_after_purchase || false;
     this.active = data.active !== false;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
@@ -30,23 +31,24 @@ class Product {
       name, description, price, compare_price, images = [], 
       stock = 0, variants = [], featured = false, active = true,
       specification = {}, tags = [], category_id,
-      customizable = false, customization_type = 'none'
+      customizable = false, customization_type = 'none',
+      enable_tutorials_after_purchase = false
     } = productData;
 
     const query = `
       INSERT INTO products (
         name, description, price, compare_price, images, 
         stock, variants, featured, active, specification, tags, category_id,
-        customizable, customization_type
+        customizable, customization_type, enable_tutorials_after_purchase
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `;
     const values = [
       name, description, price, compare_price, JSON.stringify(images), 
       stock, JSON.stringify(variants), featured, active, 
       JSON.stringify(specification), JSON.stringify(tags), category_id,
-      customizable, customization_type
+      customizable, customization_type, enable_tutorials_after_purchase
     ];
 
     const result = await pool.query(query, values);

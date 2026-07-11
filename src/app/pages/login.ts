@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
   
   isLoading = signal(false);
   showPassword = signal(false);
@@ -28,7 +29,8 @@ export class LoginComponent {
     this.errorMessage.set(null);
     try {
       await this.authService.loginWithGoogle();
-      this.router.navigate(['/']);
+      const redirect = this.route.snapshot.queryParams['redirect'] || '/';
+      this.router.navigateByUrl(redirect);
     } catch (error: unknown) {
       console.error(error);
       const err = error as { code?: string };
@@ -47,7 +49,8 @@ export class LoginComponent {
     this.errorMessage.set(null);
     try {
       await this.authService.loginWithEmail(this.email, this.password);
-      this.router.navigate(['/']);
+      const redirect = this.route.snapshot.queryParams['redirect'] || '/';
+      this.router.navigateByUrl(redirect);
     } catch (error: unknown) {
       console.error(error);
       const errorMessage = error instanceof Error ? error.message : 'Authentication failed. Please try again.';

@@ -289,6 +289,25 @@
               >Footer</span
             >
           </button>
+
+          <button
+            (click)="activeTab.set('tutorials'); isMobileMenuOpen.set(false)"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all group"
+            [class.bg-white/5]="activeTab() === 'tutorials'"
+            [class.text-accent]="activeTab() === 'tutorials'"
+            [class.text-accent-muted]="activeTab() !== 'tutorials'"
+            [title]="isSidebarCollapsed() ? 'Tutorials' : ''"
+          >
+            <span
+              class="material-icons text-lg group-hover:scale-110 transition-transform"
+              >school</span
+            >
+            <span
+              class="font-medium text-xs uppercase tracking-widest whitespace-nowrap"
+              [class.hidden]="isSidebarCollapsed()"
+              >Tutorials</span
+            >
+          </button>
         </div>
         }
       </div>
@@ -554,6 +573,91 @@
         }
       </div>
 
+      <!-- Checkout Conversion & Analytics Metrics -->
+      @if (analyticsStats(); as stats) {
+      <div class="mt-8 space-y-6">
+        <h3 class="text-xl font-bold uppercase tracking-widest text-accent font-serif">Guest Checkout & Conversion Analytics</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Guest Conversion Rate -->
+          <div class="tech-card p-6 border-purple-500/20 hover:border-purple-500/40 transition-colors">
+            <div class="flex justify-between items-start mb-4">
+              <span class="tech-label">Guest Conversion Rate</span>
+              <span class="material-icons text-purple-400">group_add</span>
+            </div>
+            <div class="tech-value text-3xl font-bold mb-1 text-purple-400 font-mono">
+              {{ stats.guestConversionRate | number:'1.1-2' }}%
+            </div>
+            <div class="text-[10px] text-accent-muted font-mono uppercase">
+              {{ stats.completeGuest }} of {{ stats.startGuest }} guest checkouts completed
+            </div>
+          </div>
+
+          <!-- Guest Abandonment Rate -->
+          <div class="tech-card p-6 border-red-500/20 hover:border-red-500/40 transition-colors">
+            <div class="flex justify-between items-start mb-4">
+              <span class="tech-label">Guest Abandonment Rate</span>
+              <span class="material-icons text-red-400">shopping_cart_checkout</span>
+            </div>
+            <div class="tech-value text-3xl font-bold mb-1 text-red-400 font-mono">
+              {{ stats.guestAbandonmentRate | number:'1.1-2' }}%
+            </div>
+            <div class="text-[10px] text-accent-muted font-mono uppercase">
+              Abandoned checkout flows
+            </div>
+          </div>
+
+          <!-- Registered Conversion Rate -->
+          <div class="tech-card p-6 border-blue-500/20 hover:border-blue-500/40 transition-colors">
+            <div class="flex justify-between items-start mb-4">
+              <span class="tech-label">Registered Conversion Rate</span>
+              <span class="material-icons text-blue-400">how_to_reg</span>
+            </div>
+            <div class="tech-value text-3xl font-bold mb-1 text-blue-400 font-mono">
+              {{ stats.regConversionRate | number:'1.1-2' }}%
+            </div>
+            <div class="text-[10px] text-accent-muted font-mono uppercase">
+              {{ stats.completeReg }} of {{ stats.startReg }} checkouts completed
+            </div>
+          </div>
+
+          <!-- Guest-to-Registered User Conversion -->
+          <div class="tech-card p-6 border-green-500/20 hover:border-green-500/40 transition-colors">
+            <div class="flex justify-between items-start mb-4">
+              <span class="tech-label">Guest-to-Reg Conversion</span>
+              <span class="material-icons text-green-400">trending_up</span>
+            </div>
+            <div class="tech-value text-3xl font-bold mb-1 text-green-400 font-mono">
+              {{ stats.guestToRegRate | number:'1.1-2' }}%
+            </div>
+            <div class="text-[10px] text-accent-muted font-mono uppercase">
+              {{ stats.convertedGuests }} of {{ stats.totalGuests }} guests registered later
+            </div>
+          </div>
+
+          <!-- Average Order Values -->
+          <div class="tech-card p-6 lg:col-span-2 border-accent/20 hover:border-accent/40 transition-colors">
+            <div class="flex justify-between items-start mb-4">
+              <span class="tech-label">Average Order Values (AOV)</span>
+              <span class="material-icons text-accent">analytics</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-2">
+              <div>
+                <p class="text-[9px] text-accent-muted uppercase tracking-wider">Guest Order AOV</p>
+                <p class="text-xl font-bold text-white font-mono">{{ stats.aovGuest | currency:'INR' }}</p>
+              </div>
+              <div>
+                <p class="text-[9px] text-accent-muted uppercase tracking-wider">Registered AOV</p>
+                <p class="text-xl font-bold text-white font-mono">{{ stats.aovReg | currency:'INR' }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      }
+
       <div class="tech-card">
         <div class="tech-header">
           <span class="tech-label">Recent Orders</span>
@@ -760,6 +864,19 @@
                       for="p-customizable"
                       class="tech-label cursor-pointer"
                       >Customizable Product</label
+                    >
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <input
+                      id="p-enable-tutorials"
+                      type="checkbox"
+                      [(ngModel)]="newProduct.enable_tutorials_after_purchase"
+                      class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent"
+                    />
+                    <label
+                      for="p-enable-tutorials"
+                      class="tech-label cursor-pointer"
+                      >Enable Tutorials After Purchase</label
                     >
                   </div>
                 </div>
@@ -1016,18 +1133,26 @@
       </div>
       }
 
-      <!-- Orders View -->
-      @if (activeTab() === 'orders') {
+       @if (activeTab() === 'orders') {
       <div class="tech-card">
-        <div class="tech-header">
+        <div class="tech-header flex justify-between items-center">
           <span class="tech-label">Orders List</span>
+          <!-- Filtering dropdown -->
+          <select 
+            (change)="onOrderFilterChange($any($event.target).value)"
+            class="bg-metallic-black border border-white/10 rounded px-3 py-1.5 text-xs text-accent-muted focus:border-accent outline-none"
+          >
+            <option value="all">All Orders</option>
+            <option value="guest">Guest Orders</option>
+            <option value="registered">Registered Orders</option>
+          </select>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-white/5 bg-white/[0.02]">
                 <th class="py-3 px-6 tech-label">Order Number</th>
-                <th class="py-3 px-6 tech-label">Customer ID</th>
+                <th class="py-3 px-6 tech-label">Customer</th>
                 <th class="py-3 px-6 tech-label">Total Amount</th>
                 <th class="py-3 px-6 tech-label">Status</th>
                 <th class="py-3 px-6 tech-label">Update Status</th>
@@ -1039,11 +1164,16 @@
               <tr
                 class="border-b border-white/5 hover:bg-white/5 transition-colors"
               >
-                <td class="py-4 px-6 tech-value text-xs font-bold">
-                  {{ order.order_number }}
+                <td class="py-4 px-6 tech-value text-xs font-bold flex items-center gap-2 flex-wrap">
+                  <span>{{ order.order_number }}</span>
+                  @if (order.is_guest) {
+                    <span class="px-1.5 py-0.5 rounded text-[8px] bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase tracking-wider">Guest</span>
+                  } @else {
+                    <span class="px-1.5 py-0.5 rounded text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold uppercase tracking-wider">Registered</span>
+                  }
                 </td>
                 <td class="py-4 px-6 text-[10px] font-mono text-accent-muted">
-                  {{ order.userid }}
+                  {{ order.user_name || 'Guest' }}
                 </td>
                 <td class="py-4 px-6 tech-value font-bold">
                   {{ order.total_amount | currency:'INR' }}
@@ -1883,6 +2013,669 @@
       </div>
       }
 
+      <!-- Tutorials Management View -->
+      @if (activeTab() === 'tutorials') {
+      <div class="space-y-6 animate-in fade-in duration-300">
+        <!-- Sub Tabs Navigation -->
+        <div class="flex border-b border-white/5 pb-2 gap-4">
+          <button 
+            (click)="activeTutorialTab.set('videos')"
+            class="px-4 py-2 font-bold uppercase tracking-wider text-xs transition-colors"
+            [class.text-accent]="activeTutorialTab() === 'videos'"
+            [class.border-b-2]="activeTutorialTab() === 'videos'"
+            [class.border-accent]="activeTutorialTab() === 'videos'"
+            [class.text-accent-muted]="activeTutorialTab() !== 'videos'"
+          >
+            Tutorial Videos
+          </button>
+          <button 
+            (click)="activeTutorialTab.set('categories')"
+            class="px-4 py-2 font-bold uppercase tracking-wider text-xs transition-colors"
+            [class.text-accent]="activeTutorialTab() === 'categories'"
+            [class.border-b-2]="activeTutorialTab() === 'categories'"
+            [class.border-accent]="activeTutorialTab() === 'categories'"
+            [class.text-accent-muted]="activeTutorialTab() !== 'categories'"
+          >
+            Tutorial Categories
+          </button>
+          <button 
+            (click)="activeTutorialTab.set('analytics')"
+            class="px-4 py-2 font-bold uppercase tracking-wider text-xs transition-colors"
+            [class.text-accent]="activeTutorialTab() === 'analytics'"
+            [class.border-b-2]="activeTutorialTab() === 'analytics'"
+            [class.border-accent]="activeTutorialTab() === 'analytics'"
+            [class.text-accent-muted]="activeTutorialTab() !== 'analytics'"
+          >
+            Student Analytics
+          </button>
+        </div>
+
+        <!-- 1. VIDEOS TAB -->
+        @if (activeTutorialTab() === 'videos') {
+          <div class="space-y-6">
+            @if (!showTutorialForm()) {
+              <!-- Videos List view -->
+              <div class="flex justify-between items-center">
+                <span class="tech-label opacity-50">{{ tutorialService.tutorials().length }} Videos Registered</span>
+                <button 
+                  (click)="cancelTutorialEdit(); showTutorialForm.set(true)"
+                  class="metallic-button py-2 px-4 text-xs uppercase tracking-widest flex items-center gap-2"
+                >
+                  <span class="material-icons text-xs">add</span> Add Tutorial Video
+                </button>
+              </div>
+
+              <div class="tech-card">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="border-b border-white/5 bg-white/[0.02]">
+                        <th class="py-3 px-6 tech-label w-20">Order</th>
+                        <th class="py-3 px-6 tech-label">Video Details</th>
+                        <th class="py-3 px-6 tech-label">Category</th>
+                        <th class="py-3 px-6 tech-label">Duration</th>
+                        <th class="py-3 px-6 tech-label">Status</th>
+                        <th class="py-3 px-6 tech-label w-24">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (tutorialService.isLoading()) {
+                        @for (i of [1, 2, 3]; track i) {
+                          <tr class="border-b border-white/5">
+                            <td class="py-4 px-6"><app-skeleton width="30px" height="1rem"></app-skeleton></td>
+                            <td class="py-4 px-6"><app-skeleton width="200px" height="1rem"></app-skeleton></td>
+                            <td class="py-4 px-6"><app-skeleton width="100px" height="1rem"></app-skeleton></td>
+                            <td class="py-4 px-6"><app-skeleton width="60px" height="1rem"></app-skeleton></td>
+                            <td class="py-4 px-6"><app-skeleton width="60px" height="1rem"></app-skeleton></td>
+                            <td class="py-4 px-6"><app-skeleton width="80px" height="1rem"></app-skeleton></td>
+                          </tr>
+                        }
+                      } @else {
+                        @for (tut of tutorialService.tutorials(); track tut.id) {
+                          <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-6 flex items-center gap-2">
+                              <div class="flex flex-col gap-1">
+                                <button (click)="moveTutorial(tut, 'up')" class="text-accent-muted hover:text-white"><span class="material-icons text-xs">keyboard_arrow_up</span></button>
+                                <button (click)="moveTutorial(tut, 'down')" class="text-accent-muted hover:text-white"><span class="material-icons text-xs">keyboard_arrow_down</span></button>
+                              </div>
+                              <span class="font-mono text-xs">{{ tut.display_order }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                              <div class="flex items-center gap-3">
+                                @if (tut.thumbnail_url) {
+                                  <img [src]="tut.thumbnail_url" alt="" class="w-12 h-8 object-cover rounded border border-white/10" referrerpolicy="no-referrer">
+                                } @else {
+                                  <div class="w-12 h-8 rounded bg-white/5 flex items-center justify-center border border-white/10"><span class="material-icons text-xs text-accent-muted">play_circle</span></div>
+                                }
+                                <div>
+                                  <div class="font-bold text-sm text-white">{{ tut.title }}</div>
+                                  <div class="text-[10px] text-accent-muted font-light">{{ tut.subtitle || 'No subtitle' }}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="py-4 px-6 text-xs text-accent-muted">
+                              {{ tut.category_name || 'Uncategorized' }}
+                            </td>
+                            <td class="py-4 px-6 text-xs font-mono text-accent-muted">
+                              {{ tut.duration }}
+                            </td>
+                            <td class="py-4 px-6">
+                              <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                                [class.bg-green-500/10]="tut.status === 'published'"
+                                [class.text-green-500]="tut.status === 'published'"
+                                [class.border]="true"
+                                [class.border-green-500/20]="tut.status === 'published'"
+                                [class.bg-white/5]="tut.status === 'draft'"
+                                [class.text-accent-muted]="tut.status === 'draft'"
+                                [class.border-white/10]="tut.status === 'draft'"
+                              >
+                                {{ tut.status }}
+                              </span>
+                            </td>
+                            <td class="py-4 px-6 flex items-center gap-3">
+                              <button (click)="editTutorial(tut)" class="text-accent hover:text-white transition-colors" title="Edit"><span class="material-icons text-sm">edit</span></button>
+                              <button (click)="deleteTutorial(tut.id)" class="text-red-500 hover:text-white transition-colors" title="Delete"><span class="material-icons text-sm">delete</span></button>
+                            </td>
+                          </tr>
+                        } @empty {
+                          <tr>
+                            <td colspan="6" class="py-12 text-center text-xs text-accent-muted italic uppercase tracking-wider">No tutorial videos found. Create one to begin.</td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            } @else {
+              <!-- Video Create/Edit form -->
+              <div class="tech-card max-w-4xl mx-auto">
+                <div class="tech-header flex justify-between items-center">
+                  <span class="tech-label">{{ editingTutorial() ? 'Modify Tutorial Node' : 'Initialize Tutorial Node' }}</span>
+                  <button (click)="cancelTutorialEdit()" class="text-xs text-accent-muted hover:text-white flex items-center gap-1"><span class="material-icons text-xs">close</span> Cancel</button>
+                </div>
+                <div class="p-4 sm:p-8 space-y-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                      <label for="t-title" class="tech-label">Tutorial Title</label>
+                      <input id="t-title" type="text" [(ngModel)]="newTutorial.title" class="input-field text-sm" placeholder="Enter title...">
+                    </div>
+                    <div class="space-y-2">
+                      <label for="t-subtitle" class="tech-label">Subtitle</label>
+                      <input id="t-subtitle" type="text" [(ngModel)]="newTutorial.subtitle" class="input-field text-sm" placeholder="Enter subtitle...">
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="t-desc" class="tech-label">Description</label>
+                    <textarea id="t-desc" [(ngModel)]="newTutorial.description" class="input-field text-sm" rows="3" placeholder="Enter tutorial explanation..."></textarea>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                      <label for="t-category" class="tech-label">Category</label>
+                      <select id="t-category" [(ngModel)]="newTutorial.category_id" class="input-field text-sm bg-metallic-black">
+                        <option [value]="0">Uncategorized</option>
+                        @for (cat of tutorialService.categories(); track cat.id) {
+                          <option [value]="cat.id">{{ cat.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="space-y-2">
+                      <label for="t-duration" class="tech-label">Duration (e.g. 10:45)</label>
+                      <input id="t-duration" type="text" [(ngModel)]="newTutorial.duration" class="input-field text-sm font-mono" placeholder="MM:SS">
+                    </div>
+                    <div class="space-y-2">
+                      <label for="t-diff" class="tech-label">Difficulty</label>
+                      <select id="t-diff" [(ngModel)]="newTutorial.difficulty" class="input-field text-sm bg-metallic-black">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                      <label for="t-order" class="tech-label">Display Order</label>
+                      <input id="t-order" type="number" [(ngModel)]="newTutorial.display_order" class="input-field text-sm font-mono">
+                    </div>
+                    <div class="space-y-2">
+                      <label for="t-status" class="tech-label">Status</label>
+                      <select id="t-status" [(ngModel)]="newTutorial.status" class="input-field text-sm bg-metallic-black">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Upload Fields -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-white/5 pt-6">
+                    <!-- Video Upload -->
+                    <div class="space-y-3">
+                      <span class="tech-label block">Video Stream Uplink</span>
+                      <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-4">
+                        <div class="flex items-center gap-4">
+                          <button 
+                            (click)="videoFileInput.click()"
+                            class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2"
+                            [disabled]="isUploadingVideo()"
+                          >
+                            <span class="material-icons text-xs">{{ isUploadingVideo() ? 'hourglass_top' : 'upload' }}</span>
+                            {{ isUploadingVideo() ? 'Uploading...' : 'Choose MP4 File' }}
+                          </button>
+                          <input type="file" #videoFileInput class="hidden" accept="video/mp4,video/webm" (change)="onTutorialVideoSelected($event)">
+                          <span class="text-[10px] text-accent-muted font-mono truncate max-w-[200px]">
+                            {{ newTutorial.video_url ? 'Video Ready' : 'No file uploaded' }}
+                          </span>
+                        </div>
+                        @if (newTutorial.video_url) {
+                          <div class="text-[10px] font-mono text-accent truncate bg-black/40 p-2 rounded border border-accent/20">
+                            Storage: {{ newTutorial.video_url }}
+                          </div>
+                          <div class="mt-4 space-y-2">
+                            <span class="tech-label block text-[9px] uppercase tracking-wider text-accent-muted">Video Preview</span>
+                            <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
+                              <video 
+                                [src]="tutorialService.getVideoPreviewUrl(newTutorial.video_url)"
+                                controls
+                                class="w-full h-full object-contain"
+                              ></video>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Thumbnail Upload -->
+                    <div class="space-y-3">
+                      <span class="tech-label block">Thumbnail Media</span>
+                      <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-4">
+                        <div class="flex items-center gap-4">
+                          <button 
+                            (click)="thumbFileInput.click()"
+                            class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2"
+                            [disabled]="isUploadingThumbnail()"
+                          >
+                            <span class="material-icons text-xs">{{ isUploadingThumbnail() ? 'hourglass_top' : 'image' }}</span>
+                            {{ isUploadingThumbnail() ? 'Uploading...' : 'Choose Image' }}
+                          </button>
+                          <input type="file" #thumbFileInput class="hidden" accept="image/*" (change)="onTutorialThumbnailSelected($event)">
+                          <span class="text-[10px] text-accent-muted font-mono truncate max-w-[200px]">
+                            {{ newTutorial.thumbnail_url ? 'Image Ready' : 'No image uploaded' }}
+                          </span>
+                        </div>
+                        @if (newTutorial.thumbnail_url) {
+                          <div class="mt-2 relative w-24 h-16 group">
+                            <img [src]="newTutorial.thumbnail_url" alt="" class="w-full h-full object-cover rounded border border-white/10" referrerpolicy="no-referrer">
+                            <button type="button" (click)="newTutorial.thumbnail_url = ''" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"><span class="material-icons text-[10px]">close</span></button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Resource Attachments Upload -->
+                    <div class="col-span-1 md:col-span-2 space-y-3 pt-4 border-t border-white/5">
+                      <span class="tech-label block">Resource Attachments (PDFs, Slicer Profiles, ZIPs)</span>
+                      <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-4">
+                        <div class="flex items-center gap-4">
+                          <button 
+                            type="button"
+                            (click)="resourceFileInput.click()"
+                            class="metallic-button py-2 px-4 text-[10px] flex items-center gap-2"
+                            [disabled]="isUploadingResource()"
+                          >
+                            <span class="material-icons text-xs">{{ isUploadingResource() ? 'hourglass_top' : 'attach_file' }}</span>
+                            {{ isUploadingResource() ? 'Uploading...' : 'Choose File' }}
+                          </button>
+                          <input type="file" #resourceFileInput class="hidden" (change)="onTutorialResourceSelected($event)">
+                          <span class="text-[10px] text-accent-muted font-mono">
+                            Upload helpful resources like manuals or slicer profile bundles
+                          </span>
+                        </div>
+
+                        <!-- Current Attachments List -->
+                        @if (newTutorial.resources && newTutorial.resources.length > 0) {
+                          <div class="space-y-2">
+                            <span class="tech-label block text-[9px] uppercase tracking-wider text-accent-muted">Uploaded Attachments</span>
+                            <div class="grid grid-cols-1 gap-2">
+                              @for (res of newTutorial.resources; track $index) {
+                                <div class="flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg text-xs font-mono">
+                                  <div class="flex items-center gap-2 truncate pr-4">
+                                    <span class="material-icons text-xs text-accent">insert_drive_file</span>
+                                    <a [href]="res.url" target="_blank" class="truncate text-white hover:text-accent hover:underline" [title]="res.name">{{ res.name }}</a>
+                                  </div>
+                                  <button 
+                                    type="button" 
+                                    (click)="removeTutorialResource($index)"
+                                    class="text-red-400 hover:text-red-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-white/5"
+                                  >
+                                    <span class="material-icons text-sm">delete</span>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Product Mapping -->
+                  <div class="border-t border-white/5 pt-6 space-y-3">
+                    <span class="tech-label">Assign Purchase-Access Products (Option A)</span>
+                    <p class="text-[10px] text-accent-muted italic mt-0.5">Check the products that automatically grant access to this tutorial when purchased</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-4 bg-white/[0.02] border border-white/5 rounded-xl no-scrollbar">
+                      @for (prod of productService.products(); track prod.id) {
+                        <div class="flex items-center gap-3">
+                          <input 
+                            [id]="'map-prod-' + prod.id" 
+                            type="checkbox" 
+                            [checked]="newTutorial.product_ids.includes(prod.id)"
+                            (change)="toggleProductInMapping(prod.id)"
+                            class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent"
+                          >
+                          <label [for]="'map-prod-' + prod.id" class="text-xs text-white hover:text-accent transition-colors cursor-pointer truncate">
+                            {{ prod.name }}
+                          </label>
+                        </div>
+                      } @empty {
+                        <div class="col-span-3 text-center text-xs text-accent-muted italic py-4">No store products loaded.</div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="pt-8 border-t border-white/5 flex gap-4">
+                    <button (click)="saveTutorial()" class="metallic-button flex-grow py-4 tracking-widest uppercase flex items-center justify-center gap-2" [disabled]="isUploadingVideo() || isUploadingThumbnail()">
+                      <span class="material-icons text-sm">save</span> {{ editingTutorial() ? 'Update Tutorial' : 'Save Tutorial' }}
+                    </button>
+                    <button (click)="cancelTutorialEdit()" class="border border-white/10 px-8 rounded-lg text-xs font-bold hover:bg-white/5 transition-all">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- 2. CATEGORIES TAB -->
+        @if (activeTutorialTab() === 'categories') {
+          <div class="space-y-6">
+            @if (!showTutorialCategoryForm()) {
+              <!-- Categories list view -->
+              <div class="flex justify-between items-center">
+                <span class="tech-label opacity-50">{{ tutorialService.categories().length }} Categories Registered</span>
+                <button 
+                  (click)="cancelTutorialCategoryEdit(); showTutorialCategoryForm.set(true)"
+                  class="metallic-button py-2 px-4 text-xs uppercase tracking-widest flex items-center gap-2"
+                >
+                  <span class="material-icons text-xs">add</span> Add Tutorial Category
+                </button>
+              </div>
+
+              <div class="tech-card">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="border-b border-white/5 bg-white/[0.02]">
+                        <th class="py-3 px-6 tech-label w-20">Order</th>
+                        <th class="py-3 px-6 tech-label">Category Name</th>
+                        <th class="py-3 px-6 tech-label">Description</th>
+                        <th class="py-3 px-6 tech-label w-24">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (cat of tutorialService.categories(); track cat.id) {
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <td class="py-4 px-6 flex items-center gap-2">
+                            <div class="flex flex-col gap-1">
+                              <button (click)="moveCategory(cat, 'up')" class="text-accent-muted hover:text-white"><span class="material-icons text-xs">keyboard_arrow_up</span></button>
+                              <button (click)="moveCategory(cat, 'down')" class="text-accent-muted hover:text-white"><span class="material-icons text-xs">keyboard_arrow_down</span></button>
+                            </div>
+                            <span class="font-mono text-xs">{{ cat.display_order }}</span>
+                          </td>
+                          <td class="py-4 px-6 text-sm text-white font-bold">{{ cat.name }}</td>
+                          <td class="py-4 px-6 text-xs text-accent-muted">{{ cat.description || 'No description' }}</td>
+                          <td class="py-4 px-6 flex items-center gap-3">
+                            <button (click)="editTutorialCategory(cat)" class="text-accent hover:text-white transition-colors" title="Edit"><span class="material-icons text-sm">edit</span></button>
+                            <button (click)="deleteTutorialCategory(cat.id)" class="text-red-500 hover:text-white transition-colors" title="Delete"><span class="material-icons text-sm">delete</span></button>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="4" class="py-12 text-center text-xs text-accent-muted italic uppercase tracking-wider">No tutorial categories found. Create one to begin.</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            } @else {
+              <!-- Categories form -->
+              <div class="tech-card max-w-2xl mx-auto">
+                <div class="tech-header flex justify-between items-center">
+                  <span class="tech-label">{{ editingTutorialCategory() ? 'Modify Tutorial Category' : 'Initialize Tutorial Category' }}</span>
+                  <button (click)="cancelTutorialCategoryEdit()" class="text-xs text-accent-muted hover:text-white flex items-center gap-1"><span class="material-icons text-xs">close</span> Cancel</button>
+                </div>
+                <div class="p-4 sm:p-8 space-y-6">
+                  <div class="space-y-2">
+                    <label for="c-name" class="tech-label">Category Name</label>
+                    <input id="c-name" type="text" [(ngModel)]="newTutorialCategory.name" class="input-field text-sm" placeholder="e.g. Printer Installation">
+                  </div>
+                  <div class="space-y-2">
+                    <label for="c-desc" class="tech-label">Description</label>
+                    <textarea id="c-desc" [(ngModel)]="newTutorialCategory.description" class="input-field text-sm" rows="3" placeholder="Explain the focus of this category..."></textarea>
+                  </div>
+                  <div class="space-y-2">
+                    <label for="c-order" class="tech-label">Display Order</label>
+                    <input id="c-order" type="number" [(ngModel)]="newTutorialCategory.display_order" class="input-field text-sm font-mono">
+                  </div>
+
+                  <div class="pt-8 border-t border-white/5 flex gap-4">
+                    <button (click)="saveTutorialCategory()" class="metallic-button flex-grow py-4 tracking-widest uppercase flex items-center justify-center gap-2">
+                      <span class="material-icons text-sm">save</span> {{ editingTutorialCategory() ? 'Update Category' : 'Save Category' }}
+                    </button>
+                    <button (click)="cancelTutorialCategoryEdit()" class="border border-white/10 px-8 rounded-lg text-xs font-bold hover:bg-white/5 transition-all">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- 3. ANALYTICS TAB -->
+        @if (activeTutorialTab() === 'analytics') {
+          <div class="space-y-8">
+            <!-- Analytics sub type switcher -->
+            <div class="flex bg-white/5 p-1 rounded-xl w-fit border border-white/5">
+              <button 
+                (click)="tutorialAnalyticsType.set('overall'); loadOverallAnalytics()"
+                class="px-4 py-2 text-[10px] uppercase font-bold tracking-widest rounded-lg transition-all"
+                [class.bg-accent]="tutorialAnalyticsType() === 'overall'"
+                [class.text-metallic-black]="tutorialAnalyticsType() === 'overall'"
+                [class.text-accent-muted]="tutorialAnalyticsType() !== 'overall'"
+              >
+                Overall Stats
+              </button>
+              <button 
+                (click)="tutorialAnalyticsType.set('tutorial')"
+                class="px-4 py-2 text-[10px] uppercase font-bold tracking-widest rounded-lg transition-all"
+                [class.bg-accent]="tutorialAnalyticsType() === 'tutorial'"
+                [class.text-metallic-black]="tutorialAnalyticsType() === 'tutorial'"
+                [class.text-accent-muted]="tutorialAnalyticsType() !== 'tutorial'"
+              >
+                Per Tutorial
+              </button>
+              <button 
+                (click)="tutorialAnalyticsType.set('user')"
+                class="px-4 py-2 text-[10px] uppercase font-bold tracking-widest rounded-lg transition-all"
+                [class.bg-accent]="tutorialAnalyticsType() === 'user'"
+                [class.text-metallic-black]="tutorialAnalyticsType() === 'user'"
+                [class.text-accent-muted]="tutorialAnalyticsType() !== 'user'"
+              >
+                Per Student
+              </button>
+            </div>
+
+            <!-- A. OVERALL STATS -->
+            @if (tutorialAnalyticsType() === 'overall') {
+              @if (overallStats(); as stats) {
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div class="tech-card p-6 flex flex-col justify-between">
+                    <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Total Courses</span>
+                    <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ stats.totalTutorials }}</span>
+                  </div>
+                  <div class="tech-card p-6 flex flex-col justify-between">
+                    <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Total Views</span>
+                    <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ stats.totalVideoViews }}</span>
+                  </div>
+                  <div class="tech-card p-6 flex flex-col justify-between">
+                    <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Total Watch Time</span>
+                    <span class="text-3xl font-bold tracking-tight text-white mt-4 font-mono">{{ (stats.totalWatchTime / 60) | number:'1.0-0' }}m</span>
+                  </div>
+                  <div class="tech-card p-6 flex flex-col justify-between">
+                    <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Active Students</span>
+                    <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ stats.activeLearners }}</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                  <!-- Completion rate and other counts -->
+                  <div class="tech-card p-6 space-y-6">
+                    <span class="tech-label text-xs uppercase tracking-widest text-accent">Performance Metrics</span>
+                    <div class="space-y-4">
+                      <div>
+                        <div class="flex justify-between text-xs mb-1">
+                          <span class="text-accent-muted">Course Completion Rate</span>
+                          <span class="text-white font-bold font-mono">{{ stats.averageCompletionRate | number:'1.0-1' }}%</span>
+                        </div>
+                        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                          <div class="bg-accent h-full rounded-full" [style.width]="stats.averageCompletionRate + '%'"></div>
+                        </div>
+                      </div>
+                      <div class="flex justify-between py-2 border-b border-white/5 text-xs">
+                        <span class="text-accent-muted">Completed Lessons</span>
+                        <span class="text-white font-bold font-mono">{{ stats.completedTutorials }}</span>
+                      </div>
+                      <div class="flex justify-between py-2 border-b border-white/5 text-xs">
+                        <span class="text-accent-muted">Categories Configured</span>
+                        <span class="text-white font-bold font-mono">{{ stats.totalCategories }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Popular Tutorials -->
+                  <div class="tech-card p-6 space-y-4">
+                    <span class="tech-label text-xs uppercase tracking-widest text-accent">Top 5 Popular Tutorials</span>
+                    <div class="space-y-3">
+                      @for (item of stats.popularTutorials; track item.id) {
+                        <div class="flex justify-between items-center py-2 border-b border-white/5 text-xs">
+                          <span class="text-white font-semibold truncate max-w-[250px]">{{ item.title }}</span>
+                          <span class="text-accent font-bold font-mono flex items-center gap-1"><span class="material-icons text-[10px]">visibility</span> {{ item.views_count }} views</span>
+                        </div>
+                      } @empty {
+                        <div class="text-center text-xs text-accent-muted italic py-6">No view history recorded.</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="py-12 text-center text-xs text-accent-muted italic">Loading overall analytics registry...</div>
+              }
+            }
+
+            <!-- B. PER TUTORIAL STATS -->
+            @if (tutorialAnalyticsType() === 'tutorial') {
+              <div class="space-y-6">
+                <div class="space-y-2 max-w-md">
+                  <label for="stat-tut-select" class="tech-label">Select Tutorial File</label>
+                  <select id="stat-tut-select" (change)="onTutorialSelectedForStats($event)" class="input-field text-sm bg-metallic-black">
+                    <option value="">-- Choose Course Lesson --</option>
+                    @for (t of tutorialService.tutorials(); track t.id) {
+                      <option [value]="t.id">{{ t.title }}</option>
+                    }
+                  </select>
+                </div>
+
+                @if (selectedTutorialAnalyticsId() && perTutorialStats(); as tStats) {
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 animate-in fade-in duration-300">
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Plays Logged</span>
+                      <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ tStats.totalPlays }}</span>
+                    </div>
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Unique Viewers</span>
+                      <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ tStats.uniqueViewers }}</span>
+                    </div>
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Average Watch</span>
+                      <span class="text-3xl font-bold tracking-tight text-white mt-4 font-mono">{{ (tStats.averageWatchTime / 60) | number:'1.0-1' }}m</span>
+                    </div>
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Average Percentage</span>
+                      <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ tStats.completionRate | number:'1.0-0' }}%</span>
+                    </div>
+                  </div>
+
+                  <div class="tech-card p-6 mt-6 max-w-2xl">
+                    <span class="tech-label text-xs uppercase tracking-widest text-accent mb-4 block">Viewing Activity logs</span>
+                    <div class="space-y-3 font-mono text-xs">
+                      @for (day of tStats.activeDays; track day.day) {
+                        <div class="flex justify-between py-2 border-b border-white/5">
+                          <span class="text-accent-muted">{{ day.day }}</span>
+                          <span class="text-white font-bold">{{ day.views_count }} views</span>
+                        </div>
+                      } @empty {
+                        <div class="text-center text-xs text-accent-muted italic py-6">No historical views recorded on this video.</div>
+                      }
+                    </div>
+                  </div>
+                } @else if (selectedTutorialAnalyticsId()) {
+                  <div class="py-12 text-center text-xs text-accent-muted italic">Fetching video stats database query...</div>
+                }
+              </div>
+            }
+
+            <!-- C. PER USER STATS -->
+            @if (tutorialAnalyticsType() === 'user') {
+              <div class="space-y-6">
+                <div class="space-y-2 max-w-md">
+                  <label for="stat-user-select" class="tech-label">Select Student Account</label>
+                  <select id="stat-user-select" (change)="onUserSelectedForStats($event)" class="input-field text-sm bg-metallic-black">
+                    <option value="">-- Choose Registered Customer --</option>
+                    @for (c of customers(); track c.id) {
+                      <option [value]="c.id">{{ c.name }} ({{ c.email }})</option>
+                    }
+                  </select>
+                </div>
+
+                @if (selectedUserAnalyticsId() && perUserStats(); as uStats) {
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-300">
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Total Learning Time</span>
+                      <span class="text-3xl font-bold tracking-tight text-white mt-4 font-mono">{{ (uStats.totalWatchTime / 60) | number:'1.0-1' }}m</span>
+                    </div>
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Completion Rate</span>
+                      <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ uStats.completionPercentage | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="tech-card p-6 flex flex-col justify-between">
+                      <span class="tech-label text-[10px] uppercase tracking-wider text-accent-muted">Unlocked Tutorials</span>
+                      <span class="text-4xl font-bold tracking-tight text-white mt-4 font-mono">{{ uStats.accessibleTutorialsCount }}</span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                    <!-- Student details and purchases -->
+                    <div class="space-y-6">
+                      <div class="tech-card p-6 space-y-4">
+                        <span class="tech-label text-xs uppercase tracking-widest text-accent">Student Details</span>
+                        <div class="space-y-2 text-xs">
+                          <div class="flex justify-between py-1 border-b border-white/5"><span class="text-accent-muted">Name</span><span class="text-white font-bold">{{ uStats.userName }}</span></div>
+                          <div class="flex justify-between py-1 border-b border-white/5"><span class="text-accent-muted">Email</span><span class="text-white font-bold font-mono">{{ uStats.userEmail }}</span></div>
+                          <div class="flex justify-between py-1 border-b border-white/5"><span class="text-accent-muted">Global Override</span><span class="font-bold" [class.text-accent]="uStats.tutorialAccessOverride" [class.text-accent-muted]="!uStats.tutorialAccessOverride">{{ uStats.tutorialAccessOverride ? 'ENABLED' : 'DISABLED' }}</span></div>
+                        </div>
+                      </div>
+
+                      <div class="tech-card p-6 space-y-4">
+                        <span class="tech-label text-xs uppercase tracking-widest text-accent">Purchased Eligible Products</span>
+                        <div class="space-y-2 text-xs max-h-48 overflow-y-auto">
+                          @for (p of uStats.purchasedProducts; track p.id) {
+                            <div class="py-2 border-b border-white/5 text-white font-semibold">{{ p.name }}</div>
+                          } @empty {
+                            <div class="text-accent-muted italic py-2">No purchased products found in sales records.</div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Watch History -->
+                    <div class="tech-card p-6 space-y-4">
+                      <span class="tech-label text-xs uppercase tracking-widest text-accent">Recent Watch Log</span>
+                      <div class="space-y-3 max-h-96 overflow-y-auto pr-2 no-scrollbar">
+                        @for (wh of uStats.watchHistory; track wh.id) {
+                          <div class="text-xs p-3 bg-white/5 rounded border border-white/5 space-y-1">
+                            <div class="font-bold text-white">{{ wh.tutorial_title }}</div>
+                            <div class="flex justify-between text-[10px] text-accent-muted">
+                              <span>Duration: {{ wh.duration }}s</span>
+                              <span>{{ wh.watched_at | date:'yyyy-MM-dd HH:mm' }}</span>
+                            </div>
+                          </div>
+                        } @empty {
+                          <div class="text-center text-xs text-accent-muted italic py-12">No recent play events logged.</div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                @} @else if (selectedUserAnalyticsId()) {
+                  <div class="py-12 text-center text-xs text-accent-muted italic">Fetching student stats database query...</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      }
+
       <!-- Categories View -->
       @if (activeTab() === 'categories') {
       <div class="space-y-8">
@@ -2063,86 +2856,366 @@
 
       <!-- Customers View -->
       @if (activeTab() === 'customers') {
-      <div class="tech-card">
-        <div class="tech-header">
-          <span class="tech-label">Client Identity Registry</span>
-          <span class="tech-label opacity-50"
-            >{{ customers().length }} Records Found</span
-          >
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-white/5 bg-white/[0.02]">
-                <th class="py-3 px-6 tech-label">Client Identity</th>
-                <th class="py-3 px-6 tech-label">Email Uplink</th>
-                <th class="py-3 px-6 tech-label">Voice Uplink</th>
-                <th class="py-3 px-6 tech-label">Enrollment Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (orderService.isLoading()) { @for (i of [1, 2, 3, 4, 5]; track
-              i) {
-              <tr class="border-b border-white/5">
-                <td class="py-4 px-6 flex items-center gap-3">
-                  <app-skeleton
-                    width="32px"
-                    height="32px"
-                    className="rounded-full"
-                  ></app-skeleton>
-                  <div>
-                    <app-skeleton
-                      width="100px"
-                      height="1rem"
-                      className="mb-2"
-                    ></app-skeleton>
-                    <app-skeleton width="60px" height="0.5rem"></app-skeleton>
+        @if (selectedCustomerForOverview(); as customer) {
+          <!-- Detailed Customer Overview and Configuration Page -->
+          <div class="tech-card space-y-6 p-6 animate-in fade-in duration-300">
+            <!-- Header section -->
+            <div class="flex justify-between items-start border-b border-white/5 pb-4">
+              <div class="space-y-1">
+                <button 
+                  type="button"
+                  (click)="closeCustomerOverview()"
+                  class="flex items-center gap-1 text-[10px] text-accent hover:text-white uppercase font-mono transition-colors"
+                >
+                  <span class="material-icons text-sm">arrow_back</span> Back to Registry
+                </button>
+                <h3 class="text-2xl font-bold text-white tracking-tight">Client Overview: {{ customer.name || 'Anonymous' }}</h3>
+                <p class="text-xs text-accent-muted font-mono">Database Registry UID: {{ customer.id }}</p>
+              </div>
+              <div class="flex gap-2">
+                <button 
+                  type="button"
+                  (click)="closeCustomerOverview()"
+                  class="px-4 py-2 border border-white/10 hover:border-white/20 text-white rounded-xl text-xs font-bold transition-all uppercase"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button"
+                  (click)="saveCustomerOverview()"
+                  class="px-4 py-2 bg-accent hover:bg-accent/90 border border-accent/20 text-metallic-black rounded-xl text-xs font-bold transition-all uppercase shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+
+            <!-- Main Layout Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <!-- Left Column: Configure Core Fields -->
+              <div class="lg:col-span-5 space-y-6">
+                <div class="space-y-4 bg-white/[0.02] border border-white/5 p-5 rounded-2xl">
+                  <span class="tech-label text-[10px] text-accent uppercase font-mono block tracking-wider">Identity Settings</span>
+                  
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Full Name</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="customer.name" 
+                      class="input-field text-xs py-2 px-3 rounded-lg bg-black/40 border border-white/10 text-white w-full font-sans"
+                    >
                   </div>
-                </td>
-                <td class="py-4 px-6">
-                  <app-skeleton width="150px" height="1rem"></app-skeleton>
-                </td>
-                <td class="py-4 px-6">
-                  <app-skeleton width="100px" height="1rem"></app-skeleton>
-                </td>
-                <td class="py-4 px-6">
-                  <app-skeleton width="80px" height="1rem"></app-skeleton>
-                </td>
-              </tr>
-              } } @else { @for (customer of customers(); track customer.id) {
-              <tr
-                class="border-b border-white/5 hover:bg-white/5 transition-colors"
-              >
-                <td class="py-4 px-6 flex items-center gap-3">
-                  <div
-                    class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden"
-                  >
-                    <span class="material-icons text-sm">person</span>
+
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Email Address</label>
+                    <input 
+                      type="email" 
+                      [(ngModel)]="customer.email" 
+                      class="input-field text-xs py-2 px-3 rounded-lg bg-black/40 border border-white/10 text-white w-full font-sans"
+                    >
                   </div>
-                  <div>
-                    <div class="font-bold text-sm">
-                      {{ customer.name || 'Anonymous' }}
+
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Phone (Voice Link)</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="customer.phone" 
+                      placeholder="e.g. +91 98765 43210"
+                      class="input-field text-xs py-2 px-3 rounded-lg bg-black/40 border border-white/10 text-white w-full font-sans"
+                    >
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Access Level (Role)</label>
+                    <select 
+                      [(ngModel)]="customer.role"
+                      class="input-field text-xs py-2 px-3 rounded-lg bg-black/40 border border-white/10 text-white w-full font-mono outline-none"
+                    >
+                      <option value="customer">Customer (Standard)</option>
+                      <option value="admin">Administrator (Full Access)</option>
+                    </select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Access Override Settings</label>
+                    <div class="flex items-center justify-between p-3 bg-black/30 rounded-lg border border-white/5">
+                      <div class="text-[10px] font-mono text-white/80">Tutorial Academy Access</div>
+                      <button 
+                        type="button"
+                        (click)="customer.tutorial_access = !customer.tutorial_access"
+                        class="px-2.5 py-1 rounded text-[9px] font-bold uppercase transition-all"
+                        [class.bg-accent/10]="customer.tutorial_access"
+                        [class.text-accent]="customer.tutorial_access"
+                        [class.border]="true"
+                        [class.border-accent/30]="customer.tutorial_access"
+                        [class.bg-white/5]="!customer.tutorial_access"
+                        [class.text-accent-muted]="!customer.tutorial_access"
+                        [class.border-white/10]="!customer.tutorial_access"
+                      >
+                        {{ customer.tutorial_access ? 'Enabled' : 'Disabled' }}
+                      </button>
                     </div>
-                    <div class="tech-value text-[9px] text-accent-muted">
-                      ID: {{ customer.id }}
-                    </div>
                   </div>
-                </td>
-                <td class="py-4 px-6 text-xs font-mono">
-                  {{ customer.email }}
-                </td>
-                <td class="py-4 px-6 text-xs font-mono">
-                  {{ customer.phone || 'N/A' }}
-                </td>
-                <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">
-                  {{ customer.created_at | date:'yyyy-MM-dd' }}
-                </td>
-              </tr>
-              } }
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </div>
+
+                <div class="space-y-4 bg-white/[0.02] border border-white/5 p-5 rounded-2xl">
+                  <span class="tech-label text-[10px] text-accent uppercase font-mono block tracking-wider">Address Parameters</span>
+                  <div class="space-y-2">
+                    <label class="text-[10px] uppercase text-accent-muted block font-mono">Address (JSON or Text Format)</label>
+                    <textarea 
+                      [(ngModel)]="customer.address" 
+                      rows="3"
+                      placeholder="e.g. 123 Tech Lane, Silicon Valley"
+                      class="input-field text-xs py-2 px-3 rounded-lg bg-black/40 border border-white/10 text-white w-full font-sans resize-none"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- ASSIGN DIRECT COURSE ACCESS (OPTION B) -->
+                <div class="space-y-4 bg-white/[0.02] border border-white/5 p-5 rounded-2xl">
+                  <span class="tech-label text-[10px] text-accent uppercase font-mono block tracking-wider">ASSIGN DIRECT COURSE ACCESS (OPTION B)</span>
+                  <p class="text-[9px] text-accent-muted italic -mt-2">Check the courses that this customer can access directly without purchase</p>
+                  <div class="grid grid-cols-1 gap-2.5 max-h-56 overflow-y-auto p-4 bg-black/40 border border-white/5 rounded-2xl no-scrollbar">
+                    @for (tut of tutorialService.tutorials(); track tut.id) {
+                      <div class="flex items-center gap-3">
+                        <input 
+                          [id]="'map-tut-' + tut.id" 
+                          type="checkbox" 
+                          [checked]="customer.tutorial_ids?.includes(tut.id)"
+                          (change)="toggleTutorialInAccessMapping(tut.id)"
+                          class="w-4 h-4 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent"
+                        >
+                        <label 
+                          [for]="'map-tut-' + tut.id" 
+                          class="text-xs text-white/90 truncate cursor-pointer hover:text-accent select-none"
+                          [title]="tut.title"
+                        >
+                          {{ tut.title }}
+                        </label>
+                      </div>
+                    } @empty {
+                      <div class="text-xs text-accent-muted italic font-mono p-2">No tutorials in academy.</div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: User Analytics & Watch History -->
+              <div class="lg:col-span-7 space-y-6">
+                <!-- Stats Summary Row -->
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
+                    <span class="text-[9px] uppercase tracking-wider text-accent-muted block font-mono">Watch Time</span>
+                    <span class="text-lg font-bold text-white">{{ customerOverviewStats()?.totalWatchTime ? (customerOverviewStats()?.totalWatchTime / 60 | number:'1.0-0') : 0 }} min</span>
+                  </div>
+                  <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
+                    <span class="text-[9px] uppercase tracking-wider text-accent-muted block font-mono">Completion</span>
+                    <span class="text-lg font-bold text-white">{{ customerOverviewStats()?.completionPercentage ? (customerOverviewStats()?.completionPercentage | number:'1.0-0') : 0 }}%</span>
+                  </div>
+                  <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
+                    <span class="text-[9px] uppercase tracking-wider text-accent-muted block font-mono">Lessons</span>
+                    <span class="text-lg font-bold text-white">{{ customerOverviewStats()?.tutorialsWatchedCount || 0 }}</span>
+                  </div>
+                </div>
+
+                <!-- Mapped Products -->
+                <div class="space-y-3 bg-white/[0.02] border border-white/5 p-5 rounded-2xl">
+                  <span class="tech-label text-[10px] text-accent uppercase font-mono block tracking-wider">Purchased Products (Access Keys)</span>
+                  <div class="space-y-2">
+                    @for (prod of customerOverviewStats()?.purchasedProducts; track prod.id) {
+                      <div class="flex items-center gap-2 p-2.5 bg-black/40 border border-white/5 rounded-xl text-xs">
+                        <span class="material-icons text-green-400 text-sm">shopping_bag</span>
+                        <span class="font-mono text-white/90 font-bold">{{ prod.name }}</span>
+                        <span class="text-[9px] text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded font-mono uppercase ml-auto">Paid</span>
+                      </div>
+                    } @empty {
+                      <p class="text-xs text-accent-muted italic font-mono p-2">No purchased products found for this client ID.</p>
+                    }
+                  </div>
+                </div>
+
+                <!-- Tutorial watch details -->
+                <div class="space-y-3 bg-white/[0.02] border border-white/5 p-5 rounded-2xl max-h-[300px] overflow-y-auto no-scrollbar">
+                  <span class="tech-label text-[10px] text-accent uppercase font-mono block tracking-wider">Lesson Watching Progress</span>
+                  <div class="space-y-2.5">
+                    @for (detail of customerOverviewStats()?.watchedTutorialsDetails; track detail.tutorial_id) {
+                      <div class="p-3 bg-black/35 border border-white/5 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                          <span class="font-bold text-white truncate max-w-[70%]">{{ detail.tutorial_title }}</span>
+                          <span class="font-mono text-accent">{{ detail.percentage_watched }}% watched</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+                          <div class="bg-accent h-full rounded-full" [style.width.%]="detail.percentage_watched"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-[8px] text-accent-muted font-mono">
+                          <span>Last watched pos: {{ (detail.last_watched_position / 60 | number:'1.0-0') }} min</span>
+                          <span>Completed: {{ detail.completed ? 'YES' : 'NO' }}</span>
+                        </div>
+                      </div>
+                    } @empty {
+                      <p class="text-xs text-accent-muted italic font-mono p-2">No progress logged for any tutorial node.</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="tech-card animate-in fade-in duration-300">
+            <div class="tech-header flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div class="space-y-1">
+                <span class="tech-label text-sm uppercase tracking-wider block font-bold text-white">Client Identity Registry</span>
+                <span class="text-[10px] text-accent-muted font-mono uppercase">{{ customers().length }} Records Found</span>
+              </div>
+              
+              <!-- Multi-select Course filter popover dropdown -->
+              <div class="relative group">
+                <button 
+                  type="button" 
+                  class="px-4 py-2 bg-black/40 border border-white/10 hover:border-accent/40 rounded-xl text-xs font-mono font-bold text-accent flex items-center gap-2 transition-all"
+                >
+                  <span class="material-icons text-sm">filter_list</span>
+                  Filter by Eligible Courses ({{ selectedCourseFilterIds().length }})
+                  <span class="material-icons text-sm">expand_more</span>
+                </button>
+                
+                <!-- Popover Panel on Hover/Click -->
+                <div class="absolute right-0 top-full mt-2 w-64 bg-metallic-black/95 border border-white/10 rounded-2xl p-4 shadow-2xl z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div class="text-[10px] uppercase font-mono text-accent-muted mb-2 pb-1.5 border-b border-white/5 font-bold">
+                    Select Target Courses
+                  </div>
+                  <div class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                    @for (tut of tutorialService.tutorials(); track tut.id) {
+                      <div class="flex items-center gap-2.5 py-1">
+                        <input 
+                          [id]="'filter-tut-' + tut.id" 
+                          type="checkbox" 
+                          [checked]="selectedCourseFilterIds().includes(tut.id)"
+                          (change)="toggleCourseFilter(tut.id)"
+                          class="w-3.5 h-3.5 rounded border-white/10 bg-black text-accent focus:ring-accent"
+                        >
+                        <label 
+                          [for]="'filter-tut-' + tut.id" 
+                          class="text-[11px] text-white/80 cursor-pointer hover:text-white select-none truncate"
+                          [title]="tut.title"
+                        >
+                          {{ tut.title }}
+                        </label>
+                      </div>
+                    } @empty {
+                      <div class="text-[10px] text-accent-muted italic font-mono">No courses to filter by.</div>
+                    }
+                  </div>
+                  @if (selectedCourseFilterIds().length > 0) {
+                    <button 
+                      type="button"
+                      (click)="selectedCourseFilterIds.set([]); loadCustomers()"
+                      class="mt-3 w-full text-center text-[9px] uppercase tracking-wider font-mono text-accent hover:text-white transition-colors pt-2 border-t border-white/5"
+                    >
+                      Clear Selection
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-white/5 bg-white/[0.02]">
+                    <th class="py-3 px-6 tech-label">Client Identity</th>
+                    <th class="py-3 px-6 tech-label">Email Uplink</th>
+                    <th class="py-3 px-6 tech-label">Voice Uplink</th>
+                    <th class="py-3 px-6 tech-label">Enrollment Timestamp</th>
+                    <th class="py-3 px-6 tech-label">Tutorial Override</th>
+                    <th class="py-3 px-6 tech-label">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (orderService.isLoading()) {
+                    @for (i of [1, 2, 3, 4, 5]; track i) {
+                      <tr class="border-b border-white/5">
+                        <td class="py-4 px-6 flex items-center gap-3">
+                          <app-skeleton width="32px" height="32px" className="rounded-full"></app-skeleton>
+                          <div>
+                            <app-skeleton width="100px" height="1rem" className="mb-2"></app-skeleton>
+                            <app-skeleton width="60px" height="0.5rem"></app-skeleton>
+                          </div>
+                        </td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="150px" height="1rem"></app-skeleton>
+                        </td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="100px" height="1rem"></app-skeleton>
+                        </td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="80px" height="1rem"></app-skeleton>
+                        </td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="80px" height="1.5rem" className="rounded"></app-skeleton>
+                        </td>
+                        <td class="py-4 px-6">
+                          <app-skeleton width="80px" height="1.5rem" className="rounded"></app-skeleton>
+                        </td>
+                      </tr>
+                    }
+                  } @else {
+                    @for (customer of customers(); track customer.id) {
+                      <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="py-4 px-6 flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent overflow-hidden">
+                            <span class="material-icons text-sm">person</span>
+                          </div>
+                          <div>
+                            <div class="font-bold text-sm">
+                              {{ customer.name || 'Anonymous' }}
+                            </div>
+                            <div class="tech-value text-[9px] text-accent-muted">
+                              ID: {{ customer.id }}
+                            </div>
+                          </div>
+                        </td>
+                        <td class="py-4 px-6 text-xs font-mono">
+                          {{ customer.email }}
+                        </td>
+                        <td class="py-4 px-6 text-xs font-mono">
+                          {{ customer.phone || 'N/A' }}
+                        </td>
+                        <td class="py-4 px-6 tech-value text-[10px] text-accent-muted">
+                          {{ customer.created_at | date:'yyyy-MM-dd' }}
+                        </td>
+                        <td class="py-4 px-6">
+                          <button 
+                            (click)="toggleTutorialAccess(customer)"
+                            class="px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all"
+                            [class.bg-accent/10]="customer.tutorial_access"
+                            [class.text-accent]="customer.tutorial_access"
+                            [class.border]="true"
+                            [class.border-accent/30]="customer.tutorial_access"
+                            [class.bg-white/5]="!customer.tutorial_access"
+                            [class.text-accent-muted]="!customer.tutorial_access"
+                            [class.border-white/10]="!customer.tutorial_access"
+                          >
+                            <span class="material-icons text-[10px]">{{ customer.tutorial_access ? 'check_circle' : 'cancel' }}</span>
+                            {{ customer.tutorial_access ? 'Enabled' : 'Disabled' }}
+                          </button>
+                        </td>
+                        <td class="py-4 px-6">
+                          <button 
+                            (click)="openCustomerOverview(customer)"
+                            class="px-3 py-1 bg-accent/20 hover:bg-accent text-accent hover:text-metallic-black border border-accent/30 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all"
+                          >
+                            <span class="material-icons text-[12px]">visibility</span>
+                            Overview
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
       }
 
       <!-- Messages View -->

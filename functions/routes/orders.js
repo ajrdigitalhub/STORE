@@ -2,24 +2,46 @@ const express = require('express');
 const crypto = require('crypto');
 const pool = require('../db');
 const Order = require('../models/Order');
-const { auth, adminAuth } = require('../middleware/auth');
+const { auth, adminAuth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// POST /api/orders — create order (customer)
-router.post('/', auth, async (req, res, next) => {
+// POST /api/orders — create order (customer or guest)
+router.post('/', optionalAuth, async (req, res, next) => {
   try {
     const { 
       items, 
       shippingAddress, 
+      shipping_address,
       paymentMethod, 
+      payment_method,
       totalAmount,
+      total_amount,
       gst_amount,
       shipping_charge,
       razorpay_orderid,
       razorpay_paymentid,
-      razorpay_signature
+      razorpay_signature,
+      isGuest,
+      is_guest,
+      guestName,
+      guest_name,
+      guestPhone,
+      guest_phone,
+      guestEmail,
+      guest_email,
+      firebaseUid,
+      firebase_uid
     } = req.body;
+
+    const finalShippingAddress = shippingAddress || shipping_address;
+    const finalPaymentMethod = paymentMethod || payment_method;
+    const finalTotalAmount = totalAmount !== undefined ? totalAmount : total_amount;
+    const finalIsGuest = isGuest !== undefined ? isGuest : is_guest;
+    const finalGuestName = guestName || guest_name;
+    const finalGuestPhone = guestPhone || guest_phone;
+    const finalGuestEmail = guestEmail || guest_email;
+    const finalFirebaseUid = firebaseUid || firebase_uid;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'Order must have at least one item' });
@@ -29,7 +51,7 @@ router.post('/', auth, async (req, res, next) => {
     let orderStatus = 'pending';
 
     // If Razorpay, verify payment before creating order
-    if (paymentMethod === 'razorpay') {
+    if (finalPaymentMethod === 'razorpay') {
       if (!razorpay_orderid || !razorpay_paymentid || !razorpay_signature) {
         return res.status(400).json({ message: 'Razorpay payment details are required' });
       }
@@ -58,19 +80,32 @@ router.post('/', auth, async (req, res, next) => {
     }
 
     const order = await Order.create({
-      user_id: req.userId,
+      user_id: req.userId || null,
       items,
-      total_amount: totalAmount,
-      shipping_address: shippingAddress,
-      payment_method: paymentMethod,
+      total_amount: finalTotalAmount,
+      shipping_address: finalShippingAddress,
+      payment_method: finalPaymentMethod,
       payment_status: paymentStatus,
       order_status: orderStatus,
       gst_amount,
       shipping_charge,
       razorpay_orderid,
       razorpay_paymentid,
-      razorpay_signature
+      razorpay_signature,
+      is_guest: finalIsGuest === 'true' || finalIsGuest === true || !req.userId,
+      guest_name: finalGuestName,
+      guest_phone: finalGuestPhone,
+      guest_email: finalGuestEmail,
+      firebase_uid: finalFirebaseUid
     });
+
+    // Log conversion event
+    try {
+      const eventType = (!req.userId) ? 'checkout_complete_guest' : 'checkout_complete_registered';
+      await pool.query('INSERT INTO conversion_events (event_type, amount) VALUES ($1, $2)', [eventType, finalTotalAmount]);
+    } catch (err) {
+      console.error('Failed to log conversion event:', err);
+    }
 
     // Send WhatsApp confirmation
     const { sendOrderConfirmation } = require('../whatsapp');
@@ -98,11 +133,11 @@ router.post('/', auth, async (req, res, next) => {
 // GET /api/orders — customer's orders or all orders for admin
 router.get('/', auth, async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, isGuest } = req.query;
 
     let result;
     if (req.user.role === 'admin') {
-      result = await Order.findAll({ page: Number(page), limit: Number(limit) });
+      result = await Order.findAll({ page: Number(page), limit: Number(limit), isGuest });
     } else {
       result = await Order.findByUser(req.userId, { page: Number(page), limit: Number(limit) });
     }
@@ -113,6 +148,33 @@ router.get('/', auth, async (req, res, next) => {
       page: Number(page), 
       pages: Math.ceil(result.total / Number(limit)) 
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/orders/track — public track order
+router.get('/track', async (req, res, next) => {
+  try {
+    const { orderNumber, phone } = req.query;
+    if (!orderNumber || !phone) {
+      return res.status(400).json({ message: 'Order number and mobile number are required' });
+    }
+
+    const order = await Order.findByOrderNumber(orderNumber);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Verify phone matches shipping address phone (compare last 10 digits to prevent country code mismatches)
+    const savedPhone = (order.shipping_address?.phone || order.phone || '').replace(/\D/g, '').slice(-10);
+    const inputPhone = phone.replace(/\D/g, '').slice(-10);
+
+    if (savedPhone !== inputPhone) {
+      return res.status(403).json({ message: 'Access denied. Information mismatch.' });
+    }
+
+    res.json(order);
   } catch (error) {
     next(error);
   }
@@ -138,8 +200,8 @@ router.get('/:id', auth, async (req, res, next) => {
 // PUT /api/orders/:id/status — admin update order status
 router.put('/:id/status', adminAuth, async (req, res, next) => {
   try {
-    const { orderStatus, paymentStatus } = req.body;
-    const order = await Order.updateStatus(req.params.id, { orderStatus, paymentStatus });
+    const { orderStatus, paymentStatus, courierName, trackingNumber } = req.body;
+    const order = await Order.updateStatus(req.params.id, { orderStatus, paymentStatus, courierName, trackingNumber });
     
     // Send WhatsApp notification
     const { sendOrderStatusUpdate } = require('../whatsapp');

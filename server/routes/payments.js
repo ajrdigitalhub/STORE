@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import Razorpay from 'razorpay';
-import { authenticate } from '../auth.js';
+import { authenticate, optionalAuthenticate } from '../auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -57,7 +57,7 @@ router.get('/get-key', async (req, res) => {
   return res.json({ key: key_id || '' });
 });
 
-router.post('/create-order', authenticate, async (req, res) => {
+router.post('/create-order', optionalAuthenticate, async (req, res) => {
   const { amount, currency = 'INR' } = req.body;
 
   try {
@@ -76,7 +76,7 @@ router.post('/create-order', authenticate, async (req, res) => {
   }
 });
 
-router.post('/verify', authenticate, async (req, res) => {
+router.post('/verify', optionalAuthenticate, async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
   
   try {

@@ -1,0 +1,561 @@
+@if (viewMode() === 'gallery') {
+  <div class="min-h-screen bg-metallic-black text-white pb-24">
+    <!-- Top Dashboard Header Banner -->
+    <div class="relative bg-black/40 backdrop-blur-md border-b border-white/5 py-12 px-6 animate-in fade-in duration-300">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="tech-label px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[10px] text-accent font-mono">
+            ACADEMY CATALOG
+          </span>
+          <span class="text-[10px] text-accent-muted uppercase tracking-widest font-mono">
+            {{ filteredTutorials().length }} Courses Available
+          </span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight italic font-serif leading-none bg-gradient-to-r from-white via-slate-200 to-accent bg-clip-text text-transparent">
+          My Slicing & Printing Courses
+        </h1>
+        <p class="text-xs text-accent-muted max-w-2xl font-light">
+          Level up your 3D engineering capabilities. Access structured tutorials, slicer calibrations, and technical guides.
+        </p>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-6 border-t border-white/5 mt-6">
+          <!-- Category Pills -->
+          <div class="flex flex-wrap gap-2">
+            <button 
+              (click)="selectedCategoryId.set(null)"
+              class="px-4 py-2 rounded-xl text-xs font-mono uppercase tracking-wider border transition-all"
+              [class.bg-accent]="selectedCategoryId() === null"
+              [class.text-metallic-black]="selectedCategoryId() === null"
+              [class.border-accent]="selectedCategoryId() === null"
+              [class.bg-white/5]="selectedCategoryId() !== null"
+              [class.text-accent-muted]="selectedCategoryId() !== null"
+              [class.border-white/5]="selectedCategoryId() !== null"
+            >
+              All Courses
+            </button>
+            @for (cat of tutorialService.categories(); track cat.id) {
+              <button 
+                (click)="selectedCategoryId.set(cat.id)"
+                class="px-4 py-2 rounded-xl text-xs font-mono uppercase tracking-wider border transition-all"
+                [class.bg-accent]="selectedCategoryId() === cat.id"
+                [class.text-metallic-black]="selectedCategoryId() === cat.id"
+                [class.border-accent]="selectedCategoryId() === cat.id"
+                [class.bg-white/5]="selectedCategoryId() !== cat.id"
+                [class.text-accent-muted]="selectedCategoryId() !== cat.id"
+                [class.border-white/5]="selectedCategoryId() !== cat.id"
+              >
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+
+          <!-- Search Field -->
+          <div class="relative w-full md:w-80">
+            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">search</span>
+            <input 
+              type="text" 
+              [ngModel]="searchQuery()" 
+              (ngModelChange)="searchQuery.set($event)"
+              placeholder="Search my courses..." 
+              class="input-field pl-10 text-xs py-3 rounded-xl bg-black/40 border border-white/10 focus:border-accent/50 text-white w-full placeholder-white/30"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="max-w-7xl mx-auto px-6 mt-12 animate-in fade-in slide-in-from-bottom-6 duration-500">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (tut of filteredTutorials(); track tut.id) {
+          <div 
+            (click)="selectTutorial(tut, true)"
+            class="group bg-white/[0.01] border border-white/5 hover:border-accent/30 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] hover:-translate-y-1"
+          >
+            <!-- Card Thumbnail -->
+            <div class="relative aspect-video bg-black/60 overflow-hidden flex items-center justify-center border-b border-white/5">
+              @if (tut.thumbnail_url) {
+                <img 
+                  [src]="tut.thumbnail_url" 
+                  alt="" 
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                  referrerpolicy="no-referrer"
+                >
+              } @else {
+                <span class="material-icons text-4xl text-accent-muted group-hover:scale-105 transition-transform duration-300">play_circle</span>
+              }
+              
+              <!-- Hover Overlay Play Icon -->
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-accent text-metallic-black flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                  <span class="material-icons text-2xl ml-0.5">play_arrow</span>
+                </div>
+              </div>
+
+              <!-- Difficulty Tag -->
+              <span class="absolute top-3 left-3 px-2 py-0.5 bg-black/60 border border-white/10 text-white/90 text-[8px] uppercase tracking-wider rounded font-mono backdrop-blur-md">
+                {{ tut.difficulty }}
+              </span>
+              
+              <!-- Duration Badge -->
+              <span class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 text-white/80 text-[9px] rounded font-mono">
+                {{ tut.duration }}
+              </span>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+              <div class="space-y-1.5">
+                <span class="text-[8px] font-mono text-accent uppercase tracking-widest block">{{ tut.category_name || 'General' }}</span>
+                <h3 class="text-sm font-bold text-white leading-snug group-hover:text-accent transition-colors line-clamp-2" [title]="tut.title">
+                  {{ tut.title }}
+                </h3>
+                <p class="text-[10px] text-accent-muted line-clamp-1 font-light">{{ tut.subtitle || 'Module Slicing & Calibration' }}</p>
+              </div>
+
+              <!-- Progress bar (Udemy Style) -->
+              <div class="space-y-1.5 pt-2 border-t border-white/5">
+                @if (tut.percentage_watched && tut.percentage_watched > 0) {
+                  <div class="flex justify-between items-center text-[9px] font-mono text-accent-muted">
+                    <span>{{ tut.percentage_watched }}% complete</span>
+                    @if (tut.completed) {
+                      <span class="text-green-400 flex items-center gap-0.5"><span class="material-icons text-[10px]">check_circle</span>Done</span>
+                    }
+                  </div>
+                  <div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+                    <div class="bg-accent h-full rounded-full transition-all duration-500" [style.width.%]="tut.percentage_watched"></div>
+                  </div>
+                } @else {
+                  <div class="flex items-center justify-between text-[9px] uppercase tracking-wider font-mono text-accent font-bold group-hover:text-white transition-colors">
+                    <span>START COURSE</span>
+                    <span class="material-icons text-[10px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="col-span-full py-24 text-center text-accent-muted italic uppercase tracking-wider border border-dashed border-white/10 rounded-3xl">
+            No accessible training courses found under this filter query.
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else if (viewMode() === 'detail') {
+  <div class="min-h-screen bg-metallic-black text-white pb-24 animate-in fade-in duration-300">
+    <!-- Top Classroom Header (Udemy Style) -->
+    <div class="bg-black border-b border-white/5 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4 min-w-0">
+        <button 
+          (click)="viewMode.set('gallery')"
+          class="flex items-center gap-1.5 text-[11px] text-accent-muted hover:text-white uppercase font-mono transition-colors font-bold whitespace-nowrap"
+        >
+          <span class="material-icons text-sm">arrow_back</span>
+          Dashboard
+        </button>
+        <span class="text-white/20">|</span>
+        <h2 class="text-sm font-bold text-white truncate leading-none" [title]="selectedTutorial()?.title">
+          {{ selectedTutorial()?.title }}
+        </h2>
+      </div>
+
+      <div class="flex items-center gap-4 flex-shrink-0">
+        <!-- Progress bar dropdown preview -->
+        <div class="hidden sm:flex items-center gap-3">
+          <div class="flex flex-col items-end gap-0.5 text-right">
+            <span class="text-[9px] font-mono text-accent">YOUR PROGRESS</span>
+            <span class="text-[10px] font-bold text-white leading-none">
+              {{ selectedProgress()?.percentage_watched || 0 }}% Complete
+            </span>
+          </div>
+          <div class="w-24 bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-accent h-full rounded-full" [style.width.%]="selectedProgress()?.percentage_watched || 0"></div>
+          </div>
+        </div>
+
+        <button 
+          (click)="isSidebarOpen.set(!isSidebarOpen())"
+          class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-accent/40 text-accent transition-all text-xs font-mono font-bold"
+        >
+          <span class="material-icons text-sm">{{ isSidebarOpen() ? 'grid_view' : 'menu_open' }}</span>
+          {{ isSidebarOpen() ? 'COLLAPSE' : 'EXPAND' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="max-w-7xl mx-auto px-4 mt-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- LEFT VIEWPORT: Video Player & Tabs -->
+        <div [class.lg:col-span-8]="isSidebarOpen()" [class.lg:col-span-12]="!isSidebarOpen()" class="space-y-6 transition-all duration-300">
+          @if (selectedTutorial(); as tut) {
+            <!-- Immersive Video Player Container -->
+            <div class="space-y-4">
+              <div class="relative w-full aspect-video bg-black rounded-3xl overflow-hidden group select-none shadow-2xl border border-white/10 hover:border-white/15 transition-all">
+                
+                <!-- Video Element with Poster -->
+                <video 
+                  #videoPlayer
+                  [src]="currentVideoUrl()"
+                  [poster]="tut.thumbnail_url"
+                  (timeupdate)="onTimeUpdate()"
+                  (loadedmetadata)="onLoadedMetadata()"
+                  (play)="onPlayStatusChange(true)"
+                  (pause)="onPlayStatusChange(false)"
+                  (ended)="onVideoEnded()"
+                  [autoplay]="false"
+                  disablePictureInPicture
+                  controlsList="nodownload"
+                  (contextmenu)="$event.preventDefault()"
+                  class="w-full h-full object-contain cursor-pointer"
+                  (click)="togglePlay()"
+                ></video>
+
+                <!-- Loading / Buffering Overlay -->
+                @if (isVideoLoading()) {
+                  <div class="absolute inset-0 bg-black/85 flex items-center justify-center pointer-events-none backdrop-blur-sm">
+                    <div class="flex flex-col items-center gap-3">
+                      <div class="w-12 h-12 rounded-full border-2 border-accent/20 border-t-accent animate-spin"></div>
+                      <span class="text-[10px] uppercase tracking-widest text-accent font-bold font-mono">Securing Media Link...</span>
+                    </div>
+                  </div>
+                }
+
+                <!-- Poster Overlay with Play button when paused/stopped -->
+                @if (!isPlaying() && !isVideoLoading()) {
+                  <div class="absolute inset-0 flex flex-col justify-between p-6 cursor-pointer bg-gradient-to-t from-black/80 via-black/30 to-black/50 transition-all hover:bg-black/40" (click)="togglePlay()">
+                    <!-- Top Badge -->
+                    <div class="flex justify-between items-start">
+                      <span class="px-3 py-1 bg-accent/20 border border-accent/30 text-accent font-mono text-[9px] uppercase rounded-full backdrop-blur-md">
+                        {{ tut.difficulty }} Level
+                      </span>
+                      <span class="text-[10px] font-mono text-white/60 bg-black/60 px-2.5 py-1 rounded backdrop-blur-md">
+                        {{ tut.duration }}
+                      </span>
+                    </div>
+
+                    <!-- Central Glowing Play Button -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-20 h-20 bg-accent text-metallic-black rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_50px_rgba(99,102,241,0.8)]">
+                        <span class="material-icons text-4xl ml-1">play_arrow</span>
+                      </div>
+                    </div>
+
+                    <!-- Bottom Title Banner -->
+                    <div class="space-y-1 backdrop-blur-sm bg-black/30 p-4 rounded-xl border border-white/5 w-fit max-w-[80%]">
+                      <div class="text-[9px] font-mono uppercase tracking-widest text-accent">Currently Loaded Lesson</div>
+                      <div class="text-lg font-bold text-white leading-tight truncate">{{ tut.title }}</div>
+                    </div>
+                  </div>
+                }
+
+                <!-- Controls bar -->
+                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-6 flex flex-col gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <!-- Seek Bar -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-[10px] font-mono text-accent-muted">{{ formatTime(currentTime()) }}</span>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      [max]="duration() || 100" 
+                      [value]="currentTime()" 
+                      (input)="onSeek($event)" 
+                      class="flex-grow h-1 bg-white/20 accent-accent rounded-full appearance-none cursor-pointer outline-none transition-all hover:h-1.5"
+                    >
+                    <span class="text-[10px] font-mono text-white/80">{{ formatTime(duration()) }}</span>
+                  </div>
+
+                  <!-- Action Controls -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                      <button (click)="togglePlay()" class="text-white hover:text-accent transition-colors">
+                        <span class="material-icons text-2xl">{{ isPlaying() ? 'pause' : 'play_arrow' }}</span>
+                      </button>
+                      <button (click)="togglePlayNext()" class="text-white hover:text-accent transition-colors" title="Next Lesson">
+                        <span class="material-icons text-xl">skip_next</span>
+                      </button>
+                      <div class="flex items-center gap-2">
+                        <button (click)="toggleMute()" class="text-white hover:text-accent transition-colors">
+                          <span class="material-icons text-lg">{{ isMuted() ? 'volume_off' : 'volume_up' }}</span>
+                        </button>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="1" 
+                          step="0.1" 
+                          [value]="isMuted() ? 0 : volume()" 
+                          (input)="onVolumeChange($event)"
+                          class="w-16 h-1 bg-white/20 accent-accent rounded-full appearance-none cursor-pointer outline-none transition-all"
+                        >
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                      <div class="flex items-center gap-2">
+                        <input 
+                          id="c-autoplay" 
+                          type="checkbox" 
+                          [(ngModel)]="autoplayNext"
+                          class="w-3 h-3 rounded border-white/10 bg-metallic-black text-accent focus:ring-accent"
+                        >
+                        <label for="c-autoplay" class="text-[9px] uppercase tracking-wider text-accent-muted cursor-pointer hover:text-white transition-colors">Autoplay Next</label>
+                      </div>
+
+                      <div class="relative">
+                        <select 
+                          (change)="onSpeedChange($event)" 
+                          [value]="playbackSpeed()"
+                          class="bg-black/80 border border-white/10 text-white rounded text-[10px] uppercase font-bold py-1 px-2 font-mono outline-none cursor-pointer hover:border-accent transition-all"
+                        >
+                          <option value="0.5">0.5x</option>
+                          <option value="1">1.0x</option>
+                          <option value="1.25">1.25x</option>
+                          <option value="1.5">1.5x</option>
+                          <option value="2">2.0x</option>
+                        </select>
+                      </div>
+                      
+                      <button (click)="toggleFullscreen()" class="text-white hover:text-accent transition-colors">
+                        <span class="material-icons text-lg">fullscreen</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navigation Buttons Row -->
+              <div class="flex justify-between items-center py-2 px-1">
+                <button 
+                  (click)="togglePlayPrev()"
+                  class="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
+                >
+                  <span class="material-icons text-sm">arrow_back</span> Previous Lesson
+                </button>
+                
+                <div class="flex items-center gap-2 text-[10px] text-accent-muted uppercase tracking-widest font-mono">
+                  <span class="material-icons text-sm">keyboard</span> Hotkeys Active
+                </div>
+
+                <button 
+                  (click)="togglePlayNext()"
+                  class="px-4 py-2.5 bg-accent hover:bg-accent/90 border border-accent/20 rounded-xl text-xs font-bold text-metallic-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                >
+                  Next Lesson <span class="material-icons text-sm">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Video Details and Resources Section -->
+            <div class="space-y-6 mt-8">
+              <div class="space-y-2">
+                <h2 class="text-3xl font-extrabold tracking-tight text-white leading-tight">{{ tut.title }}</h2>
+                <p class="text-sm text-accent font-light">{{ tut.subtitle }}</p>
+              </div>
+
+              <!-- Tabs Navigation -->
+              <div class="flex border-b border-white/5 pb-2 gap-6">
+                <button 
+                  (click)="activeInfoTab.set('description')"
+                  class="py-2 text-xs font-bold uppercase tracking-widest transition-colors relative"
+                  [class.text-accent]="activeInfoTab() === 'description'"
+                  [class.text-accent-muted]="activeInfoTab() !== 'description'"
+                >
+                  Course Details
+                  @if (activeInfoTab() === 'description') {
+                    <span class="absolute bottom-0 inset-x-0 h-[2px] bg-accent"></span>
+                  }
+                </button>
+                <button 
+                  (click)="activeInfoTab.set('resources')"
+                  class="py-2 text-xs font-bold uppercase tracking-widest transition-colors relative"
+                  [class.text-accent]="activeInfoTab() === 'resources'"
+                  [class.text-accent-muted]="activeInfoTab() !== 'resources'"
+                >
+                  Related Resources
+                  @if (activeInfoTab() === 'resources') {
+                    <span class="absolute bottom-0 inset-x-0 h-[2px] bg-accent"></span>
+                  }
+                </button>
+              </div>
+
+              <!-- Tab Contents -->
+              @if (activeInfoTab() === 'description') {
+                <div class="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-4 animate-in fade-in duration-300">
+                  <p class="text-xs uppercase tracking-widest text-accent font-mono">Module Specs & Description</p>
+                  <div class="text-sm font-light text-slate-300 leading-relaxed whitespace-pre-line">
+                    {{ tut.description }}
+                  </div>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 border-t border-white/5 pt-4 text-xs font-mono">
+                    <div>
+                      <span class="text-accent-muted block mb-0.5 uppercase tracking-wider text-[9px]">Difficulty</span>
+                      <span class="text-white font-bold">{{ tut.difficulty }}</span>
+                    </div>
+                    <div>
+                      <span class="text-accent-muted block mb-0.5 uppercase tracking-wider text-[9px]">Duration</span>
+                      <span class="text-white font-bold">{{ tut.duration }}</span>
+                    </div>
+                    <div>
+                      <span class="text-accent-muted block mb-0.5 uppercase tracking-wider text-[9px]">Watched</span>
+                      <span class="text-white font-bold">{{ selectedProgress()?.percentage_watched || 0 }}% finished</span>
+                    </div>
+                    <div>
+                      <span class="text-accent-muted block mb-0.5 uppercase tracking-wider text-[9px]">Authorization</span>
+                      <span class="font-bold text-green-400">Granted</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (activeInfoTab() === 'resources') {
+                <div class="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-4 animate-in fade-in duration-300">
+                  <p class="text-xs uppercase tracking-widest text-accent font-mono">Downloadable Attachments</p>
+                  <div class="space-y-3">
+                    @for (res of tut.resources; track $index) {
+                      <div class="flex justify-between items-center p-4 bg-white/[0.03] rounded-2xl border border-white/5 hover:border-accent/30 transition-all group">
+                        <div class="flex items-center gap-3">
+                          <span class="material-icons text-accent text-xl">insert_drive_file</span>
+                          <div>
+                            <div class="text-xs font-bold text-white">{{ res.name }}</div>
+                            <div class="text-[9px] text-accent-muted">Attachment File Module</div>
+                          </div>
+                        </div>
+                        <a 
+                          [href]="res.url" 
+                          target="_blank"
+                          download
+                          class="px-4 py-1.5 bg-white/5 hover:bg-accent hover:text-metallic-black text-[9px] uppercase font-mono font-bold border border-white/10 rounded-lg transition-all block"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    } @empty {
+                      <div class="py-6 text-center text-xs text-accent-muted italic uppercase tracking-wider">
+                        No attachments available for this lesson module.
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="py-24 text-center text-accent-muted italic uppercase tracking-wider border border-dashed border-white/10 rounded-3xl">
+              Choose a tutorial from the queue to start training.
+            </div>
+          }
+        </div>
+
+        <!-- RIGHT SIDEBAR: Syllabus Queue (collapsible) -->
+        @if (isSidebarOpen()) {
+          <div class="lg:col-span-4 space-y-6 animate-in slide-in-from-right duration-300">
+            
+            <!-- Search & Filter Card -->
+            <div class="tech-card p-5 space-y-5 bg-white/[0.01] border border-white/5 rounded-3xl">
+              <div class="relative">
+                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-accent-muted text-sm">search</span>
+                <input 
+                  type="text" 
+                  [ngModel]="searchQuery()" 
+                  (ngModelChange)="searchQuery.set($event)"
+                  placeholder="Search tutorials..." 
+                  class="input-field pl-10 text-xs py-3 rounded-xl bg-black/40 border border-white/10 focus:border-accent/50 text-white placeholder-white/30"
+                >
+              </div>
+
+              <!-- Category filter tags -->
+              <div class="space-y-2">
+                <span class="tech-label text-[9px] uppercase tracking-widest text-accent block font-mono">Module Node Filter</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    (click)="selectedCategoryId.set(null)"
+                    class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono uppercase tracking-wider border transition-all"
+                    [class.bg-accent]="selectedCategoryId() === null"
+                    [class.text-metallic-black]="selectedCategoryId() === null"
+                    [class.border-accent]="selectedCategoryId() === null"
+                    [class.bg-white/5]="selectedCategoryId() !== null"
+                    [class.text-accent-muted]="selectedCategoryId() !== null"
+                    [class.border-white/5]="selectedCategoryId() !== null"
+                  >
+                    All
+                  </button>
+                  @for (cat of tutorialService.categories(); track cat.id) {
+                    <button 
+                      (click)="selectedCategoryId.set(cat.id)"
+                      class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono uppercase tracking-wider border transition-all"
+                      [class.bg-accent]="selectedCategoryId() === cat.id"
+                      [class.text-metallic-black]="selectedCategoryId() === cat.id"
+                      [class.border-accent]="selectedCategoryId() === cat.id"
+                      [class.bg-white/5]="selectedCategoryId() !== cat.id"
+                      [class.text-accent-muted]="selectedCategoryId() !== cat.id"
+                      [class.border-white/5]="selectedCategoryId() !== cat.id"
+                    >
+                      {{ cat.name }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Lessons Queue Card -->
+            <div class="tech-card overflow-hidden bg-white/[0.01] border border-white/5 rounded-3xl shadow-xl">
+              <div class="tech-header flex justify-between items-center border-b border-white/5 p-4">
+                <span class="tech-label text-xs uppercase tracking-widest text-accent font-bold font-mono">Syllabus Queue</span>
+                <span class="text-[9px] text-accent-muted font-mono uppercase">{{ filteredTutorials().length }} Nodes Available</span>
+              </div>
+
+              <div class="divide-y divide-white/5 max-h-[600px] overflow-y-auto no-scrollbar">
+                @for (tut of filteredTutorials(); track tut.id) {
+                  <button 
+                    (click)="selectTutorial(tut)"
+                    class="w-full text-left p-4 hover:bg-white/5 transition-all flex gap-4 border-l-2"
+                    [class.bg-accent/[0.03]]="selectedTutorial()?.id === tut.id"
+                    [class.border-accent]="selectedTutorial()?.id === tut.id"
+                    [class.border-transparent]="selectedTutorial()?.id !== tut.id"
+                  >
+                    <!-- Thumbnail / Icon left side -->
+                    <div class="flex-shrink-0 relative w-16 h-12 rounded-lg overflow-hidden border border-white/10 bg-black/60 flex items-center justify-center">
+                      @if (tut.thumbnail_url) {
+                        <img [src]="tut.thumbnail_url" alt="" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                      } @else {
+                        <span class="material-icons text-lg text-accent-muted">play_circle</span>
+                      }
+                      @if (selectedTutorial()?.id === tut.id) {
+                        <div class="absolute inset-0 bg-accent/25 flex items-center justify-center">
+                          <span class="material-icons text-metallic-black text-sm animate-pulse">play_arrow</span>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Middle details -->
+                    <div class="flex-grow min-w-0 flex flex-col justify-between h-12">
+                      <div class="flex justify-between items-start gap-2">
+                        <span class="text-xs font-bold text-white truncate group-hover:text-accent pr-1 leading-snug">
+                          {{ tut.title }}
+                        </span>
+                        <span class="text-[8px] font-mono text-accent-muted bg-white/5 px-1 py-0.5 rounded border border-white/5 whitespace-nowrap">
+                          {{ tut.duration }}
+                        </span>
+                      </div>
+                      
+                      <div class="flex items-center gap-1.5 mt-1.5 text-[8px] uppercase tracking-wider font-mono">
+                        <span class="text-accent font-bold">{{ tut.difficulty }}</span>
+                        <span class="text-white/30">•</span>
+                        <span class="text-accent-muted truncate max-w-[120px]">{{ tut.category_name || 'General' }}</span>
+                      </div>
+                    </div>
+                  </button>
+                } @empty {
+                  <div class="py-12 text-center text-xs text-accent-muted italic uppercase tracking-wider">
+                    No accessible lessons found.
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

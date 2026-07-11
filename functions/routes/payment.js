@@ -4,7 +4,7 @@ const Razorpay = require('razorpay');
 const pool = require('../db');
 const Order = require('../models/Order');
 const PaymentConfig = require('../models/PaymentConfig');
-const { auth } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ const getRazorpayInstance = async () => {
     
     const appConfig = appConfigResult.rows.length > 0 ? appConfigResult.rows[0].value : {};
     const secretConfig = secretConfigResult.rows.length > 0 ? secretConfigResult.rows[0].value : {};
-
+ 
     const key_id_source = appConfig.razorpay?.keyId ? 'DB (app)' : (process.env.RAZORPAY_KEY_ID ? 'Env' : 'None');
     const key_secret_source = secretConfig.keySecret ? 'DB (razorpay_secret)' : (process.env.RAZORPAY_KEY_SECRET ? 'Env' : 'None');
 
@@ -53,7 +53,7 @@ const getRazorpayInstance = async () => {
 };
 
 // GET /api/payment/get-key
-router.get('/get-key', auth, async (req, res, next) => {
+router.get('/get-key', optionalAuth, async (req, res, next) => {
   try {
     const { key_id } = await getRazorpayInstance();
     res.json({ key: key_id });
@@ -63,7 +63,7 @@ router.get('/get-key', auth, async (req, res, next) => {
 });
 
 // POST /api/payment/create-order
-router.post('/create-order', auth, async (req, res, next) => {
+router.post('/create-order', optionalAuth, async (req, res, next) => {
   try {
     const { amount } = req.body;
 
@@ -88,7 +88,7 @@ router.post('/create-order', auth, async (req, res, next) => {
 });
 
 // POST /api/payment/verify
-router.post('/verify', auth, async (req, res, next) => {
+router.post('/verify', optionalAuth, async (req, res, next) => {
   try {
     const { razorpay_orderid, razorpay_paymentid, razorpay_signature, orderId } = req.body;
     const { key_secret } = await getRazorpayInstance();

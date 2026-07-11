@@ -8,7 +8,8 @@ export const routes: Routes = [
   { path: 'products/:id', loadComponent: () => import('./pages/product-detail').then(m => m.ProductDetailComponent) },
   { path: 'orders/:id', loadComponent: () => import('./pages/order-detail').then(m => m.OrderDetailComponent), canActivate: [authGuard] },
   { path: 'cart', loadComponent: () => import('./pages/cart').then(m => m.CartComponent) },
-  { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent), canActivate: [authGuard] },
+  { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent) },
+  { path: 'track', loadComponent: () => import('./pages/track-order').then(m => m.TrackOrderComponent) },
   { path: 'login', loadComponent: () => import('./pages/login').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register').then(m => m.RegisterComponent) },
   { path: 'profile', loadComponent: () => import('./pages/profile').then(m => m.ProfileComponent), canActivate: [authGuard] },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'contact', loadComponent: () => import('./pages/contact').then(m => m.ContactComponent) },
   { path: 'terms', loadComponent: () => import('./pages/terms').then(m => m.TermsComponent) },
   { path: 'returns', loadComponent: () => import('./pages/returns').then(m => m.ReturnsComponent) },
+  { path: 'tutorials', loadComponent: () => import('./pages/tutorials').then(m => m.TutorialsComponent), canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

@@ -12,6 +12,9 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { animate, stagger } from 'motion';
+import { TutorialService, TutorialCategory, Tutorial, AdminOverallStats, TutorialStats, UserStats } from '../../services/tutorial.service';
+import { ApiService } from '../../services/api.service';
+import { firstValueFrom } from 'rxjs';
 
 interface Customer {
   id: number;
@@ -20,6 +23,8 @@ interface Customer {
   role: string;
   phone: string | null;
   address: unknown;
+  tutorial_access?: boolean;
+  tutorial_ids?: number[];
   created_at: string;
 }
 
@@ -50,9 +55,11 @@ export class AdminDashboardComponent implements AfterViewInit {
   uploadService = inject(UploadService);
   toastService = inject(ToastService);
   http = inject(HttpClient);
+  apiService = inject(ApiService);
   private el = inject(ElementRef);
+  analyticsStats = signal<any>(null);
 
-  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'whatsapp' | 'hero' | 'footer'>('dashboard');
+  activeTab = signal<'dashboard' | 'orders' | 'products' | 'categories' | 'customers' | 'chat' | 'messages' | 'about' | 'contact' | 'payments' | 'whatsapp' | 'hero' | 'footer' | 'tutorials'>('dashboard');
   isSidebarCollapsed = signal(false);
   isMobileMenuOpen = signal(false);
   
@@ -102,11 +109,15 @@ export class AdminDashboardComponent implements AfterViewInit {
     imageUrls: [] as string[],
     featured: false,
     customizable: false,
-    customization_type: 'none' as 'none' | 'text' | 'image_file'
+    customization_type: 'none' as 'none' | 'text' | 'image_file',
+    enable_tutorials_after_purchase: false
   };
   newCategory = { name: '', description: '', image: '' };
   
   customers = signal<Customer[]>([]);
+  selectedCourseFilterIds = signal<number[]>([]);
+  selectedCustomerForOverview = signal<Customer | null>(null);
+  customerOverviewStats = signal<any | null>(null);
   messages = signal<Message[]>([]);
 
   heroForm = signal({
@@ -149,6 +160,7 @@ export class AdminDashboardComponent implements AfterViewInit {
     copyrightText: ''
   });
 
+  isLoading = signal(false);
   isUploading = signal(false);
 
   getTabDisplayName(tab: string): string {
@@ -214,6 +226,8 @@ export class AdminDashboardComponent implements AfterViewInit {
       untracked(() => {
         if (tab === 'customers') this.loadCustomers();
         if (tab === 'messages') this.loadMessages();
+        if (tab === 'tutorials') this.loadTutorialsData();
+        if (tab === 'dashboard' || tab === 'orders') this.loadAnalyticsStats();
         setTimeout(() => this.animateContent(), 0);
       });
     });
@@ -221,16 +235,46 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async loadCustomers() {
     try {
-      const res = await this.http.get<Customer[]>('/api/users').toPromise();
+      const filterIds = this.selectedCourseFilterIds();
+      let query = '';
+      if (filterIds.length > 0) {
+        query = `?tutorial_ids=${filterIds.join(',')}`;
+      }
+      const res = await firstValueFrom(this.apiService.get<Customer[]>(`/users${query}`));
       if (res) this.customers.set(res);
     } catch (error) {
       console.error('Failed to load customers', error);
     }
   }
 
+  toggleCourseFilter(tutId: number) {
+    const current = this.selectedCourseFilterIds();
+    let updated: number[];
+    if (current.includes(tutId)) {
+      updated = current.filter(id => id !== tutId);
+    } else {
+      updated = [...current, tutId];
+    }
+    this.selectedCourseFilterIds.set(updated);
+    this.loadCustomers();
+  }
+
+  loadAnalyticsStats() {
+    this.apiService.get<any>('/analytics/stats').subscribe({
+      next: (data) => {
+        this.analyticsStats.set(data);
+      },
+      error: (err) => console.error('Failed to load conversion stats:', err)
+    });
+  }
+
+  onOrderFilterChange(value: string) {
+    this.orderService.loadAdminOrders(value as any);
+  }
+
   async loadMessages() {
     try {
-      const res = await this.http.get<{ messages: Message[] }>('/api/messages').toPromise();
+      const res = await firstValueFrom(this.apiService.get<{ messages: Message[] }>('/messages'));
       if (res?.messages) this.messages.set(res.messages);
     } catch (error) {
       console.error('Failed to load messages', error);
@@ -260,6 +304,7 @@ export class AdminDashboardComponent implements AfterViewInit {
       featured: this.newProduct.featured,
       customizable: this.newProduct.customizable,
       customization_type: this.newProduct.customization_type,
+      enable_tutorials_after_purchase: this.newProduct.enable_tutorials_after_purchase || false,
       active: true
     };
 
@@ -286,7 +331,8 @@ export class AdminDashboardComponent implements AfterViewInit {
       imageUrls: [...(product.images || [])],
       featured: product.featured || false,
       customizable: product.customizable || false,
-      customization_type: product.customization_type || 'none'
+      customization_type: product.customization_type || 'none',
+      enable_tutorials_after_purchase: product.enable_tutorials_after_purchase || false
     };
     this.showProductForm.set(true);
     setTimeout(() => this.animateContent(), 0);
@@ -305,7 +351,8 @@ export class AdminDashboardComponent implements AfterViewInit {
       imageUrls: [],
       featured: false,
       customizable: false,
-      customization_type: 'none'
+      customization_type: 'none',
+      enable_tutorials_after_purchase: false
     };
   }
 
@@ -330,7 +377,7 @@ export class AdminDashboardComponent implements AfterViewInit {
 
   async markMessageAsRead(id: number) {
     try {
-      await this.http.put(`/api/messages/${id}/read`, {}).toPromise();
+      await firstValueFrom(this.apiService.put(`/messages/${id}/read`, {}));
       this.loadMessages();
     } catch (error) {
       console.error('Failed to mark message as read', error);
@@ -340,7 +387,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   async deleteMessage(id: number) {
     if (confirm('Are you sure you want to delete this message?')) {
       try {
-        await this.http.delete(`/api/messages/${id}`).toPromise();
+        await firstValueFrom(this.apiService.delete(`/messages/${id}`));
         this.loadMessages();
       } catch (error) {
         console.error('Failed to delete message', error);
@@ -636,6 +683,422 @@ export class AdminDashboardComponent implements AfterViewInit {
         this.toastService.show('Failed to close session', 'error');
       }
     }
+  }
+
+  // Tutorials Management States
+  tutorialService = inject(TutorialService);
+  activeTutorialTab = signal<'videos' | 'categories' | 'analytics'>('videos');
+  tutorialAnalyticsType = signal<'overall' | 'tutorial' | 'user'>('overall');
+  
+  showTutorialForm = signal(false);
+  editingTutorial = signal<Tutorial | null>(null);
+  showTutorialCategoryForm = signal(false);
+  editingTutorialCategory = signal<TutorialCategory | null>(null);
+
+  newTutorial = {
+    title: '',
+    subtitle: '',
+    description: '',
+    thumbnail_url: '',
+    video_url: '',
+    category_id: 0,
+    duration: '',
+    difficulty: 'Beginner',
+    display_order: 0,
+    status: 'draft' as 'draft' | 'published',
+    resources: [] as { name: string; url: string }[],
+    product_ids: [] as number[]
+  };
+
+  newTutorialCategory = {
+    name: '',
+    description: '',
+    display_order: 0
+  };
+
+  isUploadingVideo = signal(false);
+  isUploadingThumbnail = signal(false);
+
+  overallStats = signal<AdminOverallStats | null>(null);
+  selectedTutorialAnalyticsId = signal<number | null>(null);
+  perTutorialStats = signal<TutorialStats | null>(null);
+  selectedUserAnalyticsId = signal<number | null>(null);
+  perUserStats = signal<UserStats | null>(null);
+
+  async loadTutorialsData() {
+    this.isLoading.set(true);
+    try {
+      await this.tutorialService.loadCategories();
+      await this.tutorialService.loadAdminTutorials();
+      await this.loadOverallAnalytics();
+    } catch (e) {
+      console.error('Failed to load tutorials data', e);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async loadOverallAnalytics() {
+    try {
+      const stats = await this.tutorialService.getOverallStats();
+      this.overallStats.set(stats);
+    } catch (e) {
+      console.error('Failed to load overall analytics', e);
+    }
+  }
+
+  async onTutorialSelectedForStats(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const id = Number(select.value);
+    if (id) {
+      this.selectedTutorialAnalyticsId.set(id);
+      try {
+        const stats = await this.tutorialService.getTutorialStats(id);
+        this.perTutorialStats.set(stats);
+      } catch (e) {
+        console.error('Failed to load tutorial stats', e);
+      }
+    } else {
+      this.selectedTutorialAnalyticsId.set(null);
+      this.perTutorialStats.set(null);
+    }
+  }
+
+  async onUserSelectedForStats(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const id = Number(select.value);
+    if (id) {
+      this.selectedUserAnalyticsId.set(id);
+      try {
+        const stats = await this.tutorialService.getUserStats(id);
+        this.perUserStats.set(stats);
+      } catch (e) {
+        console.error('Failed to load user stats', e);
+      }
+    } else {
+      this.selectedUserAnalyticsId.set(null);
+      this.perUserStats.set(null);
+    }
+  }
+
+  async toggleTutorialAccess(customer: Customer) {
+    try {
+      const updatedAccess = !(customer as any).tutorial_access;
+      await firstValueFrom(this.apiService.put(`/users/${customer.id}/tutorial-access`, { tutorial_access: updatedAccess }));
+      (customer as any).tutorial_access = updatedAccess;
+      this.toastService.show(`Tutorial access updated for ${customer.name}`, 'success');
+      this.loadCustomers();
+    } catch (error) {
+      console.error('Failed to toggle tutorial access', error);
+      this.toastService.show('Failed to update tutorial access override', 'error');
+    }
+  }
+
+  async openCustomerOverview(customer: Customer) {
+    this.selectedCustomerForOverview.set({ ...customer, tutorial_ids: [] });
+    this.customerOverviewStats.set(null);
+    try {
+      const stats = await this.tutorialService.getUserStats(customer.id);
+      this.customerOverviewStats.set(stats);
+      if (stats && Array.isArray(stats.explicitTutorialIds)) {
+        this.selectedCustomerForOverview.update(c => {
+          if (c) {
+            c.tutorial_ids = stats.explicitTutorialIds;
+          }
+          return c;
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load user overview stats:', e);
+    }
+  }
+
+  closeCustomerOverview() {
+    this.selectedCustomerForOverview.set(null);
+    this.customerOverviewStats.set(null);
+  }
+
+  toggleTutorialInAccessMapping(tutId: number) {
+    const customer = this.selectedCustomerForOverview();
+    if (!customer) return;
+    const current = customer.tutorial_ids || [];
+    let updated: number[];
+    if (current.includes(tutId)) {
+      updated = current.filter(id => id !== tutId);
+    } else {
+      updated = [...current, tutId];
+    }
+    this.selectedCustomerForOverview.update(c => {
+      if (c) {
+        c.tutorial_ids = updated;
+      }
+      return c;
+    });
+  }
+
+  async saveCustomerOverview() {
+    const customer = this.selectedCustomerForOverview();
+    if (!customer) return;
+
+    try {
+      let parsedAddress = customer.address;
+      if (typeof parsedAddress === 'string') {
+        try {
+          parsedAddress = JSON.parse(parsedAddress);
+        } catch {
+          parsedAddress = { street: parsedAddress };
+        }
+      }
+
+      await firstValueFrom(this.apiService.put<any>(`/users/${customer.id}`, {
+        name: customer.name,
+        email: customer.email,
+        role: customer.role,
+        phone: customer.phone,
+        address: parsedAddress,
+        tutorial_access: customer.tutorial_access,
+        tutorial_ids: customer.tutorial_ids || []
+      }));
+
+      this.toastService.show('Customer records updated successfully', 'success');
+      this.loadCustomers();
+      this.closeCustomerOverview();
+    } catch (error) {
+      console.error('Failed to update customer records:', error);
+      this.toastService.show('Failed to update customer records', 'error');
+    }
+  }
+
+  // Tutorial Category CRUD
+  editTutorialCategory(cat: TutorialCategory) {
+    this.editingTutorialCategory.set(cat);
+    this.newTutorialCategory = {
+      name: cat.name,
+      description: cat.description || '',
+      display_order: cat.display_order
+    };
+    this.showTutorialCategoryForm.set(true);
+  }
+
+  cancelTutorialCategoryEdit() {
+    this.showTutorialCategoryForm.set(false);
+    this.editingTutorialCategory.set(null);
+    this.newTutorialCategory = { name: '', description: '', display_order: 0 };
+  }
+
+  async saveTutorialCategory() {
+    try {
+      if (this.editingTutorialCategory()) {
+        await this.tutorialService.updateCategory(this.editingTutorialCategory()!.id, this.newTutorialCategory);
+        this.toastService.show('Tutorial category updated successfully', 'success');
+      } else {
+        await this.tutorialService.addCategory(this.newTutorialCategory);
+        this.toastService.show('Tutorial category created successfully', 'success');
+      }
+      this.cancelTutorialCategoryEdit();
+    } catch (e) {
+      console.error(e);
+      this.toastService.show('Failed to save tutorial category', 'error');
+    }
+  }
+
+  async deleteTutorialCategory(id: number) {
+    if (confirm('Are you sure you want to delete this tutorial category?')) {
+      try {
+        await this.tutorialService.deleteCategory(id);
+        this.toastService.show('Tutorial category deleted successfully', 'success');
+      } catch (e) {
+        console.error(e);
+        this.toastService.show('Failed to delete category', 'error');
+      }
+    }
+  }
+
+  async moveCategory(cat: TutorialCategory, direction: 'up' | 'down') {
+    const list = [...this.tutorialService.categories()];
+    const idx = list.findIndex(c => c.id === cat.id);
+    if (direction === 'up' && idx > 0) {
+      const temp = list[idx - 1];
+      list[idx - 1] = list[idx];
+      list[idx] = temp;
+    } else if (direction === 'down' && idx < list.length - 1) {
+      const temp = list[idx + 1];
+      list[idx + 1] = list[idx];
+      list[idx] = temp;
+    } else {
+      return;
+    }
+    const orders = list.map((c, i) => ({ id: c.id, display_order: i }));
+    await this.tutorialService.reorderCategories(orders);
+  }
+
+  // Tutorial CRUD
+  editTutorial(tut: Tutorial) {
+    this.editingTutorial.set(tut);
+    this.newTutorial = {
+      title: tut.title,
+      subtitle: tut.subtitle || '',
+      description: tut.description,
+      thumbnail_url: tut.thumbnail_url || '',
+      video_url: tut.video_url,
+      category_id: tut.category_id || 0,
+      duration: tut.duration,
+      difficulty: tut.difficulty || 'Beginner',
+      display_order: tut.display_order,
+      status: tut.status,
+      resources: [...(tut.resources || [])],
+      product_ids: [...(tut.product_ids || [])]
+    };
+    this.showTutorialForm.set(true);
+  }
+
+  cancelTutorialEdit() {
+    this.showTutorialForm.set(false);
+    this.editingTutorial.set(null);
+    this.newTutorial = {
+      title: '',
+      subtitle: '',
+      description: '',
+      thumbnail_url: '',
+      video_url: '',
+      category_id: 0,
+      duration: '',
+      difficulty: 'Beginner',
+      display_order: 0,
+      status: 'draft',
+      resources: [],
+      product_ids: []
+    };
+  }
+
+  async saveTutorial() {
+    try {
+      if (this.newTutorial.category_id === 0) {
+        (this.newTutorial as any).category_id = null;
+      }
+      if (this.editingTutorial()) {
+        await this.tutorialService.updateTutorial(this.editingTutorial()!.id, this.newTutorial);
+        this.toastService.show('Tutorial updated successfully', 'success');
+      } else {
+        await this.tutorialService.addTutorial(this.newTutorial);
+        this.toastService.show('Tutorial created successfully', 'success');
+      }
+      await this.tutorialService.loadAdminTutorials();
+      this.cancelTutorialEdit();
+    } catch (e) {
+      console.error(e);
+      this.toastService.show('Failed to save tutorial', 'error');
+    }
+  }
+
+  async deleteTutorial(id: number) {
+    if (confirm('Are you sure you want to delete this tutorial?')) {
+      try {
+        await this.tutorialService.deleteTutorial(id);
+        this.toastService.show('Tutorial deleted successfully', 'success');
+        await this.tutorialService.loadAdminTutorials();
+      } catch (e) {
+        console.error(e);
+        this.toastService.show('Failed to delete tutorial', 'error');
+      }
+    }
+  }
+
+  async moveTutorial(tut: Tutorial, direction: 'up' | 'down') {
+    const list = [...this.tutorialService.tutorials()];
+    const idx = list.findIndex(t => t.id === tut.id);
+    if (direction === 'up' && idx > 0) {
+      const temp = list[idx - 1];
+      list[idx - 1] = list[idx];
+      list[idx] = temp;
+    } else if (direction === 'down' && idx < list.length - 1) {
+      const temp = list[idx + 1];
+      list[idx + 1] = list[idx];
+      list[idx] = temp;
+    } else {
+      return;
+    }
+    const orders = list.map((t, i) => ({ id: t.id, display_order: i }));
+    await this.tutorialService.reorderTutorials(orders);
+    await this.tutorialService.loadAdminTutorials();
+  }
+
+  toggleProductInMapping(prodId: number) {
+    const current = this.newTutorial.product_ids;
+    if (current.includes(prodId)) {
+      this.newTutorial.product_ids = current.filter(id => id !== prodId);
+    } else {
+      this.newTutorial.product_ids = [...current, prodId];
+    }
+  }
+
+  async onTutorialVideoSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.isUploadingVideo.set(true);
+      try {
+        let slug = 'general';
+        const category = this.tutorialService.categories().find(c => c.id === this.newTutorial.category_id);
+        if (category) {
+          slug = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        }
+        
+        const res = await this.tutorialService.uploadTutorialFile(file, 'video', slug);
+        this.newTutorial.video_url = res.url;
+        this.toastService.show('Video file uploaded successfully', 'success');
+      } catch (error) {
+        console.error('Video upload failed', error);
+        this.toastService.show('Video upload failed', 'error');
+      } finally {
+        this.isUploadingVideo.set(false);
+      }
+    }
+  }
+
+  async onTutorialThumbnailSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.isUploadingThumbnail.set(true);
+      try {
+        const res = await this.tutorialService.uploadTutorialFile(file, 'thumbnail');
+        this.newTutorial.thumbnail_url = res.url;
+        this.toastService.show('Thumbnail file uploaded successfully', 'success');
+      } catch (error) {
+        console.error('Thumbnail upload failed', error);
+        this.toastService.show('Thumbnail upload failed', 'error');
+      } finally {
+        this.isUploadingThumbnail.set(false);
+      }
+    }
+  }
+
+  isUploadingResource = signal(false);
+
+  async onTutorialResourceSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.isUploadingResource.set(true);
+      try {
+        const res = await this.tutorialService.uploadTutorialFile(file, 'resource');
+        this.newTutorial.resources.push({
+          name: file.name,
+          url: res.url
+        });
+        this.toastService.show('Resource attachment uploaded successfully', 'success');
+      } catch (error) {
+        console.error('Resource upload failed', error);
+        this.toastService.show('Resource upload failed', 'error');
+      } finally {
+        this.isUploadingResource.set(false);
+      }
+    }
+  }
+
+  removeTutorialResource(index: number) {
+    this.newTutorial.resources.splice(index, 1);
   }
 
   toggleSidebar() {

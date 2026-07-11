@@ -33,6 +33,7 @@ export interface UserProfile {
     zip?: string;
     country?: string;
   };
+  tutorial_access?: boolean;
   created_at: string;
   updated_at: string;
 }

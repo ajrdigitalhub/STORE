@@ -229,7 +229,7 @@ async function sendOrderConfirmation(order) {
           sub_type: "url",
           index: "0",
           parameters: [
-            { type: "text", text: String(`account/orders/${order.id}`) } // Just the ID for the dynamic URL
+            { type: "text", text: String(`/track?orderNumber=${order.orderNumber || ''}&phone=${recipientNumber || ''}`) }
           ]
         }
       ];
@@ -260,10 +260,10 @@ async function sendOrderConfirmation(order) {
       const state = address.state || 'State N/A';
       const zip = address.postalCode || address.zip || 'ZIP N/A';
 
-      const fullAddress = `${fullName}, ${addrLine1}, ${city}, ${state}, ${zip}`;
+      const fullAddress = `${fullName}, ${addrLine1}, ${city}, ${state}, ${zip} `;
       const itemsSummary = order.items.map(item => {
         const name = item.name || (item.product && item.product.name) || 'Product';
-        return `${item.quantity} x ${name}`;
+        return `${item.quantity} x ${name} `;
       }).join(', ') || 'Quantity x Product';
 
       const paymentMethodMap = {
@@ -283,7 +283,7 @@ async function sendOrderConfirmation(order) {
             { type: "text", text: String(customerName || 'Customer') },
             { type: "text", text: String(recipientNumber || 'N/A') },
             { type: "text", text: String(order.orderNumber || 'N/A') },
-            { type: "text", text: String(`${currency || '₹'}${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}`) },
+            { type: "text", text: String(`${currency || '₹'}${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'} `) },
             { type: "text", text: String(`${paymentMethod} (${paymentStatus})`) },
             { type: "text", text: String(new Date(order.orderDate || Date.now()).toLocaleDateString('en-IN')) },
             { type: "text", text: String(fullAddress || 'N/A') },
@@ -339,7 +339,7 @@ async function sendOrderStatusUpdate(order, status) {
     const { whatsappSettings, currency, siteName } = settings;
     recipientNumber = order.shipping_address.phone;
     if (!recipientNumber) {
-      console.log(order,'sg',status)
+      console.log(order, 'sg', status)
       console.log(`⚠️ No WhatsApp number for order ${order.orderNumber}`);
       return;
     }
@@ -352,13 +352,13 @@ async function sendOrderStatusUpdate(order, status) {
         orderDetails = "Your order is currently being processed by our team. We are getting everything ready for you! ⏳";
         break;
       case "Shipped":
-        orderDetails = `Great news! Your order has been shipped. 🚚\nTracking ID: ${order.trackingId || 'N/A'}\nEstimated Delivery: ${order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('en-IN') : 'N/A'}`;
+        orderDetails = `Great news! Your order has been shipped. 🚚\nTracking ID: ${order.trackingId || 'N/A'} \nEstimated Delivery: ${order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('en-IN') : 'N/A'} `;
         break;
       case "Delivered":
         orderDetails = "Yay! Your order has been delivered successfully. We hope you love it! 🎉";
         break;
       case "Cancelled":
-        orderDetails = `Your order has been cancelled. ❌\nReason: ${order.cancellationReason || 'Not provided'}`;
+        orderDetails = `Your order has been cancelled. ❌\nReason: ${order.cancellationReason || 'Not provided'} `;
         break;
       default:
         orderDetails = `Your order status is now: ${status}.`;
@@ -379,7 +379,7 @@ async function sendOrderStatusUpdate(order, status) {
           { type: "text", text: siteName || 'IDEAZONE 3D' }, // 2
           { type: "text", text: order.orderNumber }, // 3
           { type: "text", text: status }, // 4
-          { type: "text", text: `${currency || '₹'}${order.totalAmount.toFixed(2)}` }, // 5
+          { type: "text", text: `${currency || '₹'}${order.totalAmount.toFixed(2)} ` }, // 5
           { type: "text", text: paymentMethod }, // 6
           { type: "text", text: orderDetails }, // 7
           { type: "text", text: order.customerName }, // 8
@@ -392,7 +392,7 @@ async function sendOrderStatusUpdate(order, status) {
         sub_type: "url",
         index: "0",
         parameters: [
-          { type: "text", text: `account/orders/${order.id}` }
+          { type: "text", text: `track?orderNumber=${order.orderNumber || ''}& phone=${recipientNumber || ''} ` }
         ]
       }
     ];
@@ -400,24 +400,24 @@ async function sendOrderStatusUpdate(order, status) {
     const result = await sendWhatsappMessage(recipientNumber, templateName, components);
     await logWhatsappMessage({
       recipientNumber,
-      messageContent: `Template: ${templateName}`,
+      messageContent: `Template: ${templateName} `,
       status: result.success ? 'success' : 'failed',
       reason: result.success ? JSON.stringify(result.data) : (result.error || result.reason),
       orderId: order.id,
       userId: order.userId,
-      messageType: `status_update_${status.toLowerCase()}`
+      messageType: `status_update_${status.toLowerCase()} `
     });
 
   } catch (error) {
     console.error("❌ Order status update error:", error);
     await logWhatsappMessage({
       recipientNumber,
-      messageContent: `Template: status_update_${status.toLowerCase()}`,
+      messageContent: `Template: status_update_${status.toLowerCase()} `,
       status: 'failed',
       reason: error.message,
       orderId: order.id,
       userId: order.userId,
-      messageType: `status_update_${status.toLowerCase()}`
+      messageType: `status_update_${status.toLowerCase()} `
     });
   }
 }

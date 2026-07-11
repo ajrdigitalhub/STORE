@@ -6,10 +6,20 @@
     </a>
 
     <nav class="hidden md:flex items-center gap-2">
-      <a routerLink="/" routerLinkActive="bg-accent/10 text-accent" [routerLinkActiveOptions]="{exact: true}" class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Home</a>
-      <a routerLink="/products" routerLinkActive="bg-accent/10 text-accent" class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Products</a>
-      <a routerLink="/about" routerLinkActive="bg-accent/10 text-accent" class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">About</a>
-      <a routerLink="/contact" routerLinkActive="bg-accent/10 text-accent" class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Contact</a>
+      <a routerLink="/" routerLinkActive="bg-accent/10 text-accent" [routerLinkActiveOptions]="{exact: true}"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Home</a>
+      <a routerLink="/products" routerLinkActive="bg-accent/10 text-accent"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Products</a>
+      <a routerLink="/about" routerLinkActive="bg-accent/10 text-accent"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">About</a>
+      <a routerLink="/contact" routerLinkActive="bg-accent/10 text-accent"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Contact</a>
+      <a routerLink="/track" routerLinkActive="bg-accent/10 text-accent"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Track Order</a>
+      <!-- @if (hasTutorialsAccess()) { -->
+      <a routerLink="/tutorials" routerLinkActive="bg-accent/10 text-accent"
+        class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Tutorials</a>
+      <!-- } -->
       <!-- @if (authService.isAdmin()) {
         <a routerLink="/admin" routerLinkActive="bg-accent/10 text-accent" class="px-4 py-2 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Admin</a>
       } -->
@@ -22,42 +32,63 @@
       <a routerLink="/cart" class="relative p-2 text-accent-muted hover:text-white transition-colors">
         <span class="material-icons">shopping_cart</span>
         @if (cartService.totalItems() > 0) {
-          <span class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-metallic-black text-[10px] font-bold rounded-full flex items-center justify-center">
-            {{ cartService.totalItems() }}
-          </span>
+        <span
+          class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-metallic-black text-[10px] font-bold rounded-full flex items-center justify-center">
+          {{ cartService.totalItems() }}
+        </span>
         }
       </a>
 
       @if (authService.profile()) {
-        <div class="hidden md:flex items-center gap-4">
-          @if (authService.isAdmin()) {
-            <a routerLink="/admin" class="text-xs font-bold uppercase tracking-widest text-accent hover:text-white transition-colors">Admin</a>
-          }
-          <a routerLink="/profile" class="text-xs font-bold uppercase tracking-widest text-accent-muted hover:text-white transition-colors">My Account</a>
-          <button (click)="logout()" class="bg-metallic-light/50 border border-white/10 px-4 py-2 rounded-lg text-xs font-bold hover:bg-white/10 transition-all">
-            Logout
-          </button>
-        </div>
+      <div class="hidden md:flex items-center gap-4">
+        @if (authService.isAdmin()) {
+        <a routerLink="/admin"
+          class="text-xs font-bold uppercase tracking-widest text-accent hover:text-white transition-colors">Admin</a>
+        }
+        <a routerLink="/profile"
+          class="text-xs font-bold uppercase tracking-widest text-accent-muted hover:text-white transition-colors">My
+          Account</a>
+        <button (click)="logout()"
+          class="bg-metallic-light/50 border border-white/10 px-4 py-2 rounded-lg text-xs font-bold hover:bg-white/10 transition-all">
+          Logout
+        </button>
+      </div>
       } @else {
-        <a routerLink="/login" class="hidden md:block metallic-button py-2 px-6 text-xs uppercase tracking-widest">Login</a>
+      <a routerLink="/login"
+        class="hidden md:block metallic-button py-2 px-6 text-xs uppercase tracking-widest">Login</a>
       }
     </div>
   </div>
   @if (isMenuOpen()) {
-    <div class="md:hidden mt-4 p-4 bg-metallic-black/90 border border-white/10 rounded-xl flex flex-col gap-2">
-      <a routerLink="/" routerLinkActive="bg-accent/10 text-accent" [routerLinkActiveOptions]="{exact: true}" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Home</a>
-      <a routerLink="/products" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Products</a>
-      <a routerLink="/about" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">About</a>
-      <a routerLink="/contact" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Contact</a>
-      @if (authService.isAdmin()) {
-        <a routerLink="/admin" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent hover:text-white transition-all">Admin Panel</a>
-      }
-      @if (authService.profile()) {
-        <a routerLink="/profile" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">My Account</a>
-        <button (click)="logout(); toggleMenu()" class="px-4 py-3 text-left text-sm font-bold text-red-500 hover:text-white transition-all">Logout</button>
-      } @else {
-        <a routerLink="/login" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()" class="px-4 py-3 rounded-xl text-sm font-bold text-accent hover:text-white transition-all">Login</a>
-      }
-    </div>
+  <div class="md:hidden mt-4 p-4 bg-metallic-black/90 border border-white/10 rounded-xl flex flex-col gap-2">
+    <a routerLink="/" routerLinkActive="bg-accent/10 text-accent" [routerLinkActiveOptions]="{exact: true}"
+      (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Home</a>
+    <a routerLink="/products" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Products</a>
+    <a routerLink="/about" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">About</a>
+    <a routerLink="/contact" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Contact</a>
+    <a routerLink="/track" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Track Order</a>
+    @if (hasTutorialsAccess()) {
+    <a routerLink="/tutorials" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">Tutorials</a>
+    }
+    @if (authService.isAdmin()) {
+    <a routerLink="/admin" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent hover:text-white transition-all">Admin Panel</a>
+    }
+    @if (authService.profile()) {
+    <a routerLink="/profile" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent-muted hover:text-white transition-all">My Account</a>
+    <button (click)="logout(); toggleMenu()"
+      class="px-4 py-3 text-left text-sm font-bold text-red-500 hover:text-white transition-all">Logout</button>
+    } @else {
+    <a routerLink="/login" routerLinkActive="bg-accent/10 text-accent" (click)="toggleMenu()"
+      class="px-4 py-3 rounded-xl text-sm font-bold text-accent hover:text-white transition-all">Login</a>
+    }
+  </div>
   }
 </header>

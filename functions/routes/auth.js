@@ -27,6 +27,10 @@ router.post('/register', [
 
     const user = await User.create({ name, email, password, phone, address });
 
+    // Link guest orders
+    const Order = require('../models/Order');
+    await Order.linkGuestOrders(user.id, email, phone).catch(err => console.error('Error linking guest orders:', err));
+
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET || 'your_jwt_secret',
@@ -85,6 +89,10 @@ router.post('/login', [
       { expiresIn: '7d' }
     );
 
+    // Link guest orders
+    const Order = require('../models/Order');
+    await Order.linkGuestOrders(user.id, email, user.phone).catch(err => console.error('Error linking guest orders:', err));
+
     res.json({
       message: 'Login successful',
       token,
@@ -125,6 +133,10 @@ router.post('/google-sync', async (req, res, next) => {
       process.env.JWT_SECRET || 'your_jwt_secret',
       { expiresIn: '7d' }
     );
+
+    // Link guest orders
+    const Order = require('../models/Order');
+    await Order.linkGuestOrders(user.id, email, user.phone).catch(err => console.error('Error linking guest orders:', err));
 
     res.json({
       token,

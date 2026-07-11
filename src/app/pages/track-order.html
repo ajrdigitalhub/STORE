@@ -1,0 +1,210 @@
+<div class="min-h-screen bg-metallic-black pb-24 text-white">
+  <div class="max-w-4xl mx-auto px-4 pt-12">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest text-accent-muted mb-8">
+      <a routerLink="/" class="hover:text-accent transition-colors">Home</a>
+      <span class="material-icons text-[10px]">chevron_right</span>
+      <span class="text-accent">Track Order</span>
+    </nav>
+
+    <!-- Lookup Form -->
+    <div class="glass-card p-6 sm:p-10 mb-8 border border-white/5 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -z-10"></div>
+      
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
+          <span class="material-icons text-2xl">track_changes</span>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight">Track Your Order</h2>
+          <p class="text-xs text-accent-muted uppercase tracking-wider">No login required. Just enter details below:</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="track()" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <div class="space-y-2">
+          <label for="orderNum" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Order Number</label>
+          <input
+            id="orderNum"
+            type="text"
+            [(ngModel)]="orderNumber"
+            name="orderNumber"
+            placeholder="Ex: ORD-123456"
+            class="input-field py-3.5 font-mono"
+            required
+          />
+        </div>
+        <div class="space-y-2">
+          <label for="phoneNum" class="text-xs font-bold uppercase tracking-widest text-accent-muted">Mobile Number</label>
+          <div class="relative">
+            <input
+              id="phoneNum"
+              type="text"
+              [(ngModel)]="phone"
+              name="phone"
+              placeholder="Ex: +91 9876543210"
+              class="input-field py-3.5 pl-10"
+              required
+            />
+            <span class="material-icons absolute left-3.5 top-1/2 -translate-y-1/2 text-accent-muted text-sm">phone</span>
+          </div>
+        </div>
+        <div class="md:col-span-2 flex justify-end mt-4">
+          <button
+            type="submit"
+            [disabled]="isLoading()"
+            class="metallic-button px-10 py-4 flex items-center gap-2 text-xs uppercase tracking-widest"
+          >
+            @if (isLoading()) {
+              <span class="material-icons animate-spin text-sm">refresh</span>
+              Searching...
+            } @else {
+              Track Order
+              <span class="material-icons text-sm">arrow_forward</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Block -->
+    @if (order(); as o) {
+      <div id="printable-invoice" class="space-y-8 animate-in fade-in duration-300">
+        
+        <!-- Status Card -->
+        <div class="glass-card p-6 sm:p-8 border border-white/5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <span class="text-[9px] uppercase tracking-widest text-accent-muted block mb-1">Order Details</span>
+              <h3 class="text-3xl font-bold tracking-tighter text-white font-serif">Order {{ o.order_number }}</h3>
+              <p class="text-xs text-accent-muted">Placed on {{ o.created_at | date:'mediumDate':'' }}</p>
+            </div>
+            
+            <div class="flex gap-2">
+              <span [class]="'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border ' + getStatusColor(o.order_status)">
+                {{ o.order_status }}
+              </span>
+              <span class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-accent-muted">
+                {{ o.payment_status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tracking info (Courier details) -->
+        @if (o.courier_name || o.tracking_number) {
+          <div class="glass-card p-6 sm:p-8 border border-accent/20 bg-accent/5">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="material-icons text-accent">local_shipping</span>
+              <h4 class="text-lg font-bold text-white tracking-wide">Delivery & Courier Tracking</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              @if (o.courier_name) {
+                <div>
+                  <p class="text-[10px] text-accent-muted uppercase tracking-widest mb-1">Courier Partner</p>
+                  <p class="font-bold text-lg text-white font-serif">{{ o.courier_name }}</p>
+                </div>
+              }
+              @if (o.tracking_number) {
+                <div>
+                  <p class="text-[10px] text-accent-muted uppercase tracking-widest mb-1">Tracking Number</p>
+                  <p class="font-mono font-bold text-lg text-accent select-all">{{ o.tracking_number }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Items Ordered -->
+        <div class="glass-card overflow-hidden">
+          <div class="p-6 border-b border-white/5 flex justify-between items-center">
+            <h4 class="text-lg font-bold">Items In This Order</h4>
+            @if (o.payment_status === 'paid') {
+              <button
+                (click)="printInvoice()"
+                class="bg-white/5 border border-white/10 hover:bg-white/10 text-accent hover:text-white transition-all px-4 py-2 rounded-xl text-xs flex items-center gap-2"
+              >
+                <span class="material-icons text-sm">print</span>
+                Print Invoice
+              </button>
+            }
+          </div>
+          <div class="divide-y divide-white/5">
+            @for (item of o.items; track item.product) {
+              <div class="p-6 flex items-center gap-6 flex-col sm:flex-row">
+                <img
+                  [src]="item.image"
+                  [alt]="item.name"
+                  class="w-20 h-20 rounded-xl object-cover border border-white/10"
+                  referrerpolicy="no-referrer"
+                />
+                <div class="flex-grow w-full text-center sm:text-left">
+                  <h5 class="font-bold text-lg mb-1">{{ item.name }}</h5>
+                  <p class="text-xs text-accent-muted uppercase tracking-wider">Quantity: {{ item.quantity }}</p>
+                  
+                  @if (item.customization) {
+                    <div class="mt-2 p-3 bg-accent/5 border border-accent/10 rounded-lg space-y-2 text-left">
+                      <div class="flex items-center gap-2 text-accent">
+                        <span class="material-icons text-xs">auto_awesome</span>
+                        <span class="text-[9px] uppercase font-bold tracking-widest">Customization Details</span>
+                      </div>
+                      @if (item.customization.text) {
+                        <div>
+                          <p class="text-[8px] text-accent-muted uppercase tracking-widest">Custom Text</p>
+                          <p class="text-xs font-mono text-white">{{ item.customization.text }}</p>
+                        </div>
+                      }
+                      @if (item.customization.image) {
+                        <div>
+                          <p class="text-[8px] text-accent-muted uppercase tracking-widest">Custom Design</p>
+                          <a [href]="item.customization.image" target="_blank" class="block relative w-12 h-12 border border-white/10 mt-1">
+                            <img [src]="item.customization.image" alt="Custom Design" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+                          </a>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                <div class="text-center sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-0 border-white/5">
+                  <p class="font-bold text-lg">{{ item.price | currency:'INR' }}</p>
+                  <p class="text-xs text-accent-muted">Total: {{ (item.price * item.quantity) | currency:'INR' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+          
+          <!-- Totals block -->
+          <div class="bg-white/[0.02] p-6 border-t border-white/5">
+            <div class="max-w-xs ml-auto space-y-3">
+              <div class="flex justify-between text-accent-muted text-sm">
+                <span>Subtotal</span>
+                <span>{{ (o.total_amount - (o.gst_amount || 0) - (o.shipping_charge || 0)) | currency:'INR' }}</span>
+              </div>
+              <div class="flex justify-between text-accent-muted text-sm">
+                <span>Shipping</span>
+                @if (o.shipping_charge && o.shipping_charge > 0) {
+                  <span>{{ o.shipping_charge | currency:'INR' }}</span>
+                } @else {
+                  <span class="text-green-500 font-bold">FREE</span>
+                }
+              </div>
+              <div class="flex justify-between text-xl font-bold pt-3 border-t border-white/10">
+                <span>Total Amount</span>
+                <span class="text-accent">{{ o.total_amount | currency:'INR' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    } @else if (hasSearched() && !isLoading()) {
+      <div class="glass-card p-16 text-center animate-in fade-in duration-200 border border-white/5">
+        <span class="material-icons text-5xl text-accent-muted mb-4">search_off</span>
+        <h4 class="text-xl font-bold mb-2">No Matching Orders Found</h4>
+        <p class="text-sm text-accent-muted max-w-sm mx-auto leading-relaxed">
+          We couldn't locate any records matching that order and phone combination. Please review your tracking details.
+        </p>
+      </div>
+    }
+  </div>
+</div>

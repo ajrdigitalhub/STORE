@@ -29,12 +29,12 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
     @if (productService.isLoading()) {
       @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
         <div class="glass-card rounded-3xl overflow-hidden border border-white/5">
           <app-skeleton height="250px" className="rounded-none"></app-skeleton>
-          <div class="p-6 space-y-4">
+          <div class="p-4 sm:p-6 space-y-4">
             <app-skeleton width="70%" height="1.25rem"></app-skeleton>
             <app-skeleton width="50%" height="0.875rem"></app-skeleton>
             <div class="flex justify-between items-center pt-4">

@@ -62,34 +62,22 @@
             <span>{{ cartService.totalPrice() * 1 | currency:'INR' }}</span>
           </div>
         </div>
-        @if (authService.profile() || authService.user()) {
         <a routerLink="/checkout" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
           Proceed to Checkout
           <span class="material-icons">arrow_forward</span>
         </a>
-        } @else {
-        <div class="space-y-4">
-          <p class="text-xs text-yellow-500 text-center font-mono uppercase tracking-tighter">
-            Authentication required to proceed
-          </p>
-          <a routerLink="/login" class="metallic-button w-full py-4 flex items-center justify-center gap-3">
-            Login to Checkout
-            <span class="material-icons">login</span>
-          </a>
-        </div>
-        }
         <p class="text-[10px] text-accent-muted text-center mt-6 uppercase tracking-widest">
           Secure payment powered by Razorpay
         </p>
       </div>
 
-      <div class="glass-card p-6 flex items-center gap-4">
+      <!-- <div class="glass-card p-6 flex items-center gap-4">
         <span class="material-icons text-accent">local_offer</span>
         <div class="flex-grow">
           <h4 class="text-sm font-bold">Have a promo code?</h4>
           <p class="text-xs text-accent-muted">Apply it at the next step</p>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
   } @else {

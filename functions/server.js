@@ -28,6 +28,14 @@ async function initDB() {
           ALTER TABLE products ADD COLUMN customization_type VARCHAR(50) DEFAULT 'none';
         END IF;
 
+        -- Add tutorial columns
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='tutorial_access') THEN
+          ALTER TABLE users ADD COLUMN tutorial_access BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='enable_tutorials_after_purchase') THEN
+          ALTER TABLE products ADD COLUMN enable_tutorials_after_purchase BOOLEAN DEFAULT FALSE;
+        END IF;
+
         -- Orders table columns for Razorpay
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='razorpay_orderid') THEN
           ALTER TABLE orders ADD COLUMN razorpay_orderid VARCHAR(255);
@@ -37,6 +45,36 @@ async function initDB() {
         END IF;
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='razorpay_signature') THEN
           ALTER TABLE orders ADD COLUMN razorpay_signature VARCHAR(500);
+        END IF;
+
+        -- Guest Checkout Columns
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='is_guest') THEN
+          ALTER TABLE orders ADD COLUMN is_guest BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='guest_name') THEN
+          ALTER TABLE orders ADD COLUMN guest_name VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='guest_phone') THEN
+          ALTER TABLE orders ADD COLUMN guest_phone VARCHAR(20);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='guest_email') THEN
+          ALTER TABLE orders ADD COLUMN guest_email VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='firebase_uid') THEN
+          ALTER TABLE orders ADD COLUMN firebase_uid VARCHAR(255);
+        END IF;
+
+        -- Courier Tracking Columns
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='courier_name') THEN
+          ALTER TABLE orders ADD COLUMN courier_name VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='tracking_number') THEN
+          ALTER TABLE orders ADD COLUMN tracking_number VARCHAR(100);
+        END IF;
+
+        -- Tutorials resources column
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tutorials' AND column_name='resources') THEN
+          ALTER TABLE tutorials ADD COLUMN resources JSONB DEFAULT '[]'::jsonb;
         END IF;
 
         -- WhatsApp logs table
@@ -52,6 +90,15 @@ async function initDB() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       END $$;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS conversion_events (
+          id SERIAL PRIMARY KEY,
+          event_type VARCHAR(50) NOT NULL,
+          amount DECIMAL(10,2) DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     await pool.query(`
@@ -80,7 +127,84 @@ async function initDB() {
       );
     `);
 
-    console.log('Database initialized: config table, product customization fields, and whatsapp_logs table checked');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tutorial_categories (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) UNIQUE NOT NULL,
+          description TEXT,
+          display_order INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS tutorials (
+          id SERIAL PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          subtitle VARCHAR(255),
+          description TEXT,
+          thumbnail_url TEXT,
+          video_url TEXT,
+          category_id INTEGER REFERENCES tutorial_categories(id) ON DELETE SET NULL,
+          duration VARCHAR(50),
+          difficulty VARCHAR(50),
+          display_order INTEGER DEFAULT 0,
+          status VARCHAR(50) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+          resources JSONB DEFAULT '[]'::jsonb,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS tutorial_product_mappings (
+          tutorial_id INTEGER REFERENCES tutorials(id) ON DELETE CASCADE,
+          product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+          PRIMARY KEY (tutorial_id, product_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS user_tutorial_access (
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          tutorial_id INTEGER REFERENCES tutorials(id) ON DELETE CASCADE,
+          PRIMARY KEY (user_id, tutorial_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS user_tutorial_progress (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          tutorial_id INTEGER REFERENCES tutorials(id) ON DELETE CASCADE,
+          last_watched_position DECIMAL(10,2) DEFAULT 0,
+          percentage_watched INTEGER DEFAULT 0,
+          completed BOOLEAN DEFAULT FALSE,
+          first_viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          total_watch_time INTEGER DEFAULT 0,
+          sessions_count INTEGER DEFAULT 1,
+          UNIQUE(user_id, tutorial_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS watch_history (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          tutorial_id INTEGER REFERENCES tutorials(id) ON DELETE CASCADE,
+          watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          duration INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS tutorial_analytics_events (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+          tutorial_id INTEGER REFERENCES tutorials(id) ON DELETE CASCADE,
+          event_type VARCHAR(50) NOT NULL,
+          event_data JSONB DEFAULT '{}'::jsonb,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Alter existing table columns to TEXT to avoid length constraint errors
+    await pool.query(`
+      ALTER TABLE tutorials ALTER COLUMN thumbnail_url TYPE TEXT;
+      ALTER TABLE tutorials ALTER COLUMN video_url TYPE TEXT;
+    `).catch(err => console.error('Failed to alter tutorials columns (can be ignored if database already upgraded):', err.message));
+
+    console.log('Database initialized: config table, product customization fields, and tutorials tables checked');
   } catch (error) {
     console.error('Error initializing database:', error);
   }
@@ -100,6 +224,8 @@ const appConfigRoutes = require('./routes/app-config');
 const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/upload');
 const chatRoutes = require('./routes/chats');
+const tutorialRoutes = require('./routes/tutorials');
+const analyticsRoutes = require('./routes/analytics');
 const Chat = require('./models/Chat');
 
 const app = express();
@@ -157,6 +283,8 @@ app.get('/api/runtime-config', (req, res) => {
 });
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/tutorials', tutorialRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/upload', express.raw({ type: 'multipart/form-data', limit: '10mb' }), (req, res, next) => {
   req.rawBody = req.body;
   next();
@@ -242,7 +370,7 @@ app.use(express.static(browserDistPath));
 app.get(/^(?!\/api).*/, (req, res) => {
   const indexPath = path.join(browserDistPath, 'index.html');
   const csrIndexPath = path.join(browserDistPath, 'index.csr.html');
-  
+
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else if (require('fs').existsSync(csrIndexPath)) {
@@ -252,10 +380,10 @@ app.get(/^(?!\/api).*/, (req, res) => {
   }
 });
 
-// if (require.main === module) {
-//   server.listen(port, () => {
-//     console.log(`Server running on port ${port}`);
-//   });
-// }
+if (require.main === module) {
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
 
 module.exports = { app, io };

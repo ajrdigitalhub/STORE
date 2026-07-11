@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 export class RegisterComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
   
   isLoading = signal(false);
   showPassword = signal(false);
@@ -63,6 +64,7 @@ export class RegisterComponent {
 
   closeWelcomePopup() {
     this.showWelcomePopup.set(false);
-    this.router.navigate(['/']);
+    const redirect = this.route.snapshot.queryParams['redirect'] || '/';
+    this.router.navigateByUrl(redirect);
   }
 }

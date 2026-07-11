@@ -64,8 +64,23 @@ CREATE TABLE orders (
     order_number VARCHAR(20) UNIQUE NOT NULL,
     gst_amount DECIMAL(10,2) DEFAULT 0,
     shipping_charge DECIMAL(10,2) DEFAULT 0,
+    is_guest BOOLEAN DEFAULT FALSE,
+    guest_name VARCHAR(255),
+    guest_phone VARCHAR(20),
+    guest_email VARCHAR(255),
+    firebase_uid VARCHAR(255),
+    courier_name VARCHAR(255),
+    tracking_number VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Conversion events table
+CREATE TABLE conversion_events (
+    id SERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    amount DECIMAL(10,2) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Chats table

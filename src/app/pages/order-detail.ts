@@ -31,6 +31,8 @@ export class OrderDetailComponent {
 
   selectedOrderStatus: Order['order_status'] = 'pending';
   selectedPaymentStatus: Order['payment_status'] = 'pending';
+  courierName = '';
+  trackingNumber = '';
 
   constructor() {
     this.loadOrder();
@@ -45,6 +47,8 @@ export class OrderDetailComponent {
           this.order.set(order);
           this.selectedOrderStatus = order.order_status;
           this.selectedPaymentStatus = order.payment_status;
+          this.courierName = order.courier_name || '';
+          this.trackingNumber = order.tracking_number || '';
         } catch (error) {
           console.error('Failed to load order', error);
         } finally {
@@ -60,11 +64,13 @@ export class OrderDetailComponent {
 
     this.isUpdating.set(true);
     try {
-      await this.orderService.updateOrderStatus(order.id, this.selectedOrderStatus, this.selectedPaymentStatus);
+      await this.orderService.updateOrderStatus(order.id, this.selectedOrderStatus, this.selectedPaymentStatus, this.courierName, this.trackingNumber);
       this.toastService.show('Order status updated successfully', 'success');
       // Refresh local data
       const updatedOrder = await this.orderService.getOrder(order.id);
       this.order.set(updatedOrder);
+      this.courierName = updatedOrder.courier_name || '';
+      this.trackingNumber = updatedOrder.tracking_number || '';
     } catch (error) {
       console.error('Failed to update status', error);
       this.toastService.show('Failed to update order status', 'error');

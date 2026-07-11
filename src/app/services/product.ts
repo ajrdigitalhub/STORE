@@ -26,6 +26,7 @@ export interface Product {
   customizable: boolean;
   customization_type: 'none' | 'text' | 'image_file';
   active: boolean;
+  enable_tutorials_after_purchase?: boolean;
   created_at: string;
   specification?: Record<string, string>;
   tags?: string[];

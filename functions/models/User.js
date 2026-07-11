@@ -10,6 +10,7 @@ class User {
     this.role = data.role || 'customer';
     this.phone = data.phone;
     this.address = data.address;
+    this.tutorial_access = data.tutorial_access || false;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
   }
@@ -35,15 +36,15 @@ class User {
 
   // Create new user
   static async create(userData) {
-    const { name, email, password, role = 'customer', phone, address } = userData;
+    const { name, email, password, role = 'customer', phone, address, tutorial_access = false } = userData;
     const hashedPassword = await this.hashPassword(password);
 
     const query = `
-      INSERT INTO users (name, email, password, role, phone, address)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO users (name, email, password, role, phone, address, tutorial_access)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `;
-    const values = [name, email, hashedPassword, role, phone, JSON.stringify(address)];
+    const values = [name, email, hashedPassword, role, phone, JSON.stringify(address), tutorial_access];
 
     try {
       const result = await pool.query(query, values);
@@ -74,26 +75,63 @@ class User {
   }
 
   // Find all users with pagination and search
-  static async findAll({ page = 1, limit = 10, search = '' } = {}) {
+  static async findAll({ page = 1, limit = 10, search = '', tutorialIds } = {}) {
     const offset = (page - 1) * limit;
-    let query = 'SELECT * FROM users WHERE 1=1';
-    let countQuery = 'SELECT COUNT(*) FROM users WHERE 1=1';
+    let query = `
+      SELECT DISTINCT u.* 
+      FROM users u
+      LEFT JOIN user_tutorial_access uta ON uta.user_id = u.id
+      LEFT JOIN tutorial_product_mappings tpm ON true
+      LEFT JOIN orders o ON o.user_id = u.id AND o.payment_status = 'paid'
+      WHERE 1=1
+    `;
+    let countQuery = `
+      SELECT COUNT(DISTINCT u.id) 
+      FROM users u
+      LEFT JOIN user_tutorial_access uta ON uta.user_id = u.id
+      LEFT JOIN tutorial_product_mappings tpm ON true
+      LEFT JOIN orders o ON o.user_id = u.id AND o.payment_status = 'paid'
+      WHERE 1=1
+    `;
     const values = [];
     let paramIndex = 1;
 
     if (search) {
-      query += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`;
-      countQuery += ` AND (name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`;
+      query += ` AND (u.name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`;
+      countQuery += ` AND (u.name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`;
       values.push(`%${search}%`);
       paramIndex++;
     }
 
-    query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    if (Array.isArray(tutorialIds) && tutorialIds.length > 0) {
+      query += ` AND (
+        u.role = 'admin' 
+        OR u.tutorial_access = true 
+        OR uta.tutorial_id = ANY($${paramIndex}::int[])
+        OR (
+          tpm.tutorial_id = ANY($${paramIndex}::int[]) 
+          AND o.items::jsonb @> JSONB_BUILD_ARRAY(JSONB_BUILD_OBJECT('product', tpm.product_id))
+        )
+      )`;
+      countQuery += ` AND (
+        u.role = 'admin' 
+        OR u.tutorial_access = true 
+        OR uta.tutorial_id = ANY($${paramIndex}::int[])
+        OR (
+          tpm.tutorial_id = ANY($${paramIndex}::int[]) 
+          AND o.items::jsonb @> JSONB_BUILD_ARRAY(JSONB_BUILD_OBJECT('product', tpm.product_id))
+        )
+      )`;
+      values.push(tutorialIds);
+      paramIndex++;
+    }
+
+    query += ` ORDER BY u.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
     values.push(limit, offset);
 
     const [usersResult, countResult] = await Promise.all([
       pool.query(query, values),
-      pool.query(countQuery, search ? [`%${search}%`] : [])
+      pool.query(countQuery, values.slice(0, paramIndex - 1))
     ]);
 
     return {
