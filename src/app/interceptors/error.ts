@@ -25,6 +25,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                             req.url.includes('/api/categories') ||
                             req.url.includes('/api/products');
 
+        const isAuthPath = req.url.includes('/api/auth/') && !req.url.includes('/api/auth/me');
+
         // Handle specific status codes if needed
         if (error.status === 401) {
           // Unauthorized
@@ -33,8 +35,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                               req.url.includes('/api/orders') || 
                               req.url.includes('/api/users/profile');
           
-          if (isUserAction && !isSystemPath) {
+          if (isUserAction && !isSystemPath && !isAuthPath) {
             errorMessage = 'Session expired. Please login again.';
+          } else if (isAuthPath) {
+            // Keep the original server-returned validation error message
           } else {
             // Silently handle unauthorized for background checks
             const handledError = new Error('Unauthorized');
@@ -65,8 +69,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       // If we got here and it's not a handled background error, show the toast
       // ADDITIONAL GUARD: Don't show generic "Unauthorized" or "Resource not found" for GET requests unless sensitive
       const isGenericError = errorMessage === 'Unauthorized' || errorMessage === 'Resource not found' || errorMessage.includes('401') || errorMessage.includes('404');
+      const isAuthPath = req.url.includes('/api/auth/') && !req.url.includes('/api/auth/me');
+
       if (req.method === 'GET' && isGenericError && !req.url.includes('/api/orders')) {
         console.warn('Suppressing generic error toast for GET request:', req.url, errorMessage);
+      } else if (isAuthPath) {
+        // Suppress toast for login/register because they are handled inline in the form
+        console.log('Suppressing toast for auth path:', req.url, errorMessage);
       } else {
         toastService.show(errorMessage, 'error');
       }

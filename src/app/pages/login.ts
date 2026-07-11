@@ -51,9 +51,16 @@ export class LoginComponent {
       await this.authService.loginWithEmail(this.email, this.password);
       const redirect = this.route.snapshot.queryParams['redirect'] || '/';
       this.router.navigateByUrl(redirect);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'Authentication failed. Please try again.';
+      let errorMessage = 'Authentication failed. Please try again.';
+      if (error && typeof error === 'object') {
+        if (error.error && typeof error.error === 'object' && 'message' in error.error) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+      }
       this.errorMessage.set(errorMessage);
     } finally {
       this.isLoading.set(false);
